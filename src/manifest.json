@@ -1,0 +1,16 @@
+{
+    "compatibleVersion": 3,
+    "bundleVersion": 1,
+    "icon": "icon.png",
+    "commands": [{
+        "name": "skout-run",
+        "identifier": "skout-run-identifier",
+        "script": "./skout-run.js"
+    }],
+    "menu": {
+        "title": "skout",
+        "items": [
+            "skout-run-identifier"
+        ]
+    }
+}
