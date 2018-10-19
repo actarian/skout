@@ -16,51 +16,67 @@ export default function () {
 
     const doc = Document.getSelectedDocument();
 
-    function ui() {
-        sketch.UI.message.apply(this, arguments);
-    }
-
-    ui('Its alive 🙌 ');
-
     function getSelectedArtboards() {
         const selection = context.selection;
-        const artboards = selection.slice().filter(x => x.class() == 'MSArtboardGroup').map(artboard => {
-            const frame = artboard.frame();
-            console.log(frame);
-            const layout = getLayout(artboard);
-            console.log(layout);
-            return Artboard.fromNative(artboard);
-        });
-        return artboards;
+        if (selection) {
+            const artboards = selection.slice().filter(x => x.class() == 'MSArtboardGroup').map(artboard => {
+                const frame = artboard.frame();
+                // console.log(frame);
+                const layout = getLayout(artboard);
+                // console.log(layout);
+                return Artboard.fromNative(artboard);
+            });
+            return artboards;
+        } else {
+            return [];
+        }
     }
 
     function getLayout(artboard) {
         const layout = artboard.layout(); // class: MSLayoutGrid     
-        console.log('w', layout.totalWidth(), 'cols', layout.numberOfColumns(), 'colWidth', layout.columnWidth(), 'gutter', layout.gutterWidth());
+        // console.log('w', layout.totalWidth(), 'cols', layout.numberOfColumns(), 'colWidth', layout.columnWidth(), 'gutter', layout.gutterWidth());
     }
 
-    function logLayers(layers, tab = '') {
-        console.log('logLayers', layers ? layers.length : null);
+    function logLayers(doc, layers, tab = '') {
+        // console.log('logLayers', layers ? layers.length : null);
         if (layers) {
-            layers.forEach(layer => {
-                console.log(layer.type, layer.name, layer.frame.toString());
+            layers.filter(layer => layer.type !== 'Shape' && layer.type !== 'ShapePath').forEach(layer => {
                 if (layer.symbolId) {
                     const symbol = doc.getSymbolMasterWithID(layer.symbolId);
-                    logLayers(symbol.layers, tab + '\t');
+                    console.log(tab, getName(symbol.name));
+                    logLayers(doc, symbol.layers, tab + '  ');
                     // console.log(symbol);
                 } else {
-                    logLayers(layer.layers, tab + '\t');
+                    if (layer.type !== 'Group') {
+                        console.log(tab, getName(layer.name), layer.type);
+                    }
+                    // console.log(layer.type, layer.name, layer.frame.toString());
+                    logLayers(doc, layer.layers, tab + '  ');
                 }
             });
         }
     }
+
+    function getName(name) {
+        return name.replace(/\//g, '-').replace(/ /g, '');
+    }
+
+    function ui() {
+        if (doc) {
+            sketch.UI.message.apply(this, arguments);
+        } else {
+            console.log.apply(this, arguments);
+        }
+    }
+
+    ui('Its alive 🙌 ');
 
     const artboards = getSelectedArtboards();
     if (artboards.length === 0) {
         ui('No artboards selected.');
     } else {
         artboards.forEach(artboard => {
-            logLayers(artboard.layers.slice());
+            logLayers(artboard.parent.parent, artboard.layers.slice());
         });
     }
 
