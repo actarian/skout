@@ -3,81 +3,80 @@
 // documentation: https://developer.sketchapp.com/reference/api/
 
 import sketch from 'sketch';
-import {
-    Artboard,
-    Document
-} from 'sketch/dom';
+import SPage from './skout/spage';
 
 // var sketch = require('sketch');
 // var Document = require('sketch/dom');
 // var Artboard = require('sketch/dom').Artboard;
 
+const DEBUG = 0;
+
 export default function () {
 
-    const doc = Document.getSelectedDocument();
+    function message(...rest) {
+        // const doc = Document.getSelectedDocument();
+        const doc = context.document;
+        if (doc) {
+            sketch.UI.message.apply(this, rest);
+            rest.unshift('message');
+        } else {
+            rest.unshift('no context');
+        }
+        console.log.apply(this, rest);
+    }
 
-    function getSelectedArtboards() {
+    function getArtboards() {
         const selection = context.selection;
         if (selection) {
-            const artboards = selection.slice().filter(x => x.class() == 'MSArtboardGroup').map(artboard => {
-                const frame = artboard.frame();
-                // console.log(frame);
-                const layout = getLayout(artboard);
-                // console.log(layout);
-                return Artboard.fromNative(artboard);
-            });
+            const artboards = selection.slice().filter(x => x.class() == 'MSArtboardGroup');
             return artboards;
         } else {
             return [];
         }
     }
 
-    function getLayout(artboard) {
-        const layout = artboard.layout(); // class: MSLayoutGrid     
-        // console.log('w', layout.totalWidth(), 'cols', layout.numberOfColumns(), 'colWidth', layout.columnWidth(), 'gutter', layout.gutterWidth());
+    function getFolderModal() {
+        //create modal for user to select file
+        /*
+        var modal = NSOpenPanel.openPanel();
+        // modal.setAllowedFileTypes(['json']);
+        modal.setCanChooseDirectories(true);
+        modal.setCanChooseFiles(false);
+        modal.setCanCreateDirectories(false);
+        modal.setTitle('Select an output folder');
+        modal.setPrompt('Output folder');
+        modal.runModal();
+        */
+        var modal = NSOpenPanel.openPanel();
+        // var modal = NSSavePanel.savePanel();
+        // modal.setAllowedFileTypes(['json']);
+        // modal.setNameFieldStringValue(documentName+'.json');
+        modal.setCanChooseDirectories(true);
+        modal.setCanChooseFiles(false);
+        modal.setCanCreateDirectories(true);
+        modal.setTitle('Select an output folder');
+        modal.setPrompt('Output folder');
+        return modal;
     }
 
-    function logLayers(doc, layers, tab = '') {
-        // console.log('logLayers', layers ? layers.length : null);
-        if (layers) {
-            layers.filter(layer => layer.type !== 'Shape' && layer.type !== 'ShapePath').forEach(layer => {
-                if (layer.symbolId) {
-                    const symbol = doc.getSymbolMasterWithID(layer.symbolId);
-                    console.log(tab, getName(symbol.name));
-                    logLayers(doc, symbol.layers, tab + '  ');
-                    // console.log(symbol);
-                } else {
-                    if (layer.type !== 'Group') {
-                        console.log(tab, getName(layer.name), layer.type);
-                    }
-                    // console.log(layer.type, layer.name, layer.frame.toString());
-                    logLayers(doc, layer.layers, tab + '  ');
-                }
-            });
-        }
-    }
-
-    function getName(name) {
-        return name.replace(/\//g, '-').replace(/ /g, '');
-    }
-
-    function ui() {
-        if (doc) {
-            sketch.UI.message.apply(this, arguments);
-        } else {
-            console.log.apply(this, arguments);
-        }
-    }
-
-    ui('Its alive 🙌 ');
-
-    const artboards = getSelectedArtboards();
+    const artboards = getArtboards();
     if (artboards.length === 0) {
-        ui('No artboards selected.');
+        message('No artboards selected 🙌 ');
     } else {
-        artboards.forEach(artboard => {
-            logLayers(artboard.parent.parent, artboard.layers.slice());
-        });
+        const pages = artboards.map(x => SPage.fromArtboard(x));
+        // console.log('pages', JSON.stringify(pages).replace(/(")(\w*)(\":)/g, ' $2: '));
+        // console.log('pages', pages);
+        // message(pages.length + ' page found 🙌 ');
+        if (DEBUG) {
+            const html = pages[0].getHtml();
+        } else {
+            const modal = getFolderModal();
+            if (modal.runModal()) {
+                var folder = modal.URL().path();
+                pages[0].exportToFolder(folder);
+                message('saved to folder 🙌 ' + folder);
+            }
+        }
     }
 
 }
