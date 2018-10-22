@@ -16,10 +16,14 @@ export default class SShape extends SNode {
             const image = fill.image();
             const gradient = SNode.cssStyle(this.styleText)['background-image']; // fill.gradient();
             if (image) {
-                // this.image = image;
-                // this.imagePath = `img/${this.className}.jpg`;
-                // backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
-                const filePath = SImage.filePath(this.className);
+                if (SNode.folder) {
+                    const fileName = this.getFileName();
+                    SImage.saveToJpg(image, SNode.folder, 'img/', fileName);
+                    backgroundCss = `url('img/${fileName}') no-repeat center`;
+                } else {
+                    backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
+                }
+                /*
                 SImage.collectedImages.push({
                     name: filePath,
                     save: (folder, filePath) => {
@@ -27,6 +31,7 @@ export default class SShape extends SNode {
                     },
                 });
                 backgroundCss = `url('${filePath}') no-repeat center`;
+                */
             } else if (gradient) {
                 backgroundCss = gradient;
             } else {
@@ -57,7 +62,7 @@ export default class SShape extends SNode {
                 display: 'inline-block',
                 top: this.frame.top + 'px',
                 left: this.frame.left + 'px',
-                width: this.frame.width + 'px',
+                width: (this.frame.width === SNode.maxWidth) ? '100%' : this.frame.width + 'px',
                 height: this.frame.height + 'px',
                 background: backgroundCss,
                 border: borderCss,
@@ -89,6 +94,10 @@ export default class SShape extends SNode {
 
     render() {
         return new VNode('span', this.attributes(), []);
+    }
+
+    getFileName() {
+        return `${this.className}-${this.id}.png`;
     }
 
 }

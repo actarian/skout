@@ -28,7 +28,7 @@ export default class SSvg extends SNode {
     }
 
     render() {
-        console.log(this.parent.type);
+        // console.log(this.parent.type);
         if (this.parent.type === 'MSSymbolInstance' || this.type === 'MSLayerGroup') {
             SSvg.collectedSvgs.push({
                 name: this.id,
@@ -73,18 +73,20 @@ export default class SSvg extends SNode {
         copy.exportOptions().removeAllExportFormats();
         var exportOption = copy.exportOptions().addExportFormat();
         exportOption.setScale(1);
+        /*
         var path = folder + '/' + filePath;
-        console.log('SSvg.save', path);
+        // console.log('SSvg.save', path);
         var slices = MSExportRequest.exportRequestsFromExportableLayer(copy);
         for (var i = 0; i < slices.count(); i++) {
             const doc = context.document;
-            console.log(doc);
+            // console.log(doc);
             // doc.saveArtboardOrSlice(slices[i], path);
             // [doc saveArtboardOrSlice: slices[i] toFile: path];
         }
+        */
         const options = {
             compact: true,
-            'use-id-for-name': true,
+            // 'use-id-for-name': true,
             overwrite: true,
             formats: 'svg',
             output: folder + '/svg',

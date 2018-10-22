@@ -19,10 +19,11 @@ export default class SNode {
         return {
             className: this.name.replace(/(?!-)(?!_)(\W*)/g, ''),
             style: Object.assign({
+                zIndex: this.i,
                 position: 'absolute',
                 top: this.frame.top + 'px',
                 left: this.frame.left + 'px',
-                width: this.frame.width + 'px',
+                width: (this.frame.width === SNode.maxWidth) ? '100%' : this.frame.width + 'px',
                 height: this.frame.height + 'px',
                 // background: 'rgba(0,0,0,0.05)'
             }, SNode.cssStyle(this.styleText)),

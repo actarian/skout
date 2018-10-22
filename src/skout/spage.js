@@ -68,6 +68,7 @@ export default class SPage extends SNode {
     }
 
     exportToFolder(folder) {
+        SNode.folder = folder;
         const html = this.getHtml();
         var file = NSString.stringWithString(html);
         file.writeToFile_atomically_encoding_error(folder + '/index.html', true, NSUTF8StringEncoding, null);
@@ -102,7 +103,7 @@ export default class SPage extends SNode {
         if (layers) {
             return layers.filter(layer => (
                 !layer.hidden
-            )).map(layer => {
+            )).map((layer, i) => {
                 if (o) {
                     o.forEach(x => {
                         if (x.key == layer.id) {
@@ -122,6 +123,7 @@ export default class SPage extends SNode {
                     layers = symbol.layers;
                 }
                 const node = SPage.getNode(layer, layers);
+                node.i = i;
                 node.parent = parent;
                 // node.nodes = (node.type !== 'MSShapeGroup' && node.type !== 'MSShapePathLayer') ? SPage.getNodes(layers, node, overrides) : [];
                 node.nodes = SPage.getNodes(layers, node, overrides);
@@ -140,7 +142,7 @@ export default class SPage extends SNode {
                     return node;
                 }
                 */
-            });
+            }).sort((a, b) => a.frame.top - b.frame.top);
         } else {
             return [];
         }
@@ -275,6 +277,7 @@ export default class SPage extends SNode {
         // console.log(layout);
         artboard = Artboard.fromNative(artboard);
         const doc = artboard.parent.parent;
+        SNode.maxWidth = width;
         SSvg.doc = doc;
         SPage.doc = doc;
         SPage.layerStyles = doc.getSharedLayerStyles();

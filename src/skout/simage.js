@@ -18,7 +18,7 @@ export default class SImage extends SNode {
     }
 
     render() {
-        const filePath = SImage.filePath(this.className);
+        const filePath = this.getFilePath();
         SImage.collectedImages.push({
             name: filePath,
             save: (folder, filePath) => {
@@ -44,6 +44,10 @@ export default class SImage extends SNode {
         });
         imageData.writeToFile(path);
         return path;
+    }
+
+    getFilePath() {
+        return `img/${this.className}-${this.id}.png`;
     }
 
     static getImage(image) {
@@ -82,8 +86,46 @@ export default class SImage extends SNode {
         return NSString.stringWithFormat('data:%@;base64,%@', 'image/jpeg', imageData.base64EncodedStringWithOptions(0));
     }
 
-    static filePath(name) {
-        return 'img/' + name + '.jpg';
+    static isPng(image) {
+        const base64 = image.data().base64EncodedStringWithOptions(0);
+        const unicode = new Buffer(base64.substr(0, 16), 'base64').toString();
+        const flag = unicode.indexOf('PNG') !== -1;
+        // const len = binaryString.length;
+        console.log(base64.substr(0, 16), unicode, flag);
+        return flag;
+    }
+
+    static saveToJpg(image, folder, filepath, filename) {
+        // console.log('saveJpg', image, folder, filepath, filename);
+        if (image instanceof MSImageData) {
+            // const isPng = SImage.isPng(image);
+            // console.log('isPng', isPng);
+            /*
+            // var buffer; // new Uint8Array(8);
+            const pointer = MOPointer.alloc().initWithValue(null);
+            // const pointer = MOPointer.alloc().init();
+            // image.data().getBytes_range(pointer, NSMakeRange(0, 1));
+            image.data().getBytes_length(pointer, 1);
+            */
+            const nsImage = image.image();
+            // const nsData = image.data();
+            const cgRef = nsImage.CGImageForProposedRect_context_hints(null, nil, nil);
+            const newRep = NSBitmapImageRep.alloc().initWithCGImage(cgRef);
+            newRep.setSize(nsImage.size()); // get original size
+            /*
+            const imageData = newRep.representationUsingType_properties(NSJPEGFileType, {
+                NSImageCompressionFactor: 0.8
+            });
+            */
+            const imageData = newRep.representationUsingType_properties(NSPNGFileType, nil);
+            // console.log(NSFileManager.defaultManager());
+            NSFileManager.defaultManager().createDirectoryAtPath_attributes(folder + '/' + filepath, {
+                withIntermediateDirectories: true
+            });
+            imageData.writeToFile(folder + '/' + filepath + filename);
+            // console.log('saveJpg.writeToFile', folder, filepath, filename);
+            // return NSString.stringWithFormat('data:%@;base64,%@', 'image/jpeg', imageData.base64EncodedStringWithOptions(0));
+        }
     }
 
 }

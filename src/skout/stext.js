@@ -81,7 +81,7 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
                 position: 'absolute',
                 top: this.frame.top + 'px',
                 left: this.frame.left + 'px',
-                width: this.frame.width + 'px',
+                width: (this.frame.width === SNode.maxWidth) ? '100%' : this.frame.width + 'px',
                 height: this.frame.height + 'px',
             }, SNode.cssStyle(this.styleText)),
         };
