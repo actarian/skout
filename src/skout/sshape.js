@@ -13,12 +13,20 @@ export default class SShape extends SNode {
         const style = this.sketchObject.style();
         if (style.hasEnabledFill()) {
             const fill = style.fills().firstObject();
-            const image = SImage.getImage(fill.image());
+            const image = fill.image();
             const gradient = SNode.cssStyle(this.styleText)['background-image']; // fill.gradient();
             if (image) {
-                this.image = image;
-                this.imagePath = `img/${this.className}.jpg`;
-                backgroundCss = `url('${this.image}') no-repeat center`;
+                // this.image = image;
+                // this.imagePath = `img/${this.className}.jpg`;
+                // backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
+                const filePath = SImage.filePath(this.className);
+                SImage.collectedImages.push({
+                    name: filePath,
+                    save: (folder, filePath) => {
+                        return this.save(folder, filePath);
+                    },
+                });
+                backgroundCss = `url('${filePath}') no-repeat center`;
             } else if (gradient) {
                 backgroundCss = gradient;
             } else {
@@ -55,8 +63,28 @@ export default class SShape extends SNode {
                 border: borderCss,
                 boxShadow: boxShadowCss,
                 borderRadius: borderRadiusCss,
+                backgroundSize: 'cover',
             },
         };
+    }
+
+    save(folder, filePath) {
+        var path = folder + '/' + filePath;
+        const style = this.sketchObject.style();
+        if (style.hasEnabledFill()) {
+            const fill = style.fills().firstObject();
+            const image = fill.image();
+            /*
+            const cgRef = image.CGImageForProposedRect_context_hints(null, nil, nil);
+            const newRep = NSBitmapImageRep.alloc().initWithCGImage(cgRef);
+            newRep.setSize(image.size()); // get original size
+            const imageData = newRep.representationUsingType_properties(NSJPEGFileType, {
+                NSImageCompressionFactor: 0.8
+            });
+            imageData.writeToFile(path);
+            */
+        }
+        return path;
     }
 
     render() {

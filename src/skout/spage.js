@@ -62,6 +62,8 @@ export default class SPage extends SNode {
     getHtml() {
         const html = toHTML(this.render());
         // console.log('html =>\n', html);
+        console.log('collectedImages', SImage.collectedImages.length);
+        console.log('collectedSvgs', SSvg.collectedSvgs.length);
         return html;
     }
 
@@ -69,6 +71,10 @@ export default class SPage extends SNode {
         const html = this.getHtml();
         var file = NSString.stringWithString(html);
         file.writeToFile_atomically_encoding_error(folder + '/index.html', true, NSUTF8StringEncoding, null);
+        // console.log('collectedImages', SImage.collectedImages.length);
+        SImage.collectedImages.forEach(x => x.save(folder, x.name));
+        // console.log('collectedSvgs', SSvg.collectedSvgs.length);
+        SSvg.collectedSvgs.forEach(x => SSvg.save(folder, x.name, x.sketchObject));
     }
 
     static getName(name) {
@@ -89,7 +95,7 @@ export default class SPage extends SNode {
         return results;
     }
 
-    static getNodes(doc, layers, o) {
+    static getNodes(layers, parent, o) {
         // console.log('SPage.getNodes', layers ? layers.length : null);
         // Shape == SVG
         // ShapePath = Rect & RoundRect & Oval
@@ -111,24 +117,25 @@ export default class SPage extends SNode {
                 let layers = layer.layers;
                 let overrides = o || [];
                 if (layer.symbolId) {
-                    const symbol = doc.getSymbolMasterWithID(layer.symbolId);
+                    const symbol = SPage.doc.getSymbolMasterWithID(layer.symbolId);
                     overrides = SPage.getOverrides(layer, overrides);
                     layers = symbol.layers;
                 }
-                const node = SPage.getNode(layer, layers, doc);
-                node.nodes = (node.type !== 'MSShapeGroup' && node.type !== 'MSShapePathLayer') ?
-                    SPage.getNodes(doc, layers, overrides) : [];
+                const node = SPage.getNode(layer, layers);
+                node.parent = parent;
+                // node.nodes = (node.type !== 'MSShapeGroup' && node.type !== 'MSShapePathLayer') ? SPage.getNodes(layers, node, overrides) : [];
+                node.nodes = SPage.getNodes(layers, node, overrides);
                 return node;
                 /*
                 if (layer.symbolId) {
                     const symbol = doc.getSymbolMasterWithID(layer.symbolId);
                     const node = SPage.getNode(symbol, symbol.layers, doc).merge({
-                        nodes: SPage.getNodes(doc, symbol.layers)
+                        nodes: SPage.getNodes(symbol.layers, node)
                     });
                     return node;
                 } else {
                     const node = SPage.getNode(layer, layer.layers, doc).merge({
-                        nodes: SPage.getNodes(doc, layer.layers)
+                        nodes: SPage.getNodes(layer.layers, node)
                     });
                     return node;
                 }
@@ -139,7 +146,18 @@ export default class SPage extends SNode {
         }
     }
 
-    static getNode(object, layers, doc) {
+    static isSvg(object) {
+        var flag = true;
+        object.layers.forEach(x => {
+            const className = String(x.sketchObject.className());
+            if (className !== 'MSShapeGroup' && className !== 'MSShapePathLayer') {
+                flag = false;
+            }
+        });
+        return flag;
+    }
+
+    static getNode(object, layers) {
         layers = layers || [];
         const type = String(object.sketchObject.className());
         const groups = object.name.split('/').map(x => x.trim().replace(/ /g, '-').toLowerCase());
@@ -166,6 +184,7 @@ export default class SPage extends SNode {
             object.sketchObject.resizesContent() : 0;
         */
         let node = {
+            id: object.id,
             sketchObject: object.sketchObject,
             name,
             groups,
@@ -189,6 +208,17 @@ export default class SPage extends SNode {
         MSSymbolInstance
         */
         switch (type) {
+            case 'MSLayerGroup':
+                if (SPage.isSvg(object)) {
+                    node = new SSvg(node);
+                } else {
+                    node = new SNode(node);
+                }
+                break;
+            case 'MSShapeGroup':
+            case 'MSShapePathLayer':
+                node = new SSvg(node);
+                break;
             case 'MSSymbolInstance':
                 /*
                 object.sketchObject.overridePoints().forEach(function (overridePoint) {
@@ -201,26 +231,23 @@ export default class SPage extends SNode {
             case 'MSOvalShape':
                 node = new SShape(node);
                 break;
-            case 'MSShapeGroup':
-                node = new SSvg(node);
-                break;
             case 'MSTextLayer':
                 // console.log(object.text);
                 node.innerText = object.text;
                 node.alignment = object.alignment;
                 /*
-                                if (object.sharedStyleId) {
-                                    // console.log(SPage.textStyles);
-                                    const style = SPage.textStyles.find(x => x.id === object.sharedStyleId);
-                                    // const style = doc.getSharedLayerStyleWithID(object.sharedStyleId);
-                                    if (style) {
-                                        // console.log(style.name);
-                                        const msSharedStyle = SPage.findTextStyleByName(style.name);
-                                        const msStyle = msSharedStyle.value();
-                                        console.log(msStyle);
-                                    }
-                                }
-                                */
+                if (object.sharedStyleId) {
+                    // console.log(SPage.textStyles);
+                    const style = SPage.textStyles.find(x => x.id === object.sharedStyleId);
+                    // const style = SPage.doc.getSharedLayerStyleWithID(object.sharedStyleId);
+                    if (style) {
+                        // console.log(style.name);
+                        const msSharedStyle = SPage.findTextStyleByName(style.name);
+                        const msStyle = msSharedStyle.value();
+                        console.log(msStyle);
+                    }
+                }
+                */
                 node = new SText(node);
                 break;
             case 'MSBitmapLayer':
@@ -248,9 +275,13 @@ export default class SPage extends SNode {
         // console.log(layout);
         artboard = Artboard.fromNative(artboard);
         const doc = artboard.parent.parent;
+        SSvg.doc = doc;
+        SPage.doc = doc;
         SPage.layerStyles = doc.getSharedLayerStyles();
         SPage.textStyles = doc.getSharedTextStyles();
         SPage.documentData = doc.sketchObject.documentData();
+        SImage.collectedImages = [];
+        SSvg.collectedSvgs = [];
         const page = new SPage(
             SPage.getNode(artboard).merge({
                 width,
@@ -261,9 +292,8 @@ export default class SPage extends SNode {
                     columnWidth: layout.columnWidth(),
                     gutterWidth: layout.gutterWidth(),
                 },
-                nodes: SPage.getNodes(artboard.parent.parent, artboard.layers.slice())
+                nodes: SPage.getNodes(artboard.layers.slice(), null)
             }));
-
         return page;
     }
 

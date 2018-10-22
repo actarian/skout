@@ -18,11 +18,32 @@ export default class SImage extends SNode {
     }
 
     render() {
+        const filePath = SImage.filePath(this.className);
+        SImage.collectedImages.push({
+            name: filePath,
+            save: (folder, filePath) => {
+                return this.save(folder, filePath);
+            },
+        });
         return new VNode('div', this.attributes(), [
             new VNode('img', {
-                src: SImage.getImage(this.sketchObject.image())
+                // src: SImage.getImage(this.sketchObject.image())
+                src: filePath
             })
         ]);
+    }
+
+    save(folder, filePath) {
+        var path = folder + '/' + filePath;
+        const image = this.sketchObject.image();
+        const cgRef = image.CGImageForProposedRect_context_hints(null, nil, nil);
+        const newRep = NSBitmapImageRep.alloc().initWithCGImage(cgRef);
+        newRep.setSize(image.size()); // get original size
+        const imageData = newRep.representationUsingType_properties(NSJPEGFileType, {
+            NSImageCompressionFactor: 0.8
+        });
+        imageData.writeToFile(path);
+        return path;
     }
 
     static getImage(image) {
@@ -61,4 +82,10 @@ export default class SImage extends SNode {
         return NSString.stringWithFormat('data:%@;base64,%@', 'image/jpeg', imageData.base64EncodedStringWithOptions(0));
     }
 
+    static filePath(name) {
+        return 'img/' + name + '.jpg';
+    }
+
 }
+
+SImage.collectedImages = [];
