@@ -171,16 +171,11 @@ export default class SPage extends SNode {
         }
     }
 
-    static fromArtboard(artboard) {
-        const frame = artboard.frame();
-        const width = parseInt(frame.width());
-        const height = parseInt(frame.height());
-        const layout = artboard.layout();
+    static fromArtboard(object) {
         // console.log('fromArtboard', width, height);
         // console.log(layout);
-        artboard = Artboard.fromNative(artboard);
+        const artboard = Artboard.fromNative(object);
         const doc = artboard.parent.parent;
-        SNode.maxWidth = width;
         SSvg.doc = doc;
         SPage.doc = doc;
         SPage.layerStyles = doc.getSharedLayerStyles();
@@ -190,16 +185,28 @@ export default class SPage extends SNode {
         SSvg.collectedSvgs = [];
         const page = new SPage(SPage.getNode(artboard));
         page.nodes = SPage.getNodes(artboard.layers.slice(), null);
-        console.log('page.nodes', page.nodes.length);
-        page.layoutNode({
+        page.layoutNode(SPage.getLayout(object), 0);
+        return page;
+    }
+
+    static getLayout(object) {
+        const frame = object.frame();
+        const width = parseInt(frame.width());
+        const height = parseInt(frame.height());
+        const layout = object.layout();
+        const totalWidth = layout.totalWidth();
+        const numberOfColumns = layout.numberOfColumns();
+        const columnWidth = layout.columnWidth();
+        const gutterWidth = layout.gutterWidth();
+        return {
             maxWidth: width,
             maxHeight: height,
-            totalWidth: layout.totalWidth(),
-            numberOfColumns: layout.numberOfColumns(),
-            columnWidth: layout.columnWidth(),
-            gutterWidth: layout.gutterWidth(),
-        }, 0);
-        return page;
+            totalWidth: totalWidth,
+            numberOfColumns: numberOfColumns,
+            columnWidth: columnWidth,
+            gutterWidth: gutterWidth,
+            cols: Array.apply(null, Array(numberOfColumns)).map((x, i) => Math.min(totalWidth, Math.floor((columnWidth + gutterWidth) * (i + 1) - gutterWidth)))
+        }
     }
 
 }

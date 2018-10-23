@@ -9,9 +9,9 @@ export default class SImage extends SNode {
         return {
             className: 'picture ' + this.className,
             style: {
-                minWidth: '100px',
-                minHeight: '40px',
-                background: 'rgba(0,0,0,0.05)'
+                display: 'block',
+                width: '100%',
+                height: 'auto',
             },
             // style: this.styleText
         };
