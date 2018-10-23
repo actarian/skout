@@ -7,19 +7,9 @@ import VText from 'virtual-dom/vnode/vtext';
 import SImage from './simage';
 import SNode from './snode';
 import SShape from './sshape';
-import SStyle from './sstyle';
 import SSvg from './ssvg';
+import SSymbol from './ssymbol';
 import SText from './stext';
-
-const ResizingConstraint = Object.freeze({
-    None: 63,
-    Top: 31,
-    Right: 62,
-    Bottom: 55,
-    Left: 59,
-    Width: 61,
-    Height: 47,
-});
 
 export default class SPage extends SNode {
 
@@ -82,18 +72,54 @@ export default class SPage extends SNode {
         return name.split('/').pop().trim().replace(/ /g, '-').toLowerCase(); // name.replace(/\//g, '-').replace(/ /g, '');
     }
 
-    static getOverrides(layer, results) {
-        const overrides = layer.sketchObject.overrides();
-        const keys = overrides.allKeys();
-        if (keys.length) {
-            keys.forEach((key, i) => {
-                results.push({
-                    key: key,
-                    value: overrides[key] // string or dict
-                });
-            });
+    static getNode(object, parent) {
+        const type = String(object.sketchObject.className());
+        let node = {
+            type,
+            object,
+            parent,
+        };
+        // console.log(type, name);
+        /*
+        MSArtboardGroup
+        MSSymbolInstance
+        MSLayerGroup
+        MSRectangleShape
+        MSOvalShape
+        MSShapeGroup
+        MSShapePathLayer
+        MSBitmapLayer
+        MSTextLayer
+        */
+        switch (type) {
+            case 'MSSymbolInstance':
+                node = new SSymbol(node);
+                break;
+            case 'MSLayerGroup':
+                if (SSvg.isSvg(object)) {
+                    node = new SSvg(node);
+                } else {
+                    node = new SNode(node);
+                }
+                break;
+            case 'MSShapeGroup':
+            case 'MSShapePathLayer':
+                node = new SSvg(node);
+                break;
+            case 'MSRectangleShape':
+            case 'MSOvalShape':
+                node = new SShape(node);
+                break;
+            case 'MSTextLayer':
+                node = new SText(node);
+                break;
+            case 'MSBitmapLayer':
+                node = new SImage(node);
+                break;
+            default:
+                node = new SNode(node);
         }
-        return results;
+        return node;
     }
 
     static getNodes(layers, parent, o) {
@@ -119,154 +145,31 @@ export default class SPage extends SNode {
                 let overrides = o || [];
                 if (layer.symbolId) {
                     const symbol = SPage.doc.getSymbolMasterWithID(layer.symbolId);
-                    overrides = SPage.getOverrides(layer, overrides);
+                    overrides = SSymbol.getOverrides(layer, overrides);
                     layers = symbol.layers;
                 }
-                const node = SPage.getNode(layer, layers);
-                node.i = i;
-                node.parent = parent;
-                // node.nodes = (node.type !== 'MSShapeGroup' && node.type !== 'MSShapePathLayer') ? SPage.getNodes(layers, node, overrides) : [];
+                const node = SPage.getNode(layer, parent);
                 node.nodes = SPage.getNodes(layers, node, overrides);
                 return node;
                 /*
                 if (layer.symbolId) {
                     const symbol = doc.getSymbolMasterWithID(layer.symbolId);
-                    const node = SPage.getNode(symbol, symbol.layers, doc).merge({
+                    const node = SPage.getNode(symbol, doc).merge({
                         nodes: SPage.getNodes(symbol.layers, node)
                     });
                     return node;
                 } else {
-                    const node = SPage.getNode(layer, layer.layers, doc).merge({
+                    const node = SPage.getNode(layer, doc).merge({
                         nodes: SPage.getNodes(layer.layers, node)
                     });
                     return node;
                 }
                 */
-            }).sort((a, b) => a.frame.top - b.frame.top);
+            });
         } else {
             return [];
         }
     }
-
-    static isSvg(object) {
-        var flag = true;
-        object.layers.forEach(x => {
-            const className = String(x.sketchObject.className());
-            if (className !== 'MSShapeGroup' && className !== 'MSShapePathLayer') {
-                flag = false;
-            }
-        });
-        return flag;
-    }
-
-    static getNode(object, layers) {
-        layers = layers || [];
-        const type = String(object.sketchObject.className());
-        const groups = object.name.split('/').map(x => x.trim().replace(/ /g, '-').toLowerCase());
-        const name = groups.pop();
-        const frame = {
-            left: type === 'MSArtboardGroup' ? 0 : object.frame.x,
-            top: type === 'MSArtboardGroup' ? 0 : object.frame.y,
-            width: object.frame.width,
-            height: object.frame.height,
-        };
-        const resizingConstraint = (typeof object.sketchObject.resizingConstraint == 'function') ?
-            object.sketchObject.resizingConstraint() : 0;
-        const constraint = {
-            none: resizingConstraint === ResizingConstraint.None,
-            top: (resizingConstraint & ResizingConstraint.Top) === resizingConstraint,
-            right: (resizingConstraint & ResizingConstraint.Right) === resizingConstraint,
-            bottom: (resizingConstraint & ResizingConstraint.Bottom) === resizingConstraint,
-            left: (resizingConstraint & ResizingConstraint.Left) === resizingConstraint,
-            width: (resizingConstraint & ResizingConstraint.Width) === resizingConstraint,
-            height: (resizingConstraint & ResizingConstraint.Height) === resizingConstraint,
-        };
-        /*
-        const resizesContent = (typeof object.sketchObject.resizesContent == 'function') ?
-            object.sketchObject.resizesContent() : 0;
-        */
-        let node = {
-            id: object.id,
-            sketchObject: object.sketchObject,
-            name,
-            groups,
-            type,
-            constraint,
-            frame,
-            style: new SStyle(),
-            styleText: object.sketchObject.CSSAttributeString().trim(),
-            className: name.replace(/(?!-)(?!_)(\W*)/g, ''),
-        };
-        // console.log(type, name);
-        /*
-        MSArtboardGroup
-        MSLayerGroup
-        MSTextLayer
-        MSRectangleShape
-        MSOvalShape
-        MSShapeGroup
-        MSShapePathLayer
-        MSBitmapLayer
-        MSSymbolInstance
-        */
-        switch (type) {
-            case 'MSLayerGroup':
-                if (SPage.isSvg(object)) {
-                    node = new SSvg(node);
-                } else {
-                    node = new SNode(node);
-                }
-                break;
-            case 'MSShapeGroup':
-            case 'MSShapePathLayer':
-                node = new SSvg(node);
-                break;
-            case 'MSSymbolInstance':
-                /*
-                object.sketchObject.overridePoints().forEach(function (overridePoint) {
-                    console.log(overridePoint.layerName(), overridePoint.name(), overridePoint.property());
-                });
-                */
-                node = new SNode(node);
-                break;
-            case 'MSRectangleShape':
-            case 'MSOvalShape':
-                node = new SShape(node);
-                break;
-            case 'MSTextLayer':
-                // console.log(object.text);
-                node.innerText = object.text;
-                node.alignment = object.alignment;
-                /*
-                if (object.sharedStyleId) {
-                    // console.log(SPage.textStyles);
-                    const style = SPage.textStyles.find(x => x.id === object.sharedStyleId);
-                    // const style = SPage.doc.getSharedLayerStyleWithID(object.sharedStyleId);
-                    if (style) {
-                        // console.log(style.name);
-                        const msSharedStyle = SPage.findTextStyleByName(style.name);
-                        const msStyle = msSharedStyle.value();
-                        console.log(msStyle);
-                    }
-                }
-                */
-                node = new SText(node);
-                break;
-            case 'MSBitmapLayer':
-                node = new SImage(node);
-                break;
-            default:
-                node = new SNode(node);
-        }
-        return node;
-    }
-
-    /*
-    static findTextStyleByName(name) {
-        var predicate = NSPredicate.predicateWithFormat('name = %@', name);
-        return SPage.documentData.layerTextStyles().sharedStyles().filteredArrayUsingPredicate(predicate).firstObject();
-    }
-    */
 
     static fromArtboard(artboard) {
         const frame = artboard.frame();
@@ -285,18 +188,17 @@ export default class SPage extends SNode {
         SPage.documentData = doc.sketchObject.documentData();
         SImage.collectedImages = [];
         SSvg.collectedSvgs = [];
-        const page = new SPage(
-            SPage.getNode(artboard).merge({
-                width,
-                height,
-                layout: {
-                    totalWidth: layout.totalWidth(),
-                    numberOfColumns: layout.numberOfColumns(),
-                    columnWidth: layout.columnWidth(),
-                    gutterWidth: layout.gutterWidth(),
-                },
-                nodes: SPage.getNodes(artboard.layers.slice(), null)
-            }));
+        const page = new SPage(SPage.getNode(artboard));
+        page.nodes = SPage.getNodes(artboard.layers.slice(), null);
+        console.log('page.nodes', page.nodes.length);
+        page.layoutNode({
+            maxWidth: width,
+            maxHeight: height,
+            totalWidth: layout.totalWidth(),
+            numberOfColumns: layout.numberOfColumns(),
+            columnWidth: layout.columnWidth(),
+            gutterWidth: layout.gutterWidth(),
+        }, 0);
         return page;
     }
 

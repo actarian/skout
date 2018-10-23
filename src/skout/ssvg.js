@@ -8,7 +8,7 @@ export default class SSvg extends SNode {
 
     attributes() {
         return {
-            className: this.name.replace(/(?!-)(?!_)(\W*)/g, ''),
+            className: this.className,
             version: '1.1',
             x: '0px',
             y: '0px',
@@ -29,7 +29,7 @@ export default class SSvg extends SNode {
 
     render() {
         // console.log(this.parent.type);
-        if (this.parent.type === 'MSSymbolInstance' || this.type === 'MSLayerGroup') {
+        if (this.parentType === 'MSSymbolInstance' || this.type === 'MSLayerGroup') {
             SSvg.collectedSvgs.push({
                 name: this.id,
                 sketchObject: this.sketchObject,
@@ -93,6 +93,17 @@ export default class SSvg extends SNode {
         };
         sketch.export(copy, options);
         copy.removeFromParent();
+    }
+
+    static isSvg(object) {
+        var flag = true;
+        object.layers.forEach(x => {
+            const className = String(x.sketchObject.className());
+            if (className !== 'MSShapeGroup' && className !== 'MSShapePathLayer') {
+                flag = false;
+            }
+        });
+        return flag;
     }
 
 }

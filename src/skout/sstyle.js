@@ -1,7 +1,16 @@
 /* jshint esversion: 6 */
 
-import SNode from './snode';
+export default class SStyle {
 
-export default class SStyle extends SNode {
+    constructor(object) {
+        this.merge(object);
+    }
+
+    merge(object) {
+        if (object) {
+            Object.assign(this, object);
+        }
+        return this;
+    }
 
 }

@@ -7,7 +7,7 @@ export default class SImage extends SNode {
 
     attributes() {
         return {
-            className: 'picture ' + this.name.replace(/(?!-)(?!_)(\W*)/g, ''),
+            className: 'picture ' + this.className,
             style: {
                 minWidth: '100px',
                 minHeight: '40px',
