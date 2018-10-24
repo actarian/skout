@@ -1,5 +1,6 @@
 /* jshint esversion: 6 */
 
+import sketch from 'sketch';
 import VNode from 'virtual-dom/vnode/vnode';
 
 const ResizingConstraint = Object.freeze({
@@ -42,7 +43,7 @@ export default class SNode {
         //
         Object.defineProperty(this, 'parent', {
             value: parent,
-            writable: false
+            writable: true
         });
     }
 
@@ -94,13 +95,28 @@ export default class SNode {
         }
     }
 
-    layoutNode(layout, i) {
+    layoutNode(layout, zIndex) {
         Object.assign(this.layout, layout);
         this.isLargest = this.isLargest || false;
-        this.layout.zIndex = i;
         this.layout.isLargest = this.isLargest;
         this.layout.hasSibilings = this.hasSibilings;
         this.layout.hasOverlaps = this.hasOverlaps;
+        if (this.nodes.length &&
+            this.frame.width > this.layout.totalWidth &&
+            this.innerRect.width < this.layout.totalWidth) {
+            const container = SNode.newContainer(this);
+            this.nodes = [container];
+        }
+        // !!!
+        console.log('shouldPrependContainer', this.className, this.frame.width, this.layout.totalWidth, this.innerRect.width);
+        this.layoutNodes(layout);
+        this.style = this.getStyle(zIndex);
+    }
+
+    getStyle(zIndex) {
+        const layout = this.layout;
+        const frame = this.frame;
+        const classes = this.classes;
         /*
         this.layout.position = 'relative';
         if (this.hasSibilings && this.hasOverlaps && this.isLargest) {
@@ -111,19 +127,6 @@ export default class SNode {
         this.layout.display = 'block';
         this.layout.position = this.hasOverlaps && this.isLargest ? 'absolute' : 'relative';
         */
-        if (this.frame.width >= layout.totalWidth) {
-            if (this.hasOverlaps && this.isLargest) {
-                this.layout.position = 'relative';
-            } else {
-                this.layout.position = 'absolute';
-            }
-        } else {
-            if (this.hasOverlaps && this.isLargest) {
-                this.layout.position = 'absolute';
-            } else {
-                this.layout.position = 'relative';
-            }
-        }
         // this.layout.position = 'absolute';
         /*
         if (this.isLargest || !this.hasSibilings || !this.hasOverlaps) {
@@ -137,30 +140,29 @@ export default class SNode {
             console.log(this.className, this.layout.position, 'isLargest', this.isLargest);
         }
         */
+        let position = 'absolute';
+        if (frame.width >= layout.totalWidth) {
+            position = (this.hasOverlaps && this.isLargest) ? 'relative' : 'absolute';
+        } else {
+            position = (this.hasOverlaps && this.isLargest) ? 'absolute' : 'relative';
+        }
         const col = layout.cols.reduce((prev, curr, i) => {
-            return (Math.abs(curr - this.frame.width) <= 1 ? (i + 1) : prev);
+            return (Math.abs(curr - frame.width) <= 1 ? (i + 1) : prev);
         });
         if (col === layout.numberOfColumns) {
-            this.classes.push('container');
+            classes.push('container');
         } else if (col < layout.numberOfColumns) {
-            this.classes.push('col-' + col);
+            classes.push('col-' + col);
         }
-        this.frame.width = layout.cols[col - 1] || this.frame.width;
-        this.layoutNodes(layout);
-        this.style = this.getStyle();
-    }
-
-    getStyle() {
-        const layout = this.layout;
-        const frame = this.frame;
+        // this.frame.width = layout.cols[col - 1] || this.frame.width;
         const style = {
-            zIndex: layout.zIndex,
-            display: layout.display || 'block',
-            position: layout.position,
+            display: 'block',
+            position: position,
             top: (layout.position === 'relative') ? 'auto' : frame.top + 'px',
             left: (layout.position === 'relative') ? 'auto' : frame.left + 'px',
             width: (frame.width === layout.maxWidth) ? '100%' : frame.width + 'px',
             height: frame.height + 'px',
+            zIndex: zIndex,
             // background: 'rgba(0,0,0,0.05)'
         };
         if (this.isHorizontal) {
@@ -176,6 +178,28 @@ export default class SNode {
             style.alignItems = 'flex-start';
         }
         return style;
+    }
+
+    setInnerRect() {
+        const innerRect = {
+            top: Number.POSITIVE_INFINITY,
+            left: Number.POSITIVE_INFINITY,
+            bottom: Number.NEGATIVE_INFINITY,
+            right: Number.NEGATIVE_INFINITY,
+            width: 0,
+            height: 0
+        };
+        if (this.nodes.length) {
+            this.nodes.forEach((a, i) => {
+                innerRect.top = Math.min(innerRect.top, a.frame.top);
+                innerRect.left = Math.min(innerRect.left, a.frame.left);
+                innerRect.bottom = Math.max(innerRect.bottom, a.frame.bottom);
+                innerRect.right = Math.max(innerRect.right, a.frame.right);
+            });
+            innerRect.width = innerRect.right - innerRect.left;
+            innerRect.height = innerRect.bottom - innerRect.top;
+        }
+        this.innerRect = innerRect;
     }
 
     static getConstraint(object) {
@@ -246,6 +270,38 @@ export default class SNode {
         var g = Math.round(color.green() * 255);
         var b = Math.round(color.blue() * 255);
         return 'rgba(' + r + ',' + g + ',' + b + ',' + color.alpha() + ')';
+    }
+
+    static newContainer(node) {
+        const container = new SNode(node);
+        container.name = 'container';
+        container.type = 'Container';
+        container.className = 'container';
+        container.pathNames = [];
+        container.classes = [container.className];
+        container.frame = {
+            top: 0,
+            left: (node.frame.width - node.layout.totalWidth) / 2,
+            width: node.layout.totalWidth,
+            height: node.frame.height,
+        };
+        container.frame.right = container.frame.left + container.frame.width;
+        container.frame.bottom = container.frame.top + container.frame.height;
+        container.layout = node.layout;
+        container.style = {};
+        container.parent = node;
+        container.nodes = node.nodes;
+        container.setInnerRect();
+        container.render = () => {
+            return new VNode('div', {
+                className: 'container'
+            }, container.nodes.map(x => x.render()));
+        };
+        return container;
+    }
+
+    static getDocument() {
+        return sketch.fromNative(context.document);
     }
 
 }

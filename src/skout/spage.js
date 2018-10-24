@@ -16,7 +16,6 @@ export default class SPage extends SNode {
     render() {
         // return new VNode('span', null, [new VText('hello')]);
         // return new VNode('span', this.attributes(), this.nodes.map(x => x.render()));
-        // const styles = this.getStyles();
         return new VNode('html', null, [
             new VNode('head', null, [
                 new VNode('style', null, [
@@ -31,8 +30,8 @@ export default class SPage extends SNode {
     }
 
     .container {
-        maxWidth: ${this.layout.totalWidth}px,
-        margin: '0 auto',
+        max-width: ${this.layout.totalWidth}px;
+        margin: 0 auto;
     }
 
     *,
@@ -72,7 +71,7 @@ export default class SPage extends SNode {
         return name.split('/').pop().trim().replace(/ /g, '-').toLowerCase(); // name.replace(/\//g, '-').replace(/ /g, '');
     }
 
-    static getNode(object, parent) {
+    static getNode(object, parent, overrides) {
         const type = String(object.sketchObject.className());
         let node = {
             type,
@@ -92,6 +91,9 @@ export default class SPage extends SNode {
         MSTextLayer
         */
         switch (type) {
+            case 'MSArtboardGroup':
+                node = new SPage(node);
+                break;
             case 'MSSymbolInstance':
                 node = new SSymbol(node);
                 break;
@@ -119,72 +121,50 @@ export default class SPage extends SNode {
             default:
                 node = new SNode(node);
         }
-        return node;
-    }
-
-    static getNodes(layers, parent, o) {
-        // console.log('SPage.getNodes', layers ? layers.length : null);
-        // Shape == SVG
-        // ShapePath = Rect & RoundRect & Oval
+        let layers = object.layers;
+        if (object.symbolId) {
+            const symbol = SNode.getDocument().getSymbolMasterWithID(object.symbolId);
+            layers = symbol.layers;
+            overrides = SSymbol.getOverrides(object, overrides);
+        }
         if (layers) {
-            return layers.filter(layer => (
-                !layer.hidden
+            node.nodes = layers.filter(x => (
+                !x.hidden
             )).map((layer, i) => {
-                if (o) {
-                    o.forEach(x => {
-                        if (x.key == layer.id) {
-                            if (typeof x.value == 'string') {
-                                layer.text = x.value;
-                            } else {
-                                Object.assign(layer, x.value);
-                            }
-                        }
-                    });
-                }
-                let layers = layer.layers;
-                let overrides = o || [];
-                if (layer.symbolId) {
-                    const symbol = SPage.doc.getSymbolMasterWithID(layer.symbolId);
-                    overrides = SSymbol.getOverrides(layer, overrides);
-                    layers = symbol.layers;
-                }
-                const node = SPage.getNode(layer, parent);
-                node.nodes = SPage.getNodes(layers, node, overrides);
-                return node;
+                overrides = overrides || [];
                 /*
-                if (layer.symbolId) {
-                    const symbol = doc.getSymbolMasterWithID(layer.symbolId);
-                    const node = SPage.getNode(symbol, doc).merge({
-                        nodes: SPage.getNodes(symbol.layers, node)
-                    });
-                    return node;
-                } else {
-                    const node = SPage.getNode(layer, doc).merge({
-                        nodes: SPage.getNodes(layer.layers, node)
-                    });
-                    return node;
-                }
+                // !!!
+                overrides.forEach(x => {
+                    if (x.key == layer.id) {
+                        if (typeof x.value == 'string') {
+                            layer.text = x.value;
+                        } else {
+                            Object.assign(layer, x.value);
+                        }
+                    }
+                });
                 */
+                return SPage.getNode(layer, node, overrides);
             });
         } else {
-            return [];
+            node.nodes = [];
         }
+        node.setInnerRect();
+        return node;
     }
 
     static fromArtboard(object) {
         // console.log('fromArtboard', width, height);
         // console.log(layout);
         const artboard = Artboard.fromNative(object);
-        const doc = artboard.parent.parent;
-        SSvg.doc = doc;
-        SPage.doc = doc;
-        SPage.layerStyles = doc.getSharedLayerStyles();
-        SPage.textStyles = doc.getSharedTextStyles();
-        SPage.documentData = doc.sketchObject.documentData();
+        // const doc = SNode.getDocument();
+        // console.log(doc, context.document.documentData().metadata());
+        // const doc = context.document;
+        // SPage.layerStyles = doc.getSharedLayerStyles();
+        // SPage.textStyles = doc.getSharedTextStyles();
         SImage.collectedImages = [];
         SSvg.collectedSvgs = [];
-        const page = new SPage(SPage.getNode(artboard));
-        page.nodes = SPage.getNodes(artboard.layers.slice(), null);
+        const page = SPage.getNode(artboard);
         page.layoutNode(SPage.getLayout(object), 0);
         return page;
     }
@@ -194,10 +174,10 @@ export default class SPage extends SNode {
         const width = parseInt(frame.width());
         const height = parseInt(frame.height());
         const layout = object.layout();
-        const totalWidth = layout.totalWidth();
-        const numberOfColumns = layout.numberOfColumns();
-        const columnWidth = layout.columnWidth();
-        const gutterWidth = layout.gutterWidth();
+        const totalWidth = layout ? layout.totalWidth() : width;
+        const numberOfColumns = layout ? layout.numberOfColumns() : 1;
+        const columnWidth = layout ? layout.columnWidth() : width;
+        const gutterWidth = layout ? layout.gutterWidth() : 0;
         return {
             maxWidth: width,
             maxHeight: height,

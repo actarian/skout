@@ -12,9 +12,11 @@ export default class Stext extends SNode {
         this.alignment = node.object.alignment;
         /*
         if (object.sharedStyleId) {
-            // console.log(SPage.textStyles);
-            const style = SPage.textStyles.find(x => x.id === object.sharedStyleId);
-            // const style = SPage.doc.getSharedLayerStyleWithID(object.sharedStyleId);
+            const doc = SNode.getDocument();
+            const layerStyle = doc.getSharedLayerStyles();
+            // console.log(textStyles);
+            const style = textStyles.find(x => x.id === object.sharedStyleId);
+            // const style = doc.getSharedLayerStyleWithID(object.sharedStyleId);
             if (style) {
                 // console.log(style.name);
                 const msSharedStyle = SPage.findTextStyleByName(style.name);
@@ -117,7 +119,7 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
     /*
     static findTextStyleByName(name) {
         var predicate = NSPredicate.predicateWithFormat('name = %@', name);
-        return SPage.documentData.layerTextStyles().sharedStyles().filteredArrayUsingPredicate(predicate).firstObject();
+        return context.document.documentData().layerTextStyles().sharedStyles().filteredArrayUsingPredicate(predicate).firstObject();
     }
     */
 
