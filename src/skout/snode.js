@@ -68,7 +68,12 @@ export default class SNode {
         return attributes;
     }
 
-    layoutNodes(layout) {
+    layoutNode(layout, zIndex) {
+        Object.assign(this.layout, layout);
+        this.isLargest = this.isLargest || false;
+        this.layout.isLargest = this.isLargest;
+        this.layout.hasSibilings = this.hasSibilings;
+        this.layout.hasOverlaps = this.hasOverlaps;
         if (this.nodes.length > 1) {
             const largest = this.nodes.reduce((a, b) => a.frame.width >= b.frame.width && a.frame.height > b.frame.height ? a : b);
             largest.isLargest = true;
@@ -86,30 +91,42 @@ export default class SNode {
                     a.hasOverlaps = a.hasOverlaps || SNode.overlaps(a.frame, b.frame);
                 });
             }
-            a.layoutNode(layout, i);
+            if (a.frame.width >= layout.totalWidth) {
+                a.absolute = (a.hasOverlaps && a.isLargest) ? false : true;
+            } else {
+                a.absolute = (a.hasOverlaps && a.isLargest) ? true : false;
+            }
+            console.log(a.className, a.absolute);
         });
-        if (this.isHorizontal) {
-            this.nodes.sort((a, b) => a.frame.left - b.frame.left);
-        } else {
-            this.nodes.sort((a, b) => (a.frame.top * 10000 + a.frame.left) - (b.frame.top * 10000 + b.frame.left));
-        }
-    }
-
-    layoutNode(layout, zIndex) {
-        Object.assign(this.layout, layout);
-        this.isLargest = this.isLargest || false;
-        this.layout.isLargest = this.isLargest;
-        this.layout.hasSibilings = this.hasSibilings;
-        this.layout.hasOverlaps = this.hasOverlaps;
+        /*
+        claim-whatsapp true
+home-hero false
+header-desktop true
+form-login false
+shouldPrependContainer desktop 1440 1280 1440
+rectangle false
+rectangle true
+home-hero-body false
+shouldPrependContainer home-hero 1440 1280 1440
+        */
+        //
+        this.setInnerRect();
         if (this.nodes.length &&
             this.frame.width > this.layout.totalWidth &&
             this.innerRect.width < this.layout.totalWidth) {
             const container = SNode.newContainer(this);
             this.nodes = [container];
         }
-        // !!!
         console.log('shouldPrependContainer', this.className, this.frame.width, this.layout.totalWidth, this.innerRect.width);
-        this.layoutNodes(layout);
+        //
+        if (this.isHorizontal) {
+            this.nodes.sort((a, b) => a.frame.left - b.frame.left);
+        } else {
+            this.nodes.sort((a, b) => (a.frame.top * 10000 + a.frame.left) - (b.frame.top * 10000 + b.frame.left));
+        }
+        this.nodes.forEach((a, i) => {
+            a.layoutNode(layout, i);
+        });
         this.style = this.getStyle(zIndex);
     }
 
@@ -140,12 +157,6 @@ export default class SNode {
             console.log(this.className, this.layout.position, 'isLargest', this.isLargest);
         }
         */
-        let position = 'absolute';
-        if (frame.width >= layout.totalWidth) {
-            position = (this.hasOverlaps && this.isLargest) ? 'relative' : 'absolute';
-        } else {
-            position = (this.hasOverlaps && this.isLargest) ? 'absolute' : 'relative';
-        }
         const col = layout.cols.reduce((prev, curr, i) => {
             return (Math.abs(curr - frame.width) <= 1 ? (i + 1) : prev);
         });
@@ -157,9 +168,9 @@ export default class SNode {
         // this.frame.width = layout.cols[col - 1] || this.frame.width;
         const style = {
             display: 'block',
-            position: position,
-            top: (layout.position === 'relative') ? 'auto' : frame.top + 'px',
-            left: (layout.position === 'relative') ? 'auto' : frame.left + 'px',
+            position: this.absolute ? 'absolute' : 'relative',
+            top: this.absolute ? frame.top + 'px' : 'auto',
+            left: this.absolute ? frame.left + 'px' : 'auto',
             width: (frame.width === layout.maxWidth) ? '100%' : frame.width + 'px',
             height: frame.height + 'px',
             zIndex: zIndex,
@@ -190,7 +201,7 @@ export default class SNode {
             height: 0
         };
         if (this.nodes.length) {
-            this.nodes.forEach((a, i) => {
+            this.nodes.filter(a => !a.absolute).forEach((a, i) => {
                 innerRect.top = Math.min(innerRect.top, a.frame.top);
                 innerRect.left = Math.min(innerRect.left, a.frame.left);
                 innerRect.bottom = Math.max(innerRect.bottom, a.frame.bottom);

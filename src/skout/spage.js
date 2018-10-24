@@ -149,7 +149,6 @@ export default class SPage extends SNode {
         } else {
             node.nodes = [];
         }
-        node.setInnerRect();
         return node;
     }
 
