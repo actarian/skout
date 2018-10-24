@@ -107,19 +107,31 @@ export default class SNode {
             this.layout.position = 'absolute';
         }
         */
-
         /*
         this.layout.display = 'block';
         this.layout.position = this.hasOverlaps && this.isLargest ? 'absolute' : 'relative';
         */
-        this.layout.position = 'absolute';
+        if (this.frame.width >= layout.totalWidth) {
+            if (this.hasOverlaps && this.isLargest) {
+                this.layout.position = 'relative';
+            } else {
+                this.layout.position = 'absolute';
+            }
+        } else {
+            if (this.hasOverlaps && this.isLargest) {
+                this.layout.position = 'absolute';
+            } else {
+                this.layout.position = 'relative';
+            }
+        }
+        // this.layout.position = 'absolute';
         /*
-         if (this.isLargest || !this.hasSibilings || !this.hasOverlaps) {
-             this.layout.position = 'relative';
-         } else {
-             this.layout.position = 'absolute';
-         }
-         */
+        if (this.isLargest || !this.hasSibilings || !this.hasOverlaps) {
+            this.layout.position = 'relative';
+        } else {
+            this.layout.position = 'absolute';
+        }
+        */
         /*
         if (this.layout.position === 'relative') {
             console.log(this.className, this.layout.position, 'isLargest', this.isLargest);
@@ -143,7 +155,7 @@ export default class SNode {
         const frame = this.frame;
         const style = {
             zIndex: layout.zIndex,
-            display: layout.display,
+            display: layout.display || 'block',
             position: layout.position,
             top: (layout.position === 'relative') ? 'auto' : frame.top + 'px',
             left: (layout.position === 'relative') ? 'auto' : frame.left + 'px',

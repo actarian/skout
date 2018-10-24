@@ -25,16 +25,20 @@ export default class Stext extends SNode {
         */
     }
 
+    getStyle(...rest) {
+        const style = SNode.prototype.getStyle.apply(this, rest);
+        /*
+        return Object.assign(style, {
+            position: 'absolute',            
+        });
+        */
+        return style;
+    }
+
     attributes() {
         return {
             className: this.className,
-            style: Object.assign({
-                position: 'absolute',
-                top: this.frame.top + 'px',
-                left: this.frame.left + 'px',
-                width: (this.frame.width === this.layout.maxWidth) ? '100%' : this.frame.width + 'px',
-                height: this.frame.height + 'px',
-            }, SNode.cssStyle(this.styleText)),
+            style: Object.assign(this.style, SNode.cssStyle(this.styleText))
         };
         /*
         var attributes = {
