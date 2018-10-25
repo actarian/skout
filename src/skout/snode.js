@@ -2,6 +2,7 @@
 
 import sketch from 'sketch';
 import VNode from 'virtual-dom/vnode/vnode';
+import SUtil from './sutil';
 
 const ResizingConstraint = Object.freeze({
     None: 63,
@@ -23,7 +24,7 @@ export default class SNode {
         const type = node.type;
         const object = node.object;
         const parent = node.parent;
-        const groups = object.name.split('/').map(x => x.trim().replace(/ /g, '-').toLowerCase());
+        const groups = SUtil.toGroupNames(object.name);
         const name = groups.pop();
         //
         this.object = object;
@@ -35,7 +36,7 @@ export default class SNode {
         this.type = type;
         this.constraint = SNode.getConstraint(object);
         this.styleText = object.sketchObject.CSSAttributeString().trim();
-        this.className = name.replace(/(?!-)(?!_)(\W*)/g, '');
+        this.className = SUtil.toClassName(name);
         this.pathNames = (parent && Array.isArray(parent.pathNames)) ? [].concat(parent.pathNames, [parent.className]) : [];
         this.classes = [this.className];
         //

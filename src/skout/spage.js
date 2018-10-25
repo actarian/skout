@@ -65,11 +65,13 @@ export default class SPage extends SNode {
         // console.log('html =>\n', html);
         console.log('collectedImages', SImage.collectedImages.length);
         console.log('collectedSvgs', SSvg.collectedSvgs.length);
+        console.log('collectedTextStyles', SText.collectedTextStyles.length);
+        console.log('collectedStyles', SNode.collectedStyles.length);
         return html;
     }
 
     getCss() {
-        const collectedStyles = SNode.collectedStyles.filter(x => Object.keys(x.style).length > 0).map(x => {
+        const collectedStyles = SText.collectedTextStyles.concat(SNode.collectedStyles).filter(x => Object.keys(x.style).length > 0).map(x => {
             const props = Object.keys(x.style).map(k => {
                 const key = k.replace(/([A-Z])/g, "-$1").toLowerCase();
                 return `    ${key}: ${x.style[k]};`;
@@ -189,6 +191,8 @@ ${props} }`;
         SImage.collectedImages = [];
         SSvg.collectedSvgs = [];
         SNode.collectedStyles = [];
+        SText.collectedTextStyles = [];
+        // SText.collectTextStyles(artboard);
         const page = SPage.getNode(artboard);
         page.layoutNode(SPage.getLayout(object), 0);
         /*
@@ -221,5 +225,64 @@ ${props} }`;
             cols: Array.apply(null, Array(numberOfColumns)).map((x, i) => Math.min(totalWidth, Math.floor((columnWidth + gutterWidth) * (i + 1) - gutterWidth)))
         };
     }
+
+    collectTextStyles() {
+        /*
+        var size = styles[i].size;
+        var family = styles[i].font;
+        var name = styles[i].name;
+
+        var red = styles[i].color.red;
+        var green = styles[i].color.green;
+        var blue = styles[i].color.blue;
+        var alpha = styles[i].color.alpha;
+
+        var align = styles[i].alignment || 0;
+        var spacing = styles[i].spacing || 0;
+        var paragraphSpacing = styles[i].paragraphSpacing || 0;
+        var lineHeight = styles[i].lineHeight || 0;
+
+        var textTransform = styles[i].textTransform || 0;
+
+        var strikethrough = styles[i].strikethrough || 0;
+        var underline = styles[i].underline || 0;
+
+        var rectTextFrame = NSMakeRect(0, 0, 250, 50);
+        var newText = [
+            [MSTextLayer alloc] initWithFrame: rectTextFrame
+        ];
+
+        fonts.push(MSColor.colorWithRed_green_blue_alpha(red, green, blue, alpha))
+
+        var color = fonts[i];
+
+        newText.name = name;
+        newText.stringValue = name + ' ' + size + 'px';
+        newText.fontSize = size;
+        newText.fontPostscriptName = family;
+
+        if (isNaN(red) != true) {
+            newText.textColor = color;
+        } else {
+            newText.textColor = MSColor.colorWithNSColor(NSColor.colorWithGray(0.0));
+        }
+
+        newText.textAlignment = align;
+        [newText setCharacterSpacing: spacing];
+        [newText setLineHeight: lineHeight];
+        newText.addAttribute_value("MSAttributedStringTextTransformAttribute", textTransform)
+
+        var paragraphStyle = newText.paragraphStyle();
+        paragraphStyle.setParagraphSpacing(paragraphSpacing);
+        newText.addAttribute_value("NSParagraphStyle", paragraphStyle);
+
+        newText.addAttribute_value("NSStrikethrough", strikethrough);
+        newText.addAttribute_value("NSUnderline", underline);
+
+        checkForMatchingStyles(context, sharedStyles.objects(), name, newText.style());
+        findLayersWithSharedStyleNamed_inContainer(context, newText.name(), newText.style())
+*/
+    }
+
 
 }

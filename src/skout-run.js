@@ -9,23 +9,45 @@ import SPage from './skout/spage';
 // var Document = require('sketch/dom');
 // var Artboard = require('sketch/dom').Artboard;
 
-const DEBUG = 0;
+const DEBUGMODE = 1;
+const DEBUG = 1;
 
 export default function () {
 
-    function message(...rest) {
-        // const doc = Document.getSelectedDocument();
-        const doc = context.document;
-        if (doc) {
-            sketch.UI.message.apply(this, rest);
-            rest.unshift('message');
+    const artboards = getSelectedArtboards();
+    if (artboards.length != 1) {
+        message('Please select a single artboards 🙌 ');
+
+    } else {
+        const page = SPage.fromArtboard(artboards[0]);
+        // console.log('pages', JSON.stringify(pages).replace(/(")(\w*)(\":)/g, ' $2: '));
+        // console.log('pages', pages);
+        // message(pages.length + ' page found 🙌 ');
+        if (DEBUG) {
+            const html = page.getHtml();
         } else {
-            rest.unshift('no context');
+
+            /*
+            // options modal
+            const modal = newSettingsModal((success) => {
+                console.log(success);
+            }, (cancel) => message('canceled!'), (error) => message(error));
+            */
+
+            const modal = newSelectFolderModal();
+            if (modal.runModal()) {
+                var folder = modal.URL().path();
+                page.exportToFolder(folder);
+                message('saved to folder 🙌 ' + folder);
+            }
         }
-        console.log.apply(this, rest);
     }
 
-    function getArtboards() {
+    if (!DEBUGMODE) {
+        // SUtil.googleAnalytics('skout', 'run');
+    }
+
+    function getSelectedArtboards() {
         const selection = context.selection;
         if (selection) {
             const artboards = selection.slice().filter(x => x.class() == 'MSArtboardGroup');
@@ -35,7 +57,38 @@ export default function () {
         }
     }
 
-    function getFolderModal() {
+    function removeFolder(path) {
+        if (NSFileManager.defaultManager().fileExistsAtPath_(path)) {
+            NSFileManager.defaultManager().removeItemAtPath_error_(path, nil);
+        }
+    }
+
+    function saveTextFile(text, path, name) {
+        NSString.stringWithString(text).writeToFile_atomically_encoding_error_(
+            path + '/' + name, true, NSUTF8StringEncoding, null
+        );
+    }
+
+    function openFolder(path) {
+        NSWorkspace.sharedWorkspace().selectFile_inFileViewerRootedAtPath(path, nil);
+    }
+
+    function exportLayer(object, path, name) {
+        const doc = context.document;
+        const format = 'svg';
+        var exportFormat = MSExportFormat.alloc().init();
+        var exportRequest = MSExportRequest.exportRequestFromExportFormat_layer_inRect_useIDForName(
+            exportFormat, object, object.frame().rect(), false
+        );
+        exportRequest.setShouldTrim(false);
+        exportRequest.setFormat(format);
+        exportRequest.setScale(2);
+        // Artboard background color
+        exportRequest.setBackgroundColor(object.backgroundColor());
+        doc.saveExportRequest_toFile(exportRequest, path + "/folder/" + name + "." + format);
+    }
+
+    function newSelectFolderModal() {
         //create modal for user to select file
         /*
         var modal = NSOpenPanel.openPanel();
@@ -59,108 +112,116 @@ export default function () {
         return modal;
     }
 
-    const artboards = getArtboards();
-    if (artboards.length === 0) {
-        message('No artboards selected 🙌 ');
-    } else {
-        // Create and show dialog window  
+    function newSettingsModal(complete, cancel, error) {
         const doc = context.document;
         if (doc) {
-            /*
-            const window = NSWindow.alloc().initWithContentRect(NSMakeRect(0, 0, 800, 800), NSTitledWindowMask | NSClosableWindowMask, 
-            NSBackingStoreBuffered, false);
-            window.center();
-            window.makeKeyAndOrderFront_(window);
-            const alert = window[0];
-            */
-            const alert = modalWithOptions()[0];
-            const response = alert.runModal(); // This part shows the dialog windows and stores the 'response' in a variable
-            console.log('response', response);
-        }
+            const modal = COSAlertWindow.alloc().init(); // .new();
+            modal.addTextLabelWithValue('ciao');
+            modal.setInformativeText('informative text');
+            // modal.setIcon(NSImage.alloc().initByReferencingFile(context.plugin.urlForResourceNamed('icon@2x.png').path()));
+            modal.setMessageText('Skout export options');
+            // Creating dialog buttons
+            modal.addButtonWithTitle('Export');
+            modal.addButtonWithTitle('Cancel');
+            modal.addTextFieldWithValue('hola');
 
-        const pages = artboards.map(x => SPage.fromArtboard(x));
-        // console.log('pages', JSON.stringify(pages).replace(/(")(\w*)(\":)/g, ' $2: '));
-        // console.log('pages', pages);
-        // message(pages.length + ' page found 🙌 ');
 
-        if (DEBUG) {
-            const html = pages[0].getHtml();
+            const vw = 320;
+            const vh = 240;
+            const view = NSView.alloc().initWithFrame(NSMakeRect(0, 0, vw, vh));
+            modal.addAccessoryView(view);
+
+            if (false) {
+                // Create and configure your inputs here
+                const label = NSTextField.alloc().initWithFrame(NSMakeRect(10, 0, vw - 20, 40));
+                label.setStringValue('Lorem ipsum');
+                label.setBezeled(0);
+                label.setDrawsBackground(0);
+                label.setEditable(0);
+                label.setSelectable(0);
+                view.addSubview(label);
+            }
+
+            if (false) {
+                // TextField 1
+                const inputField1 = NSTextField.alloc().initWithFrame(NSMakeRect(0, vh - 85, 130, 20));
+                inputField1.setStringValue('AAAA');
+                view.addSubview(inputField1);
+                // TextField 2
+                const inputField2 = NSTextField.alloc().initWithFrame(NSMakeRect(140, vh - 85, 130, 20));
+                inputField2.setStringValue('BBBB');
+                view.addSubview(inputField2);
+            }
+
+            const radioButton = NSButtonCell.alloc().init();
+            radioButton.setButtonType(NSRadioButton);
+            // The matrix will contain all the cells (radio buttons)
+            const radioMatrix = NSMatrix.alloc().initWithFrame_mode_prototype_numberOfRows_numberOfColumns(
+                NSMakeRect(0, 20, 400, 50), // Horizontal position, vertical position, width, height
+                NSRadioModeMatrix, // This makes the radio buttons work together
+                radioButton,
+                1, // 1 row
+                3 // 3 columns (for 3 radio buttons)
+            );
+            // Settings the size of the radio buttons
+            radioMatrix.setCellSize(CGSizeMake(100, 25));
+            // Adding the radio buttons to the form
+            const cells = radioMatrix.cells();
+            cells.objectAtIndex(0).setTitle('Responsive');
+            cells.objectAtIndex(1).setTitle('Percentual');
+            cells.objectAtIndex(2).setTitle('Exact');
+            // Adding the matrix to the form
+            view.addSubview(radioMatrix);
+
+            // Creating the input
+            const checkbox = NSButton.alloc().initWithFrame(NSMakeRect(0, vh - 140, vw, 20));
+            checkbox.setButtonType(NSSwitchButton);
+            checkbox.setBezelStyle(0);
+            checkbox.setTitle('Svg sprite');
+            checkbox.setState(NSOffState);
+            view.addSubview(checkbox);
+
+            const response = modal.runModal();
+            if (response == NSOKButton) {
+
+                // const selectedRadioIndex = cells.indexOfObject(radioMatrix.selectedCell());
+
+                const result = {
+                    svgSprite: checkbox.stringValue() == '1',
+                    isResponsive: cells.objectAtIndex(0).stringValue() == '1',
+                    isPercentual: cells.objectAtIndex(1).stringValue() == '1',
+                    isExact: cells.objectAtIndex(2).stringValue() == '1',
+                };
+                console.log('complete', result);
+                if (typeof complete == 'function') {
+                    complete(result);
+                }
+            } else if (response == 1001) {
+                console.log('cancel');
+                if (typeof cancel == 'function') {
+                    cancel();
+                }
+            }
+            return modal;
         } else {
-            const modal = getFolderModal();
-            if (modal.runModal()) {
-                var folder = modal.URL().path();
-                pages[0].exportToFolder(folder);
-                message('saved to folder 🙌 ' + folder);
+            const result = 'Impossible to open 🙌 ';
+            console.log('error', result);
+            if (typeof error == 'function') {
+                error(result);
             }
         }
     }
 
-    function modalWithOptions() {
-        const alert = COSAlertWindow.new();
-        alert.setIcon(NSImage.alloc().initByReferencingFile(context.plugin.urlForResourceNamed("icon@2x.png").path()));
-        alert.setMessageText("Configure your confetti");
-        // Creating dialog buttons
-        alert.addButtonWithTitle("Ok");
-        alert.addButtonWithTitle("Cancel");
-        // Creating the view
-        const viewWidth = 300;
-        const viewHeight = 140;
-        const view = NSView.alloc().initWithFrame(NSMakeRect(0, 0, viewWidth, viewHeight));
-        alert.addAccessoryView(view);
-        // Create and configure your inputs here
-        /*
-        const label = NSTextField.alloc().initWithFrame(NSMakeRect(x, y, w, h));
-        label.setStringValue(text);
-        */
-        // Create label
-        /*
-        const infoLabel = sketch.utils.createLabel(NSMakeRect(0, viewHeight - 33, (viewWidth - 100), 35), "Your confetti is distributed in a grid. Setup your grid to get the results you're looking for.");
-        view.addSubview(infoLabel);
-        */
-        // Creating the inputs
-        const horizontalTextField = NSTextField.alloc().initWithFrame(NSMakeRect(0, viewHeight - 85, 130, 20));
-        const verticalTextField = NSTextField.alloc().initWithFrame(NSMakeRect(140, viewHeight - 85, 130, 20));
-
-        // Adding the textfield 
-        view.addSubview(horizontalTextField);
-        view.addSubview(verticalTextField);
-
-        // Default values for textfield
-        horizontalTextField.setStringValue('5');
-        verticalTextField.setStringValue('5');
-        // Creating the input
-        const checkbox = NSButton.alloc().initWithFrame(NSMakeRect(0, viewHeight - 140, viewWidth, 20));
-
-        // Setting the options for the checkbox
-        checkbox.setButtonType(NSSwitchButton);
-        checkbox.setBezelStyle(0);
-        checkbox.setTitle("Checkbox");
-        checkbox.setState(NSOffState); //Change this to NSOnState if you want the checkbox to be selected by default
-        // Acts like a template (prototype) for our radio buttons
-        const buttonFormat = NSButtonCell.alloc().init();
-        buttonFormat.setButtonType(NSRadioButton);
-
-        // The matrix will contain all the cells (radio buttons)
-        const matrixFormat = NSMatrix.alloc().initWithFrame_mode_prototype_numberOfRows_numberOfColumns(
-            NSMakeRect(0, 20, 400, 50), // Horizontal position, vertical position, width, height
-            NSRadioModeMatrix, // This makes the radio buttons work together
-            buttonFormat,
-            1, // 1 row
-            3 // 3 columns (for 3 radio buttons)
-        );
-        // Settings the size of the radio buttons
-        matrixFormat.setCellSize(CGSizeMake(100, 25));
-
-        // Adding the radio buttons to the form
-        const cells = matrixFormat.cells();
-        cells.objectAtIndex(0).setTitle("Horizontal");
-        cells.objectAtIndex(1).setTitle("Vertical");
-        cells.objectAtIndex(2).setTitle("Both");
-
-        // Adding the matrix to the form
-        view.addSubview(matrixFormat);
-        // Show the dialog
-        return [alert];
+    function message(...rest) {
+        // const doc = Document.getSelectedDocument();
+        const doc = context.document;
+        if (doc) {
+            sketch.UI.message.apply(this, rest);
+            rest.unshift('message');
+        } else {
+            rest.unshift('no context');
+        }
+        console.log.apply(this, rest);
     }
 
 }
