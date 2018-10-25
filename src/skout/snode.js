@@ -13,6 +13,9 @@ const ResizingConstraint = Object.freeze({
     Height: 47,
 });
 
+const EXTERNAL = true;
+const LOG_LAYERS = false;
+
 export default class SNode {
 
     constructor(node) {
@@ -61,10 +64,19 @@ export default class SNode {
     attributes() {
         const attributes = {
             className: this.classes.join(' '),
-            style: this.style,
             //n, SNode.cssStyle(this.styleText)),
             // style: this.styleText
         };
+        const style = this.style;
+        if (EXTERNAL) {
+            SNode.collectedStyles.push({
+                className: this.className,
+                pathNames: this.pathNames,
+                style: style,
+            });
+        } else {
+            attributes.style = style;
+        }
         return attributes;
     }
 
@@ -88,26 +100,47 @@ export default class SNode {
             a.hasSibilings = this.nodes.length > 1;
             if (a.hasSibilings) {
                 this.nodes.filter(b => b !== a).forEach(b => {
+                    /*
+                    if (a.className == 'claim-whatsapp') {
+                        console.log(a.className, a.frame, b.frame, SNode.overlaps(a.frame, b.frame));
+                    }
+                    */
                     a.hasOverlaps = a.hasOverlaps || SNode.overlaps(a.frame, b.frame);
+                    a.hasSmallOverlaps = a.hasSmallOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width >= layout.totalWidth && b.frame.width < layout.totalWidth);
+                    a.hasLargeOverlaps = a.hasLargeOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width < layout.totalWidth && b.frame.width >= layout.totalWidth);
                 });
             }
+            /*
             if (a.frame.width >= layout.totalWidth) {
                 a.absolute = (a.hasOverlaps && a.isLargest) ? false : true;
             } else {
                 a.absolute = (a.hasOverlaps && a.isLargest) ? true : false;
             }
-            console.log(a.className, a.absolute);
+            */
+            if (a.hasSmallOverlaps) {
+                a.absolute = true;
+            } else if (a.hasLargeOverlaps) {
+                a.absolute = false;
+            } else {
+                a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
+            }
+            // a.absolute = (a.hasOverlaps && a.isLargest) ? true : false;
+            /*
+            if (a.className == 'claim-whatsapp') {
+                console.log('claim-whatsapp', a.absolute, a.hasOverlaps, a.isLargest);
+            }
+            */
         });
         /*
         claim-whatsapp true
-home-hero false
-header-desktop true
-form-login false
-shouldPrependContainer desktop 1440 1280 1440
-rectangle false
-rectangle true
-home-hero-body false
-shouldPrependContainer home-hero 1440 1280 1440
+        home-hero false
+        header-desktop true
+        form-login false
+        shouldPrependContainer desktop 1440 1280 1440
+        rectangle false
+        rectangle true
+        home-hero-body false
+        shouldPrependContainer home-hero 1440 1280 1440
         */
         //
         this.setInnerRect();
@@ -115,19 +148,30 @@ shouldPrependContainer home-hero 1440 1280 1440
             this.frame.width > this.layout.totalWidth &&
             this.innerRect.width < this.layout.totalWidth) {
             const container = SNode.newContainer(this);
-            this.nodes = [container];
+            this.nodes = this.nodes.filter(x => x.absolute).concat([container]);
         }
-        console.log('shouldPrependContainer', this.className, this.frame.width, this.layout.totalWidth, this.innerRect.width);
+        // console.log('shouldPrependContainer', this.className, this.frame.width, this.layout.totalWidth, this.innerRect.width);
         //
         if (this.isHorizontal) {
             this.nodes.sort((a, b) => a.frame.left - b.frame.left);
         } else {
             this.nodes.sort((a, b) => (a.frame.top * 10000 + a.frame.left) - (b.frame.top * 10000 + b.frame.left));
         }
+        if (LOG_LAYERS) {
+            this.logLayers();
+        }
         this.nodes.forEach((a, i) => {
             a.layoutNode(layout, i);
         });
         this.style = this.getStyle(zIndex);
+    }
+
+    logLayers() {
+        console.log(this.className, ' '.repeat(50 - this.className.length), (this.absolute ? 'abs' : 'rel'), this.frame.width, 'x', this.frame.height);
+        this.nodes.forEach((a, i) => {
+            console.log(this.className, '=>', a.className, ' '.repeat(50 - this.className.length - 4 - a.className.length), (a.absolute ? 'abs' : 'rel'), a.frame.width, 'x', a.frame.height);
+        });
+        console.log(' ', ' ');
     }
 
     getStyle(zIndex) {
@@ -250,7 +294,8 @@ shouldPrependContainer home-hero 1440 1280 1440
     }
 
     static overlaps(a, b) {
-        return !(b.left > a.right || b.right < a.left || b.top > a.bottom || b.bottom < a.top);
+        const c = 0.1;
+        return !(b.left + c > a.right || b.right < a.left + c || b.top + c > a.bottom || b.bottom < a.top + c);
     }
 
     static cssStyle(styleText) {
@@ -301,12 +346,40 @@ shouldPrependContainer home-hero 1440 1280 1440
         container.layout = node.layout;
         container.style = {};
         container.parent = node;
-        container.nodes = node.nodes;
+        container.nodes = node.nodes.filter(a => !a.absolute);
         container.setInnerRect();
+        const padding = {
+            left: (container.innerRect.left - container.frame.left),
+            top: (container.innerRect.top - container.frame.top),
+            bottom: (container.frame.bottom - container.innerRect.bottom),
+            right: (container.frame.right - container.innerRect.right),
+        };
+        container.nodes.forEach(x => {
+            x.frame.left -= padding.left;
+            x.frame.top -= padding.top;
+            x.frame.right = x.frame.left + x.frame.width;
+            x.frame.bottom = x.frame.top + x.frame.height;
+        });
         container.render = () => {
-            return new VNode('div', {
-                className: 'container'
-            }, container.nodes.map(x => x.render()));
+            const attributes = {
+                className: `container container-${container.id}`,
+            };
+            const PADDING = true;
+            if (PADDING) {
+                const style = {
+                    padding: `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`,
+                };
+                if (EXTERNAL) {
+                    SNode.collectedStyles.push({
+                        className: `container-${container.id}`,
+                        pathNames: container.pathNames,
+                        style: style,
+                    });
+                } else {
+                    attributes.style = style;
+                }
+            }
+            return new VNode('div', attributes, container.nodes.map(x => x.render()));
         };
         return container;
     }
@@ -316,3 +389,5 @@ shouldPrependContainer home-hero 1440 1280 1440
     }
 
 }
+
+SNode.collectedStyles = [];

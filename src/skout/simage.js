@@ -3,17 +3,13 @@
 import VNode from 'virtual-dom/vnode/vnode';
 import SNode from './snode';
 
+const EXTERNAL = true;
+
 export default class SImage extends SNode {
 
     attributes() {
         return {
             className: 'picture ' + this.className,
-            style: {
-                display: 'block',
-                width: '100%',
-                height: 'auto',
-            },
-            // style: this.styleText
         };
     }
 

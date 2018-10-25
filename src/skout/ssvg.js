@@ -4,6 +4,8 @@ import sketch from 'sketch';
 import VNode from 'virtual-dom/vnode/vnode';
 import SNode from './snode';
 
+const EXTERNAL = true;
+
 export default class SSvg extends SNode {
 
     attributes() {
@@ -34,17 +36,27 @@ export default class SSvg extends SNode {
                 name: this.id,
                 sketchObject: this.sketchObject,
             });
-            return new VNode('img', {
+            const attributes = {
                 className: this.className,
                 src: SSvg.filePath(this.className),
-                style: {
-                    position: 'absolute',
-                    top: this.frame.top + 'px',
-                    left: this.frame.left + 'px',
-                    width: '100%',
-                    height: '100%',
-                }
-            }, []);
+            };
+            const style = {
+                position: 'absolute',
+                top: this.frame.top + 'px',
+                left: this.frame.left + 'px',
+                width: '100%',
+                height: '100%',
+            };
+            if (EXTERNAL) {
+                SNode.collectedStyles.push({
+                    className: this.className,
+                    pathNames: this.pathNames,
+                    style: style,
+                });
+            } else {
+                attributes.style = style;
+            }
+            return new VNode('img', attributes, []);
             // return new VNode('svg', this.attributes(), this.nodes.map(x => x.render()));
         } else if (this.type === 'MSShapeGroup') {
             return new VNode('g', null, this.nodes.map(x => x.render()));

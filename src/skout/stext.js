@@ -4,6 +4,8 @@ import VNode from 'virtual-dom/vnode/vnode';
 import VText from 'virtual-dom/vnode/vtext';
 import SNode from './snode';
 
+const EXTERNAL = true;
+
 export default class Stext extends SNode {
 
     constructor(node) {
@@ -38,10 +40,20 @@ export default class Stext extends SNode {
     }
 
     attributes() {
-        return {
+        const attributes = {
             className: this.className,
-            style: Object.assign(this.style, SNode.cssStyle(this.styleText))
         };
+        const style = Object.assign(this.style, SNode.cssStyle(this.styleText));
+        if (EXTERNAL) {
+            SNode.collectedStyles.push({
+                className: this.className,
+                pathNames: this.pathNames,
+                style: style,
+            });
+        } else {
+            attributes.style = style;
+        }
+        return attributes;
         /*
         var attributes = {
         'NSColor': NSColor.colorWithRed_green_blue_alpha(0,0,1,1),

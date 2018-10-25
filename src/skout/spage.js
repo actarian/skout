@@ -11,11 +11,15 @@ import SSvg from './ssvg';
 import SSymbol from './ssymbol';
 import SText from './stext';
 
+const EXTERNAL = true;
+
 export default class SPage extends SNode {
 
     render() {
         // return new VNode('span', null, [new VText('hello')]);
         // return new VNode('span', this.attributes(), this.nodes.map(x => x.render()));
+        const nodes = this.nodes.map(x => x.render());
+        const collectedStyles = this.getCss();
         return new VNode('html', null, [
             new VNode('head', null, [
                 new VNode('style', null, [
@@ -28,22 +32,30 @@ export default class SPage extends SNode {
         margin: 0;
         padding: 0;
     }
-
-    .container {
-        max-width: ${this.layout.totalWidth}px;
-        margin: 0 auto;
-    }
-
+    
     *,
     *::before,
     *::after {
         box-sizing: inherit;
     }
+
+    img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+    
+    .container {
+        max-width: ${this.layout.totalWidth}px;
+        margin: 0 auto;
+    }
+
+    ${collectedStyles}
                     `)
                 ]),
             ]),
             new VNode('body', null, [
-                new VNode('div', this.attributes(), this.nodes.map(x => x.render()))
+                new VNode('div', this.attributes(), nodes)
             ])
         ]);
     }
@@ -54,6 +66,19 @@ export default class SPage extends SNode {
         console.log('collectedImages', SImage.collectedImages.length);
         console.log('collectedSvgs', SSvg.collectedSvgs.length);
         return html;
+    }
+
+    getCss() {
+        const collectedStyles = SNode.collectedStyles.filter(x => Object.keys(x.style).length > 0).map(x => {
+            const props = Object.keys(x.style).map(k => {
+                const key = k.replace(/([A-Z])/g, "-$1").toLowerCase();
+                return `    ${key}: ${x.style[k]};`;
+            }).join('\r');
+            return `.${x.className} { 
+${props} }`;
+        }).join('\r\r');
+        // console.log('collectedStyles\r', collectedStyles.substr(0, 500));
+        return collectedStyles;
     }
 
     exportToFolder(folder) {
@@ -163,8 +188,17 @@ export default class SPage extends SNode {
         // SPage.textStyles = doc.getSharedTextStyles();
         SImage.collectedImages = [];
         SSvg.collectedSvgs = [];
+        SNode.collectedStyles = [];
         const page = SPage.getNode(artboard);
         page.layoutNode(SPage.getLayout(object), 0);
+        /*
+        const overlaps = SNode.overlaps({
+            top: 608, right: 1440, bottom: 718, left: 0, width: 1440, height: 110
+        }, {
+            top: 0, right: 1440, bottom: 608, left: 0, width: 1440, height: 608
+        });
+        console.log('overlaps', overlaps);
+        */
         return page;
     }
 
@@ -185,7 +219,7 @@ export default class SPage extends SNode {
             columnWidth: columnWidth,
             gutterWidth: gutterWidth,
             cols: Array.apply(null, Array(numberOfColumns)).map((x, i) => Math.min(totalWidth, Math.floor((columnWidth + gutterWidth) * (i + 1) - gutterWidth)))
-        }
+        };
     }
 
 }
