@@ -186,8 +186,12 @@ ${props} }`;
         // const doc = SNode.getDocument();
         // console.log(doc, context.document.documentData().metadata());
         // const doc = context.document;
-        // SPage.layerStyles = doc.getSharedLayerStyles();
-        // SPage.textStyles = doc.getSharedTextStyles();
+        //
+        // MSDocument.currentDocument().documentData().allLayerStyles();
+        // context.document.documentData().allLayerStyles();
+        // MSDocument.currentDocument().documentData().allTextStyles();
+        // context.document.documentData().allTextStyles();
+        //            
         SImage.collectedImages = [];
         SSvg.collectedSvgs = [];
         SNode.collectedStyles = [];
@@ -195,14 +199,7 @@ ${props} }`;
         // SText.collectTextStyles(artboard);
         const page = SPage.getNode(artboard);
         page.layoutNode(SPage.getLayout(object), 0);
-        /*
-        const overlaps = SNode.overlaps({
-            top: 608, right: 1440, bottom: 718, left: 0, width: 1440, height: 110
-        }, {
-            top: 0, right: 1440, bottom: 608, left: 0, width: 1440, height: 608
-        });
-        console.log('overlaps', overlaps);
-        */
+        //
         return page;
     }
 

@@ -4,13 +4,14 @@
 
 import sketch from 'sketch';
 import SPage from './skout/spage';
+import SUtil from './skout/sutil';
 
 // var sketch = require('sketch');
 // var Document = require('sketch/dom');
 // var Artboard = require('sketch/dom').Artboard;
 
-const DEBUGMODE = 1;
-const DEBUG = 1;
+const DEBUG_MODE = 1;
+const SKIP_FOLDER = 0;
 
 export default function () {
 
@@ -23,7 +24,7 @@ export default function () {
         // console.log('pages', JSON.stringify(pages).replace(/(")(\w*)(\":)/g, ' $2: '));
         // console.log('pages', pages);
         // message(pages.length + ' page found 🙌 ');
-        if (DEBUG) {
+        if (SKIP_FOLDER) {
             const html = page.getHtml();
         } else {
 
@@ -43,8 +44,8 @@ export default function () {
         }
     }
 
-    if (!DEBUGMODE) {
-        // SUtil.googleAnalytics('skout', 'run');
+    if (!DEBUG_MODE) {
+        SUtil.googleAnalytics('skout', 'run');
     }
 
     function getSelectedArtboards() {
@@ -124,7 +125,6 @@ export default function () {
             modal.addButtonWithTitle('Export');
             modal.addButtonWithTitle('Cancel');
             modal.addTextFieldWithValue('hola');
-
 
             const vw = 320;
             const vh = 240;

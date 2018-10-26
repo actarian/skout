@@ -1,6 +1,6 @@
 /* jshint esversion: 6 */
 
-const GOOGLE_UA = 'XXX-UA-118958211-1';
+const GOOGLE_UA = 'UA-128159763-1';
 const GOOGLE_UUID = 'google.analytics.uuid';
 
 export default class SUtil {
