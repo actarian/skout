@@ -2,6 +2,9 @@
 
 import sketch from 'sketch';
 import VNode from 'virtual-dom/vnode/vnode';
+import SOptions from './soptions';
+import SRect from './srect';
+import SStyle from './sstyle';
 import SUtil from './sutil';
 
 const ResizingConstraint = Object.freeze({
@@ -13,9 +16,6 @@ const ResizingConstraint = Object.freeze({
     Width: 61,
     Height: 47,
 });
-
-const EXTERNAL = true;
-const LOG_LAYERS = false;
 
 export default class SNode {
 
@@ -29,26 +29,54 @@ export default class SNode {
         //
         this.object = object;
         this.sketchObject = object.sketchObject;
-        this.parentType = parent ? parent.type : null;
         this.id = object.id;
         this.name = name;
         this.groups = groups;
         this.type = type;
+        this.zIndex = 0;
         this.constraint = SNode.getConstraint(object);
         this.styleText = object.sketchObject.CSSAttributeString().trim();
-        this.className = SUtil.toClassName(name);
-        this.pathNames = (parent && Array.isArray(parent.pathNames)) ? [].concat(parent.pathNames, [parent.className]) : [];
-        this.classes = [this.className];
-        //
-        // console.log(`.${this.pathNames.join(' > .')} > .${this.className}`);
+        // console.log(`.${this.pathNames.join(' > .')}`);
         this.frame = SNode.getFrame(object, type);
+        this.parentFrame = parent ? parent.frame : this.frame;
+        this.margin = new SRect();
+        this.padding = new SRect();
         this.layout = {};
         this.style = {};
+        this.collectedNames = {};
         //
         Object.defineProperty(this, 'parent', {
             value: parent,
             writable: true
         });
+        //
+        this.getNames(parent);
+    }
+
+    getNames(parent) {
+        const fileName = SStyle.getFileName(this.name);
+        let parentType = 'Root',
+            pathNames = [],
+            nameCount = 0;
+        if (parent) {
+            parentType = parent.type;
+            if (parent.type == 'MSSymbolInstance') {
+                pathNames = [parent.className];
+            } else if (Array.isArray(parent.pathNames)) {
+                pathNames = parent.pathNames.slice();
+            }
+            nameCount = parent.collectedNames[fileName] || 0;
+            nameCount++;
+            parent.collectedNames[fileName] = nameCount;
+        }
+        const className = fileName + (nameCount > 1 ? '-' + nameCount : ''); // SStyle.getClassName(name);
+        const classes = [className];
+        pathNames.push(className);
+        this.parentType = parentType;
+        this.fileName = fileName;
+        this.className = className;
+        this.classes = classes;
+        this.pathNames = pathNames;
     }
 
     merge(object) {
@@ -65,47 +93,40 @@ export default class SNode {
     attributes() {
         const attributes = {
             className: this.classes.join(' '),
-            //n, SNode.cssStyle(this.styleText)),
-            // style: this.styleText
         };
         const style = this.style;
-        if (EXTERNAL) {
-            SNode.collectedStyles.push({
-                className: this.className,
-                pathNames: this.pathNames,
+        if (SOptions.inline) {
+            attributes.style = style;
+        } else {
+            SStyle.collectedStyles.push({
+                className: this.pathNames.join(' > .'),
                 style: style,
             });
-        } else {
-            attributes.style = style;
         }
         return attributes;
     }
 
-    layoutNode(layout, zIndex) {
+    layoutNode(layout) {
         Object.assign(this.layout, layout);
+        const nodes = this.nodes.slice();
         this.isLargest = this.isLargest || false;
         this.layout.isLargest = this.isLargest;
         this.layout.hasSibilings = this.hasSibilings;
         this.layout.hasOverlaps = this.hasOverlaps;
         if (this.nodes.length > 1) {
-            const largest = this.nodes.reduce((a, b) => a.frame.width >= b.frame.width && a.frame.height > b.frame.height ? a : b);
+            const largest = nodes.reduce((a, b) => a.frame.width >= b.frame.width && a.frame.height > b.frame.height ? a : b);
             largest.isLargest = true;
-            const horizontals = this.nodes.slice().sort((a, b) => a.frame.left - b.frame.left);
+            const horizontals = nodes.sort((a, b) => a.frame.left - b.frame.left);
             const isHorizontal = horizontals.reduce((a, b) => (a && b && a.frame.right <= b.frame.left) ? b : null);
             this.isHorizontal = isHorizontal;
-            const verticals = this.nodes.slice().sort((a, b) => a.frame.top - b.frame.top);
+            const verticals = nodes.sort((a, b) => a.frame.top - b.frame.top);
             const isVertical = verticals.reduce((a, b) => (a && b && a.frame.bottom <= b.frame.top) ? b : null);
             this.isVertical = isVertical;
         }
-        this.nodes.forEach((a, i) => {
-            a.hasSibilings = this.nodes.length > 1;
+        nodes.forEach((a, i) => {
+            a.hasSibilings = nodes.length > 1;
             if (a.hasSibilings) {
-                this.nodes.filter(b => b !== a).forEach(b => {
-                    /*
-                    if (a.className == 'claim-whatsapp') {
-                        console.log(a.className, a.frame, b.frame, SNode.overlaps(a.frame, b.frame));
-                    }
-                    */
+                nodes.filter(b => b !== a).forEach(b => {
                     a.hasOverlaps = a.hasOverlaps || SNode.overlaps(a.frame, b.frame);
                     a.hasSmallOverlaps = a.hasSmallOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width >= layout.totalWidth && b.frame.width < layout.totalWidth);
                     a.hasLargeOverlaps = a.hasLargeOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width < layout.totalWidth && b.frame.width >= layout.totalWidth);
@@ -125,46 +146,46 @@ export default class SNode {
             } else {
                 a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
             }
-            // a.absolute = (a.hasOverlaps && a.isLargest) ? true : false;
-            /*
-            if (a.className == 'claim-whatsapp') {
-                console.log('claim-whatsapp', a.absolute, a.hasOverlaps, a.isLargest);
-            }
-            */
         });
-        /*
-        claim-whatsapp true
-        home-hero false
-        header-desktop true
-        form-login false
-        shouldPrependContainer desktop 1440 1280 1440
-        rectangle false
-        rectangle true
-        home-hero-body false
-        shouldPrependContainer home-hero 1440 1280 1440
-        */
-        //
         this.setInnerRect();
+        // !!!
+        /*
         if (this.nodes.length &&
             this.frame.width > this.layout.totalWidth &&
             this.innerRect.width < this.layout.totalWidth) {
             const container = SNode.newContainer(this);
             this.nodes = this.nodes.filter(x => x.absolute).concat([container]);
         }
+        */
+        this.padding.top = this.innerRect.top;
+        this.padding.right = this.frame.width - this.innerRect.right;
+        this.padding.bottom = this.frame.height - this.innerRect.bottom;
+        this.padding.left = this.innerRect.left;
         // console.log('shouldPrependContainer', this.className, this.frame.width, this.layout.totalWidth, this.innerRect.width);
-        //
         if (this.isHorizontal) {
-            this.nodes.sort((a, b) => a.frame.left - b.frame.left);
+            this.nodes.sort((a, b) => a.frame.left - b.frame.left).forEach((b, i) => {
+                if (i > 0) {
+                    const a = this.nodes[i - 1];
+                    a.margin.right = b.frame.left - a.frame.right;
+                }
+            });
+        } else if (this.isVertical) {
+            this.nodes.sort((a, b) => a.frame.top - b.frame.top).forEach((b, i) => {
+                if (i > 0) {
+                    const a = this.nodes[i - 1];
+                    a.margin.bottom = b.frame.top - a.frame.bottom;
+                }
+            });
         } else {
             this.nodes.sort((a, b) => (a.frame.top * 10000 + a.frame.left) - (b.frame.top * 10000 + b.frame.left));
         }
-        if (LOG_LAYERS) {
+        this.nodes.forEach((a, i) => {
+            a.layoutNode(layout);
+        });
+        if (SOptions.log.layers) {
             this.logLayers();
         }
-        this.nodes.forEach((a, i) => {
-            a.layoutNode(layout, i);
-        });
-        this.style = this.getStyle(zIndex);
+        this.style = this.getStyle();
     }
 
     logLayers() {
@@ -175,10 +196,13 @@ export default class SNode {
         console.log(' ', ' ');
     }
 
-    getStyle(zIndex) {
+    getStyle() {
         const layout = this.layout;
         const frame = this.frame;
+        const parentFrame = this.parentFrame;
         const classes = this.classes;
+        const margin = this.margin;
+        const padding = this.padding;
         /*
         this.layout.position = 'relative';
         if (this.hasSibilings && this.hasOverlaps && this.isLargest) {
@@ -207,6 +231,8 @@ export default class SNode {
         });
         if (col === layout.numberOfColumns) {
             classes.push('container');
+            frame.width = layout.maxWidth;
+            this.absolute = false; // !!!
         } else if (col < layout.numberOfColumns) {
             classes.push('col-' + col);
         }
@@ -214,18 +240,23 @@ export default class SNode {
         const style = {
             display: 'block',
             position: this.absolute ? 'absolute' : 'relative',
-            top: this.absolute ? frame.top + 'px' : 'auto',
-            left: this.absolute ? frame.left + 'px' : 'auto',
             width: (frame.width === layout.maxWidth) ? '100%' : frame.width + 'px',
             height: frame.height + 'px',
-            zIndex: zIndex,
+            // width: this.constraint.width ? frame.width + 'px' : (frame.width / parentFrame.width * 100) + '%',
+            // height: this.constraint.height ? frame.height + 'px' : (frame.height / parentFrame.height * 100) + '%',
+            zIndex: this.zIndex,
             // background: 'rgba(0,0,0,0.05)'
         };
+        if (this.absolute) {
+            style.top = frame.top + 'px';
+            style.left = frame.left + 'px';
+        }
         if (this.isHorizontal) {
             style.display = 'flex';
             style.flexDirection = 'row';
-            style.justifyContent = 'space-between';
+            style.justifyContent = 'center';
             style.alignItems = 'center';
+            style.minHeight = '100%';
         }
         if (this.isVertical) {
             style.display = 'flex';
@@ -233,6 +264,8 @@ export default class SNode {
             style.justifyContent = 'flex-start';
             style.alignItems = 'flex-start';
         }
+        style.margin = `${margin.top}px ${margin.right}px ${margin.bottom}px ${margin.left}px`;
+        style.padding = `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
         return style;
     }
 
@@ -299,42 +332,12 @@ export default class SNode {
         return !(b.left + c > a.right || b.right < a.left + c || b.top + c > a.bottom || b.bottom < a.top + c);
     }
 
-    static cssStyle(styleText) {
-        const style = {};
-        styleText.split(';').forEach(x => {
-            if (x.indexOf(':') !== -1) {
-                const kv = x.split(':');
-                style[kv[0].trim()] = kv[1].trim();
-            }
-        });
-        return style;
-    }
-
-    static toHash(text) {
-        var hash = 0,
-            i, chr;
-        if (text.length === 0) return hash;
-        for (i = 0; i < text.length; i++) {
-            chr = text.charCodeAt(i);
-            hash = ((hash << 5) - hash) + chr;
-            hash |= 0; // Convert to 32bit integer
-        }
-        return hash;
-    }
-
-    static toRgb(color) {
-        var r = Math.round(color.red() * 255);
-        var g = Math.round(color.green() * 255);
-        var b = Math.round(color.blue() * 255);
-        return 'rgba(' + r + ',' + g + ',' + b + ',' + color.alpha() + ')';
-    }
-
     static newContainer(node) {
         const container = new SNode(node);
         container.name = 'container';
         container.type = 'Container';
         container.className = 'container';
-        container.pathNames = [];
+        container.pathNames = [].concat(node.pathNames, [container]);
         container.classes = [container.className];
         container.frame = {
             top: 0,
@@ -363,21 +366,20 @@ export default class SNode {
         });
         container.render = () => {
             const attributes = {
-                className: `container container-${container.id}`,
+                className: 'container',
             };
             const PADDING = true;
             if (PADDING) {
                 const style = {
                     padding: `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`,
                 };
-                if (EXTERNAL) {
-                    SNode.collectedStyles.push({
-                        className: `container-${container.id}`,
-                        pathNames: container.pathNames,
+                if (SOptions.inline) {
+                    attributes.style = style;
+                } else {
+                    SStyle.collectedStyles.push({
+                        className: container.pathNames.join(' '),
                         style: style,
                     });
-                } else {
-                    attributes.style = style;
                 }
             }
             return new VNode('div', attributes, container.nodes.map(x => x.render()));
@@ -391,4 +393,4 @@ export default class SNode {
 
 }
 
-SNode.collectedStyles = [];
+SNode.collectedStyles = '';

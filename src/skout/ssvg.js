@@ -3,8 +3,8 @@
 import sketch from 'sketch';
 import VNode from 'virtual-dom/vnode/vnode';
 import SNode from './snode';
-
-const EXTERNAL = true;
+import SOptions from './soptions';
+import SStyle from './sstyle';
 
 export default class SSvg extends SNode {
 
@@ -38,7 +38,7 @@ export default class SSvg extends SNode {
             });
             const attributes = {
                 className: this.className,
-                src: SSvg.filePath(this.className),
+                src: SSvg.filePath(this.fileName),
             };
             const style = {
                 position: 'absolute',
@@ -47,14 +47,13 @@ export default class SSvg extends SNode {
                 width: '100%',
                 height: '100%',
             };
-            if (EXTERNAL) {
-                SNode.collectedStyles.push({
-                    className: this.className,
-                    pathNames: this.pathNames,
+            if (SOptions.inline) {
+                attributes.style = style;
+            } else {
+                SStyle.collectedStyles.push({
+                    className: this.pathNames.join(' > .'),
                     style: style,
                 });
-            } else {
-                attributes.style = style;
             }
             return new VNode('img', attributes, []);
             // return new VNode('svg', this.attributes(), this.nodes.map(x => x.render()));

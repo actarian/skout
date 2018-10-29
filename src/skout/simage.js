@@ -2,8 +2,7 @@
 
 import VNode from 'virtual-dom/vnode/vnode';
 import SNode from './snode';
-
-const EXTERNAL = true;
+import SUtil from './sutil';
 
 export default class SImage extends SNode {
 
@@ -14,7 +13,7 @@ export default class SImage extends SNode {
     }
 
     render() {
-        const filePath = this.getFilePath();
+        const filePath = `img/${this.fileName}-${this.id}.png`;
         SImage.collectedImages.push({
             name: filePath,
             save: (folder, filePath) => {
@@ -40,10 +39,6 @@ export default class SImage extends SNode {
         });
         imageData.writeToFile(path);
         return path;
-    }
-
-    getFilePath() {
-        return `img/${this.className}-${this.id}.png`;
     }
 
     static getImage(image) {
@@ -115,9 +110,7 @@ export default class SImage extends SNode {
             */
             const imageData = newRep.representationUsingType_properties(NSPNGFileType, nil);
             // console.log(NSFileManager.defaultManager());
-            NSFileManager.defaultManager().createDirectoryAtPath_attributes(folder + '/' + filepath, {
-                withIntermediateDirectories: true
-            });
+            SUtil.addFolder(folder + '/' + filepath);
             imageData.writeToFile(folder + '/' + filepath + filename);
             // console.log('saveJpg.writeToFile', folder, filepath, filename);
             // return NSString.stringWithFormat('data:%@;base64,%@', 'image/jpeg', imageData.base64EncodedStringWithOptions(0));

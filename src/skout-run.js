@@ -3,6 +3,7 @@
 // documentation: https://developer.sketchapp.com/reference/api/
 
 import sketch from 'sketch';
+import SOptions from './skout/soptions';
 import SPage from './skout/spage';
 import SUtil from './skout/sutil';
 
@@ -10,42 +11,51 @@ import SUtil from './skout/sutil';
 // var Document = require('sketch/dom');
 // var Artboard = require('sketch/dom').Artboard;
 
-const DEBUG_MODE = 1;
-const SKIP_FOLDER = 0;
-
 export default function () {
+
+    SOptions.defaults({
+        save: false,
+        settings: false,
+        debug: true,
+        folder: '/Users/lucazampetti/Desktop/SKOUT',
+    });
 
     const artboards = getSelectedArtboards();
     if (artboards.length != 1) {
         message('Please select a single artboards 🙌 ');
 
     } else {
+        if (SOptions.settings) {
+            const modal = newSettingsModal((settings) => {
+                SOptions.set(settings);
+                getHtml();
+            }, (cancel) => message('canceled!'), (error) => message(error));
+        } else {
+            getHtml();
+        }
+
+    }
+
+    function getHtml() {
         const page = SPage.fromArtboard(artboards[0]);
         // console.log('pages', JSON.stringify(pages).replace(/(")(\w*)(\":)/g, ' $2: '));
         // console.log('pages', pages);
         // message(pages.length + ' page found 🙌 ');
-        if (SKIP_FOLDER) {
-            const html = page.getHtml();
-        } else {
-
-            /*
-            // options modal
-            const modal = newSettingsModal((success) => {
-                console.log(success);
+        if (SOptions.save) {
+            const modal = newSelectFolderModal((folder) => {
+                SOptions.folder = folder.path;
+                page.exportToFolder(SOptions.folder);
+                message('saved to folder ' + SOptions.folder + ' 🙌 ');
             }, (cancel) => message('canceled!'), (error) => message(error));
-            */
-
-            const modal = newSelectFolderModal();
-            if (modal.runModal()) {
-                var folder = modal.URL().path();
-                page.exportToFolder(folder);
-                message('saved to folder 🙌 ' + folder);
-            }
+        } else if (SOptions.folder) {
+            page.exportToFolder(SOptions.folder);
+            console.log('saved to folder ' + SOptions.folder + ' 🙌 ');
+        } else {
+            const html = page.getHtml();
         }
-    }
-
-    if (!DEBUG_MODE) {
-        SUtil.googleAnalytics('skout', 'run');
+        if (!SOptions.debug) {
+            SUtil.googleAnalytics('skout', 'run');
+        }
     }
 
     function getSelectedArtboards() {
@@ -58,59 +68,49 @@ export default function () {
         }
     }
 
-    function removeFolder(path) {
-        if (NSFileManager.defaultManager().fileExistsAtPath_(path)) {
-            NSFileManager.defaultManager().removeItemAtPath_error_(path, nil);
-        }
-    }
-
-    function saveTextFile(text, path, name) {
-        NSString.stringWithString(text).writeToFile_atomically_encoding_error_(
-            path + '/' + name, true, NSUTF8StringEncoding, null
-        );
-    }
-
-    function openFolder(path) {
-        NSWorkspace.sharedWorkspace().selectFile_inFileViewerRootedAtPath(path, nil);
-    }
-
-    function exportLayer(object, path, name) {
+    function newSelectFolderModal(complete, cancel, error) {
         const doc = context.document;
-        const format = 'svg';
-        var exportFormat = MSExportFormat.alloc().init();
-        var exportRequest = MSExportRequest.exportRequestFromExportFormat_layer_inRect_useIDForName(
-            exportFormat, object, object.frame().rect(), false
-        );
-        exportRequest.setShouldTrim(false);
-        exportRequest.setFormat(format);
-        exportRequest.setScale(2);
-        // Artboard background color
-        exportRequest.setBackgroundColor(object.backgroundColor());
-        doc.saveExportRequest_toFile(exportRequest, path + "/folder/" + name + "." + format);
-    }
-
-    function newSelectFolderModal() {
-        //create modal for user to select file
-        /*
-        var modal = NSOpenPanel.openPanel();
-        // modal.setAllowedFileTypes(['json']);
-        modal.setCanChooseDirectories(true);
-        modal.setCanChooseFiles(false);
-        modal.setCanCreateDirectories(false);
-        modal.setTitle('Select an output folder');
-        modal.setPrompt('Output folder');
-        modal.runModal();
-        */
-        var modal = NSOpenPanel.openPanel();
-        // var modal = NSSavePanel.savePanel();
-        // modal.setAllowedFileTypes(['json']);
-        // modal.setNameFieldStringValue(documentName+'.json');
-        modal.setCanChooseDirectories(true);
-        modal.setCanChooseFiles(false);
-        modal.setCanCreateDirectories(true);
-        modal.setTitle('Select an output folder');
-        modal.setPrompt('Output folder');
-        return modal;
+        if (doc) {
+            //create modal for user to select file
+            /*
+            var modal = NSOpenPanel.openPanel();
+            // modal.setAllowedFileTypes(['json']);
+            modal.setCanChooseDirectories(true);
+            modal.setCanChooseFiles(false);
+            modal.setCanCreateDirectories(false);
+            modal.setTitle('Select an output folder');
+            modal.setPrompt('Output folder');
+            modal.runModal();
+            */
+            var modal = NSOpenPanel.openPanel();
+            // var modal = NSSavePanel.savePanel();
+            // modal.setAllowedFileTypes(['json']);
+            // modal.setNameFieldStringValue(documentName+'.json');
+            modal.setCanChooseDirectories(true);
+            modal.setCanChooseFiles(false);
+            modal.setCanCreateDirectories(true);
+            modal.setTitle('Select an output folder');
+            modal.setPrompt('Output folder');
+            const response = modal.runModal();
+            if (response == NSOKButton) {
+                const result = {
+                    path: modal.URL().path(),
+                };
+                if (typeof complete == 'function') {
+                    complete(result);
+                }
+            } else if (response == 1001) {
+                if (typeof cancel == 'function') {
+                    cancel();
+                }
+            }
+            return modal;
+        } else {
+            const result = 'Impossible to open 🙌 ';
+            if (typeof error == 'function') {
+                error(result);
+            }
+        }
     }
 
     function newSettingsModal(complete, cancel, error) {
@@ -183,21 +183,17 @@ export default function () {
 
             const response = modal.runModal();
             if (response == NSOKButton) {
-
                 // const selectedRadioIndex = cells.indexOfObject(radioMatrix.selectedCell());
-
                 const result = {
                     svgSprite: checkbox.stringValue() == '1',
                     isResponsive: cells.objectAtIndex(0).stringValue() == '1',
                     isPercentual: cells.objectAtIndex(1).stringValue() == '1',
                     isExact: cells.objectAtIndex(2).stringValue() == '1',
                 };
-                console.log('complete', result);
                 if (typeof complete == 'function') {
                     complete(result);
                 }
             } else if (response == 1001) {
-                console.log('cancel');
                 if (typeof cancel == 'function') {
                     cancel();
                 }
@@ -205,7 +201,6 @@ export default function () {
             return modal;
         } else {
             const result = 'Impossible to open 🙌 ';
-            console.log('error', result);
             if (typeof error == 'function') {
                 error(result);
             }

@@ -13,28 +13,6 @@ export default class SUtil {
         return name.toLowerCase().split('/').map(x => x.trim().replace(/ /g, '-'));
     }
 
-    static toClassName(name) {
-        return name.toLowerCase().replace(/(?!-)(?!_)(\W*)/g, '');
-    }
-
-    static cssStyle(styleText) {
-        const style = {};
-        styleText.split(';').forEach(x => {
-            if (x.indexOf(':') !== -1) {
-                const kv = x.split(':');
-                style[kv[0].trim()] = kv[1].trim();
-            }
-        });
-        return style;
-    }
-
-    static toRgb(color) {
-        var r = Math.round(color.red() * 255);
-        var g = Math.round(color.green() * 255);
-        var b = Math.round(color.blue() * 255);
-        return 'rgba(' + r + ',' + g + ',' + b + ',' + color.alpha() + ')';
-    }
-
     static toHash(text) {
         var hash = 0,
             i, chr;
@@ -45,6 +23,46 @@ export default class SUtil {
             hash |= 0; // Convert to 32bit integer
         }
         return hash;
+    }
+
+    static addFolder(path) {
+        if (!NSFileManager.defaultManager().fileExistsAtPath_(path)) {
+            NSFileManager.defaultManager().createDirectoryAtPath_attributes(path, {
+                withIntermediateDirectories: true
+            });
+        }
+    }
+
+    static removeFolder(path) {
+        if (NSFileManager.defaultManager().fileExistsAtPath_(path)) {
+            NSFileManager.defaultManager().removeItemAtPath_error_(path, nil);
+        }
+    }
+
+    static saveTextFile(text, path, name) {
+        SUtil.addFolder(path);
+        NSString.stringWithString(text).writeToFile_atomically_encoding_error_(
+            path + '/' + name, true, NSUTF8StringEncoding, null
+        );
+    }
+
+    static openFolder(path) {
+        NSWorkspace.sharedWorkspace().selectFile_inFileViewerRootedAtPath(path, nil);
+    }
+
+    static exportLayer(object, path, name, format) {
+        format = format || 'svg'; // !!!
+        const doc = context.document;
+        var exportFormat = MSExportFormat.alloc().init();
+        var exportRequest = MSExportRequest.exportRequestFromExportFormat_layer_inRect_useIDForName(
+            exportFormat, object, object.frame().rect(), false
+        );
+        exportRequest.setShouldTrim(false);
+        exportRequest.setFormat(format);
+        exportRequest.setScale(2);
+        // Artboard background color
+        exportRequest.setBackgroundColor(object.backgroundColor());
+        doc.saveExportRequest_toFile(exportRequest, path + '/' + name + '.' + format);
     }
 
     static googleAnalytics(category, action, label, value) {

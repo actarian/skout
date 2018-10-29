@@ -1,5 +1,6 @@
 /* jshint esversion: 6 */
 
+
 export default class SStyle {
 
     constructor(object) {
@@ -11,6 +12,46 @@ export default class SStyle {
             Object.assign(this, object);
         }
         return this;
+    }
+
+    static getSharedStyle(object) {
+        let result;
+        if (object.sharedStyleId) {
+            const doc = context.document;
+            const styles = doc.documentData().allTextStyles(); // doc.documentData().layerTextStyles().objects();
+            const sharedStyle = styles.find(x => x.objectID() == object.sharedStyleId);
+            if (sharedStyle) {
+                const className = SStyle.getClassName(sharedStyle.name());
+                const collected = SStyle.collectedTextStyles.find(x => x.className == className);
+                if (!collected) {
+                    // console.log(this.className, sharedStyle.name());
+                    result = {
+                        className: className,
+                        style: SStyle.parseStyle(sharedStyle),
+                    };
+                }
+            }
+            /*
+            const doc = SNode.getDocument();
+            const sharedStyles = doc.getSharedLayerStyles();
+            const style = sharedStyles.find(x => x.id == node.object.sharedStyleId);
+            */
+            // const styleO = SStyle.findTextStyleByName(style.name);
+            /*
+            const doc = SNode.getDocument();
+            const sharedStyles = doc.getSharedLayerStyles();
+            const style = sharedStyles.find(x => x.id == node.object.sharedStyleId);
+            // const style = doc.getSharedLayerStyleWithID(object.sharedStyleId);
+            console.log(node.object.sharedStyleId, sharedStyles[0]);
+            if (style) {
+                // console.log(style.name);
+                const msSharedStyle = SStyle.findTextStyleByName(style.name);
+                const msStyle = msSharedStyle.value();
+                console.log(msStyle);
+            }
+            */
+        }
+        return result;
     }
 
     static parseStyle(object) {
@@ -28,9 +69,19 @@ export default class SStyle {
         const textDecoration = lineThrough || underline;
         const paragraphStyle = textStyle.NSParagraphStyle;
         const paragraphSpacing = paragraphStyle.paragraphSpacing;
-        const lineHeight = paragraphStyle.minimumLineHeight; // !!!
+        const lineHeight = paragraphStyle.maximumLineHeight; // !!!
         const verticalAlignment = ['center', 'B', 'C'][textStyle.textStyleVerticalAlignmentKey]; // !!!
         const alignment = ['left', 'right', 'center', 'justify'][object.alignment]; // !!!
+        //
+        /*
+        alignment: nsparagraph.style.alignment + '',
+            lineHeight: nsparagraph.style.maximumLineHeight + '',
+            parapgrah: nsparagraph.style.paragraphSpacing + '',
+            va: layerStyle
+                .value()
+                .textStyle()
+                .verticalAlignment() + '',
+        */
         // alignment = this.object.alignment;
         /*
         NSTextAlignmentLeft
@@ -133,7 +184,7 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
             console.log(k, object);
         });
         */
-        // const g = SText.listTextLayerAttrsFromStyle(sharedStyle);
+        // const g = SStyle.listTextLayerAttrsFromStyle(sharedStyle);
 
         /*
         var size = styles[i].size;
@@ -221,4 +272,230 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
         return output;
     }
 
+    static serializeStyle(styleText) {
+        const style = {};
+        styleText.split(';').forEach(x => {
+            if (x.indexOf(':') !== -1) {
+                const kv = x.split(':');
+                style[kv[0].trim()] = kv[1].trim();
+            }
+        });
+        return style;
+    }
+
+    static toRgb(color) {
+        var r = Math.round(color.red() * 255);
+        var g = Math.round(color.green() * 255);
+        var b = Math.round(color.blue() * 255);
+        return 'rgba(' + r + ',' + g + ',' + b + ',' + color.alpha() + ')';
+    }
+
+    static getClassNameCount(name, names) {
+        let count = SStyle.collectedNames[name] || 0;
+        count++;
+        SStyle.collectedNames[name] = count;
+        return count > 1 ? '-' + count : '';
+    }
+
+    static getFileName(name) {
+        return name.toLowerCase().replace(/(?!-)(?!_)(\W*)/g, '');
+    }
+
+    static getClassName(name) {
+        name = SStyle.getFileName(name);
+        return name; // + SStyle.getClassNameCount(name);
+    }
+
+    // UNUSED !!!
+
+    /*
+    static findTextStyleById(id) {
+        var predicate = NSPredicate.predicateWithFormat('id = %@', id);
+        return context.document.documentData().layerTextStyles().sharedStyles().filteredArrayUsingPredicate(predicate).firstObject();
+    }
+
+    static findTextStyleByName(name) {
+        var predicate = NSPredicate.predicateWithFormat('name = %@', name);
+        return context.document.documentData().layerTextStyles().sharedStyles().filteredArrayUsingPredicate(predicate).firstObject();
+    }
+
+    static listTextLayerAttrsFromStyle(layerStyle) {
+        const attrs = layerStyle
+            .style()
+            .primitiveTextStyle()
+            .attributes()
+            .treeAsDictionary();
+
+        const nsfont = attrs.NSFont;
+        const nsparagraph = attrs.NSParagraphStyle;
+
+        let tt;
+        try {
+            tt =
+                layerStyle
+                .value()
+                .textStyle()
+                .encodedAttributes().MSAttributedStringTextTransformAttribute + '';
+        } catch (error) {
+            tt = null;
+        }
+
+        let cc;
+        try {
+            cc = attrs.MSAttributedStringColorAttribute.value + '';
+        } catch (error) {
+            cc = null;
+        }
+
+        return {
+            color: cc,
+            nsfont: nsfont.attributes.NSFontNameAttribute + '',
+            fontSize: nsfont.attributes.NSFontSizeAttribute + '',
+            family: nsfont.family + '',
+            name: nsfont.name + '',
+            kerning: attrs.NSKern + '',
+            alignment: nsparagraph.style.alignment + '',
+            lineHeight: nsparagraph.style.maximumLineHeight + '',
+            parapgrah: nsparagraph.style.paragraphSpacing + '',
+            va: layerStyle
+                .value()
+                .textStyle()
+                .verticalAlignment() + '',
+            tt: tt
+        };
+    }
+    */
+
+    static collectTextStyles(artboard) {
+        // Get sharedObjectID of shared style with specified name
+        const doc = context.document;
+        const styles = doc.documentData().layerTextStyles().objects();
+        // styles.forEach(x => console.log(x.name()));
+
+        let layers = NSArray.array();
+        let style, predicate;
+
+        const enumerator = styles.objectEnumerator();
+        while (style = enumerator.nextObject()) {
+            predicate = NSPredicate.predicateWithFormat('style.sharedObjectID == %@', style.objectID());
+            layers = layers.arrayByAddingObjectsFromArray(SText.collectLayers(artboard, predicate));
+        }
+        // console.log(artboard.sketchObject.children().length);
+        // console.log(layers.length);
+
+        /*
+        const styleName = 'H1';
+        const searchPredicate = NSPredicate.predicateWithFormat('name == %@', styleName);
+        const filteredStyles = styles.filteredArrayUsingPredicate(searchPredicate);
+        */
+
+        /*
+        const filteredLayers = NSArray.array();
+        const loopStyles = filteredStyles.objectEnumerator(), style, predicate;
+
+        while (style = loopStyles.nextObject()) {
+            predicate = NSPredicate.predicateWithFormat('style.sharedObjectID == %@', style.objectID())
+            filteredLayers = filteredLayers.arrayByAddingObjectsFromArray(findLayersMatchingPredicate_inContainer_filterByType(context, predicate, container))
+        }
+
+        for (let i = 0; i < filteredLayers.length; i++) {
+            filteredLayers[i].style = newStyle;
+        }
+
+        return filteredLayers;
+        */
+    }
+
+    static collectLayers(artboard, predicate) {
+        var layers = NSMutableArray.array();
+        const instances = artboard.sketchObject.children().filteredArrayUsingPredicate(predicate);
+        const instanceLoop = instances.objectEnumerator();
+        let instance;
+        while ((instance = instanceLoop.nextObject())) {
+            layers.addObject(instance);
+        }
+        return layers;
+    }
+
+    /*
+    collectSymbols() {
+        var layers = NSMutableArray.array();
+        var pages = context.document.pages(),
+            pageLoop = pages.objectEnumerator(),
+            page;
+        while (page = pageLoop.nextObject()) {
+            var predicate = NSPredicate.predicateWithFormat('className == 'MSSymbolInstance' && symbolMaster == %@', symbolMaster),
+                instances = page.children().filteredArrayUsingPredicate(predicate),
+                instanceLoop = instances.objectEnumerator(),
+                instance;
+            while (instance = instanceLoop.nextObject()) {
+                layers.addObject(instance);
+            }
+        }
+        return layers;
+    }
+    */
+
+    /*
+    collectTextStyles() {
+    var size = styles[i].size;
+    var family = styles[i].font;
+    var name = styles[i].name;
+
+    var red = styles[i].color.red;
+    var green = styles[i].color.green;
+    var blue = styles[i].color.blue;
+    var alpha = styles[i].color.alpha;
+
+    var align = styles[i].alignment || 0;
+    var spacing = styles[i].spacing || 0;
+    var paragraphSpacing = styles[i].paragraphSpacing || 0;
+    var lineHeight = styles[i].lineHeight || 0;
+
+    var textTransform = styles[i].textTransform || 0;
+
+    var strikethrough = styles[i].strikethrough || 0;
+    var underline = styles[i].underline || 0;
+
+    var rectTextFrame = NSMakeRect(0, 0, 250, 50);
+    var newText = [
+        [MSTextLayer alloc] initWithFrame: rectTextFrame
+    ];
+
+    fonts.push(MSColor.colorWithRed_green_blue_alpha(red, green, blue, alpha))
+
+    var color = fonts[i];
+
+    newText.name = name;
+    newText.stringValue = name + ' ' + size + 'px';
+    newText.fontSize = size;
+    newText.fontPostscriptName = family;
+
+    if (isNaN(red) != true) {
+        newText.textColor = color;
+    } else {
+        newText.textColor = MSColor.colorWithNSColor(NSColor.colorWithGray(0.0));
+    }
+
+    newText.textAlignment = align;
+    [newText setCharacterSpacing: spacing];
+    [newText setLineHeight: lineHeight];
+    newText.addAttribute_value("MSAttributedStringTextTransformAttribute", textTransform)
+
+    var paragraphStyle = newText.paragraphStyle();
+    paragraphStyle.setParagraphSpacing(paragraphSpacing);
+    newText.addAttribute_value("NSParagraphStyle", paragraphStyle);
+
+    newText.addAttribute_value("NSStrikethrough", strikethrough);
+    newText.addAttribute_value("NSUnderline", underline);
+
+    checkForMatchingStyles(context, sharedStyles.objects(), name, newText.style());
+    findLayersWithSharedStyleNamed_inContainer(context, newText.name(), newText.style())
 }
+*/
+
+}
+
+SStyle.collectedNames = {};
+SStyle.collectedStyles = [];
+SStyle.collectedTextStyles = [];

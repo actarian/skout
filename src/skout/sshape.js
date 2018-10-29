@@ -3,8 +3,8 @@
 import VNode from 'virtual-dom/vnode/vnode';
 import SImage from './simage';
 import SNode from './snode';
-
-const EXTERNAL = true;
+import SOptions from './soptions';
+import SStyle from './sstyle';
 
 export default class SShape extends SNode {
 
@@ -16,12 +16,11 @@ export default class SShape extends SNode {
         if (objectStyle.hasEnabledFill()) {
             const fill = objectStyle.fills().firstObject();
             const image = fill.image();
-            const gradient = SNode.cssStyle(this.styleText)['background-image']; // fill.gradient();
+            const gradient = SStyle.serializeStyle(this.styleText)['background-image']; // fill.gradient();
             if (image) {
-                const fileName = this.getFileName();
-                backgroundCss = `url('img/${fileName}') no-repeat center`;
+                backgroundCss = `url('../img/${this.className}.png') no-repeat center`;
                 if (SNode.folder) {
-                    SImage.saveToJpg(image, SNode.folder, 'img/', fileName);
+                    SImage.saveToJpg(image, SNode.folder, 'img/', `${this.className}.png`);
                 } else {
                     // backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
                 }
@@ -37,14 +36,14 @@ export default class SShape extends SNode {
             } else if (gradient) {
                 backgroundCss = gradient;
             } else {
-                const fillColor = SNode.toRgb(fill.color());
+                const fillColor = SStyle.toRgb(fill.color());
                 backgroundCss = `${fillColor}`;
             }
         }
         if (objectStyle.hasEnabledBorder()) {
             const border = objectStyle.borders().firstObject();
             const borderWidth = border.thickness();
-            const borderColor = SNode.toRgb(border.color());
+            const borderColor = SStyle.toRgb(border.color());
             borderCss = `${borderWidth}px solid ${borderColor}`;
         }
         if (objectStyle.hasEnabledShadow()) {
@@ -58,7 +57,7 @@ export default class SShape extends SNode {
         }
         const borderRadiusCss = this.type === 'MSRectangleShape' ? this.sketchObject.cornerRadiusFloat() + 'px' : '50%';
         const attributes = {
-            className: `shape shape-${this.id}`,
+            className: `shape ${this.className}`,
         };
         const style = {
             position: 'absolute',
@@ -73,14 +72,13 @@ export default class SShape extends SNode {
             borderRadius: borderRadiusCss,
             backgroundSize: 'cover',
         };
-        if (EXTERNAL) {
-            SNode.collectedStyles.push({
-                className: `shape-${this.id}`,
-                pathNames: this.pathNames,
+        if (SOptions.inline) {
+            attributes.style = style;
+        } else {
+            SStyle.collectedStyles.push({
+                className: this.pathNames.join(' > .'),
                 style: style,
             });
-        } else {
-            attributes.style = style;
         }
         return attributes;
     }
@@ -106,10 +104,6 @@ export default class SShape extends SNode {
 
     render() {
         return new VNode('span', this.attributes(), []);
-    }
-
-    getFileName() {
-        return `${this.className}-${this.id}.png`;
     }
 
 }

@@ -6,52 +6,30 @@ import VNode from 'virtual-dom/vnode/vnode';
 import VText from 'virtual-dom/vnode/vtext';
 import SImage from './simage';
 import SNode from './snode';
+import SOptions from './soptions';
 import SShape from './sshape';
+import SStyle from './sstyle';
 import SSvg from './ssvg';
 import SSymbol from './ssymbol';
 import SText from './stext';
-
-const EXTERNAL = true;
+import SUtil from './sutil';
 
 export default class SPage extends SNode {
 
     render() {
-        // return new VNode('span', null, [new VText('hello')]);
-        // return new VNode('span', this.attributes(), this.nodes.map(x => x.render()));
         const nodes = this.nodes.map(x => x.render());
-        const collectedStyles = this.getCss();
+        SPage.collectedStyles = this.getCss();
         return new VNode('html', null, [
             new VNode('head', null, [
-                new VNode('style', null, [
-                    new VText(`
-    html {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        padding: 0;
-    }
-    
-    *,
-    *::before,
-    *::after {
-        box-sizing: inherit;
-    }
-
-    img {
-        display: block;
-        width: 100%;
-        height: auto;
-    }
-    
-    .container {
-        max-width: ${this.layout.totalWidth}px;
-        margin: 0 auto;
-    }
-
-    ${collectedStyles}
-                    `)
+                new VNode('base', {
+                    href: '.'
+                }, []),
+                SOptions.css.export ? new VNode('link', {
+                    rel: 'stylesheet',
+                    type: 'text/css',
+                    href: 'css/skout.css'
+                }, []) : new VNode('style', null, [
+                    new VText(SPage.collectedStyles)
                 ]),
             ]),
             new VNode('body', null, [
@@ -65,13 +43,13 @@ export default class SPage extends SNode {
         // console.log('html =>\n', html);
         console.log('collectedImages', SImage.collectedImages.length);
         console.log('collectedSvgs', SSvg.collectedSvgs.length);
-        console.log('collectedTextStyles', SText.collectedTextStyles.length);
-        console.log('collectedStyles', SNode.collectedStyles.length);
+        console.log('collectedStyles', SStyle.collectedStyles.length);
+        console.log('collectedTextStyles', SStyle.collectedTextStyles.length);
         return html;
     }
 
     getCss() {
-        const collectedStyles = SText.collectedTextStyles.concat(SNode.collectedStyles).filter(x => Object.keys(x.style).length > 0).map(x => {
+        const collectedStyles = SStyle.collectedTextStyles.concat(SStyle.collectedStyles).filter(x => Object.keys(x.style).length > 0).map(x => {
             const props = Object.keys(x.style).map(k => {
                 const key = k.replace(/([A-Z])/g, "-$1").toLowerCase();
                 return `    ${key}: ${x.style[k]};`;
@@ -80,18 +58,71 @@ export default class SPage extends SNode {
 ${props} }`;
         }).join('\r\r');
         // console.log('collectedStyles\r', collectedStyles.substr(0, 500));
-        return collectedStyles;
+        return `
+        html {
+            box-sizing: border-box;
+        }
+    
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        *,
+        *::before,
+        *::after {
+            box-sizing: inherit;
+        }
+    
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: ${this.layout.totalWidth + this.layout.gutterWidth * 2}px;
+            margin: 0 auto;
+            padding: 0 ${this.layout.gutterWidth};
+        }
+    
+        ${collectedStyles}
+                        `;
     }
 
     exportToFolder(folder) {
         SNode.folder = folder;
         const html = this.getHtml();
-        var file = NSString.stringWithString(html);
-        file.writeToFile_atomically_encoding_error(folder + '/index.html', true, NSUTF8StringEncoding, null);
-        // console.log('collectedImages', SImage.collectedImages.length);
         SImage.collectedImages.forEach(x => x.save(folder, x.name));
-        // console.log('collectedSvgs', SSvg.collectedSvgs.length);
         SSvg.collectedSvgs.forEach(x => SSvg.save(folder, x.name, x.sketchObject));
+        if (SOptions.css.export) {
+            SUtil.saveTextFile(SPage.collectedStyles, folder + '/css', 'skout.css');
+        }
+        SUtil.saveTextFile(html, folder, 'index.html');
+    }
+
+    static fromArtboard(object) {
+        // console.log('fromArtboard', width, height);
+        // console.log(layout);
+        const artboard = Artboard.fromNative(object);
+        // const doc = SNode.getDocument();
+        // console.log(doc, context.document.documentData().metadata());
+        // const doc = context.document;
+        //
+        // MSDocument.currentDocument().documentData().allLayerStyles();
+        // context.document.documentData().allLayerStyles();
+        // MSDocument.currentDocument().documentData().allTextStyles();
+        // context.document.documentData().allTextStyles();
+        //            
+        SStyle.collectedStyles = [];
+        SStyle.collectedTextStyles = [];
+        SImage.collectedImages = [];
+        SSvg.collectedSvgs = [];
+        const page = SPage.getNode(artboard);
+        page.layoutNode(SPage.getLayout(object), 0);
+        //
+        return page;
     }
 
     static getName(name) {
@@ -171,36 +202,14 @@ ${props} }`;
                     }
                 });
                 */
-                return SPage.getNode(layer, node, overrides);
+                const sub = SPage.getNode(layer, node, overrides);
+                sub.zIndex = i;
+                return sub;
             });
         } else {
             node.nodes = [];
         }
         return node;
-    }
-
-    static fromArtboard(object) {
-        // console.log('fromArtboard', width, height);
-        // console.log(layout);
-        const artboard = Artboard.fromNative(object);
-        // const doc = SNode.getDocument();
-        // console.log(doc, context.document.documentData().metadata());
-        // const doc = context.document;
-        //
-        // MSDocument.currentDocument().documentData().allLayerStyles();
-        // context.document.documentData().allLayerStyles();
-        // MSDocument.currentDocument().documentData().allTextStyles();
-        // context.document.documentData().allTextStyles();
-        //            
-        SImage.collectedImages = [];
-        SSvg.collectedSvgs = [];
-        SNode.collectedStyles = [];
-        SText.collectedTextStyles = [];
-        // SText.collectTextStyles(artboard);
-        const page = SPage.getNode(artboard);
-        page.layoutNode(SPage.getLayout(object), 0);
-        //
-        return page;
     }
 
     static getLayout(object) {
@@ -222,64 +231,5 @@ ${props} }`;
             cols: Array.apply(null, Array(numberOfColumns)).map((x, i) => Math.min(totalWidth, Math.floor((columnWidth + gutterWidth) * (i + 1) - gutterWidth)))
         };
     }
-
-    collectTextStyles() {
-        /*
-        var size = styles[i].size;
-        var family = styles[i].font;
-        var name = styles[i].name;
-
-        var red = styles[i].color.red;
-        var green = styles[i].color.green;
-        var blue = styles[i].color.blue;
-        var alpha = styles[i].color.alpha;
-
-        var align = styles[i].alignment || 0;
-        var spacing = styles[i].spacing || 0;
-        var paragraphSpacing = styles[i].paragraphSpacing || 0;
-        var lineHeight = styles[i].lineHeight || 0;
-
-        var textTransform = styles[i].textTransform || 0;
-
-        var strikethrough = styles[i].strikethrough || 0;
-        var underline = styles[i].underline || 0;
-
-        var rectTextFrame = NSMakeRect(0, 0, 250, 50);
-        var newText = [
-            [MSTextLayer alloc] initWithFrame: rectTextFrame
-        ];
-
-        fonts.push(MSColor.colorWithRed_green_blue_alpha(red, green, blue, alpha))
-
-        var color = fonts[i];
-
-        newText.name = name;
-        newText.stringValue = name + ' ' + size + 'px';
-        newText.fontSize = size;
-        newText.fontPostscriptName = family;
-
-        if (isNaN(red) != true) {
-            newText.textColor = color;
-        } else {
-            newText.textColor = MSColor.colorWithNSColor(NSColor.colorWithGray(0.0));
-        }
-
-        newText.textAlignment = align;
-        [newText setCharacterSpacing: spacing];
-        [newText setLineHeight: lineHeight];
-        newText.addAttribute_value("MSAttributedStringTextTransformAttribute", textTransform)
-
-        var paragraphStyle = newText.paragraphStyle();
-        paragraphStyle.setParagraphSpacing(paragraphSpacing);
-        newText.addAttribute_value("NSParagraphStyle", paragraphStyle);
-
-        newText.addAttribute_value("NSStrikethrough", strikethrough);
-        newText.addAttribute_value("NSUnderline", underline);
-
-        checkForMatchingStyles(context, sharedStyles.objects(), name, newText.style());
-        findLayersWithSharedStyleNamed_inContainer(context, newText.name(), newText.style())
-*/
-    }
-
 
 }
