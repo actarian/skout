@@ -37,10 +37,10 @@ export default class SNode {
         this.constraint = SNode.getConstraint(object);
         this.styleText = object.sketchObject.CSSAttributeString().trim();
         // console.log(`.${this.pathNames.join(' > .')}`);
-        this.frame = SNode.getFrame(object, type);
-        this.parentFrame = parent ? parent.frame : this.frame;
         this.margin = new SRect();
         this.padding = new SRect();
+        this.frame = SNode.getFrame(object, type);
+        this.parentFrame = parent ? parent.frame : this.frame;
         this.layout = {};
         this.style = {};
         this.collectedNames = {};
@@ -53,66 +53,53 @@ export default class SNode {
         this.getNames(parent);
     }
 
-    getNames(parent) {
-        const fileName = SStyle.getFileName(this.name);
-        let parentType = 'Root',
-            pathNames = [],
-            nameCount = 0;
-        if (parent) {
-            parentType = parent.type;
-            if (parent.type == 'MSSymbolInstance') {
-                pathNames = [parent.className];
-            } else if (Array.isArray(parent.pathNames)) {
-                pathNames = parent.pathNames.slice();
-            }
-            nameCount = parent.collectedNames[fileName] || 0;
-            nameCount++;
-            parent.collectedNames[fileName] = nameCount;
+    static getFrame(object, type) {
+        if (!object) {
+            return;
         }
-        const className = fileName + (nameCount > 1 ? '-' + nameCount : ''); // SStyle.getClassName(name);
-        const classes = [className];
-        pathNames.push(className);
-        this.parentType = parentType;
-        this.fileName = fileName;
-        this.className = className;
-        this.classes = classes;
-        this.pathNames = pathNames;
-    }
-
-    merge(object) {
-        if (object) {
-            Object.assign(this, object);
-        }
-        return this;
-    }
-
-    render() {
-        return new VNode('div', this.attributes(), this.nodes.map(x => x.render()));
-    }
-
-    attributes() {
-        const attributes = {
-            className: this.classes.join(' '),
+        const frame = object.sketchObject.frame();
+        const width = Math.round(frame.width());
+        const height = Math.round(frame.height());
+        const left = type === 'MSArtboardGroup' ? 0 : Math.round(frame.x());
+        const top = type === 'MSArtboardGroup' ? 0 : Math.round(frame.y());
+        const right = left + width;
+        const bottom = top + height;
+        return {
+            top,
+            right,
+            bottom,
+            left,
+            width,
+            height
         };
-        const style = this.style;
-        if (SOptions.inline) {
-            attributes.style = style;
-        } else {
-            SStyle.collectedStyles.push({
-                className: this.pathNames.join(' > .'),
-                style: style,
+    }
+
+    setInnerRect() {
+        const innerRect = {
+            top: Number.POSITIVE_INFINITY,
+            left: Number.POSITIVE_INFINITY,
+            bottom: Number.NEGATIVE_INFINITY,
+            right: Number.NEGATIVE_INFINITY,
+            width: 0,
+            height: 0
+        };
+        if (this.nodes.length) {
+            this.nodes.filter(a => !a.absolute).forEach((a, i) => {
+                innerRect.top = Math.min(innerRect.top, a.frame.top);
+                innerRect.left = Math.min(innerRect.left, a.frame.left);
+                innerRect.bottom = Math.max(innerRect.bottom, a.frame.bottom);
+                innerRect.right = Math.max(innerRect.right, a.frame.right);
             });
+            innerRect.width = innerRect.right - innerRect.left;
+            innerRect.height = innerRect.bottom - innerRect.top;
         }
-        return attributes;
+        this.innerRect = innerRect;
     }
 
     layoutNode(layout) {
         Object.assign(this.layout, layout);
         const nodes = this.nodes.slice();
         this.isLargest = this.isLargest || false;
-        this.layout.isLargest = this.isLargest;
-        this.layout.hasSibilings = this.hasSibilings;
-        this.layout.hasOverlaps = this.hasOverlaps;
         if (this.nodes.length > 1) {
             const largest = nodes.reduce((a, b) => a.frame.width >= b.frame.width && a.frame.height > b.frame.height ? a : b);
             largest.isLargest = true;
@@ -188,6 +175,59 @@ export default class SNode {
         this.style = this.getStyle();
     }
 
+    getNames(parent) {
+        const fileName = SStyle.getFileName(this.name);
+        let parentType = 'Root',
+            pathNames = [],
+            nameCount = 0;
+        if (parent) {
+            parentType = parent.type;
+            if (parent.type == 'MSSymbolInstance') {
+                pathNames = [parent.className];
+            } else if (Array.isArray(parent.pathNames)) {
+                pathNames = parent.pathNames.slice();
+            }
+            nameCount = parent.collectedNames[fileName] || 0;
+            nameCount++;
+            parent.collectedNames[fileName] = nameCount;
+        }
+        const className = fileName + (nameCount > 1 ? '-' + nameCount : ''); // SStyle.getClassName(name);
+        const classes = [className];
+        pathNames.push(className);
+        this.parentType = parentType;
+        this.fileName = fileName;
+        this.className = className;
+        this.classes = classes;
+        this.pathNames = pathNames;
+    }
+
+    merge(object) {
+        if (object) {
+            Object.assign(this, object);
+        }
+        return this;
+    }
+
+    render() {
+        return new VNode('div', this.attributes(), this.nodes.map(x => x.render()));
+    }
+
+    attributes() {
+        const attributes = {
+            className: this.classes.join(' '),
+        };
+        const style = this.style;
+        if (SOptions.inline) {
+            attributes.style = style;
+        } else {
+            SStyle.collectedStyles.push({
+                className: this.pathNames.join(' > .'),
+                style: style,
+            });
+        }
+        return attributes;
+    }
+
     logLayers() {
         console.log(this.className, ' '.repeat(50 - this.className.length), (this.absolute ? 'abs' : 'rel'), this.frame.width, 'x', this.frame.height);
         this.nodes.forEach((a, i) => {
@@ -226,15 +266,17 @@ export default class SNode {
             console.log(this.className, this.layout.position, 'isLargest', this.isLargest);
         }
         */
-        const col = layout.cols.reduce((prev, curr, i) => {
-            return (Math.abs(curr - frame.width) <= 1 ? (i + 1) : prev);
-        });
-        if (col === layout.numberOfColumns) {
-            classes.push('container');
-            frame.width = layout.maxWidth;
-            this.absolute = false; // !!!
-        } else if (col < layout.numberOfColumns) {
-            classes.push('col-' + col);
+        if (parentFrame && parentFrame.width >= layout.maxWidth) {
+            const col = layout.cols.reduce((prev, curr, i) => {
+                return (Math.abs(curr - frame.width) <= 1 ? (i + 1) : prev);
+            });
+            if (col === layout.numberOfColumns) {
+                classes.push('container'); // !!!
+                frame.width = layout.maxWidth;
+                this.absolute = false; // !!!
+            } else if (col < layout.numberOfColumns) {
+                classes.push('col-' + col);
+            }
         }
         // this.frame.width = layout.cols[col - 1] || this.frame.width;
         const style = {
@@ -256,7 +298,8 @@ export default class SNode {
             style.flexDirection = 'row';
             style.justifyContent = 'center';
             style.alignItems = 'center';
-            style.minHeight = '100%';
+            style.height = frame.height + 'px';
+            // style.minHeight = '100%';
         }
         if (this.isVertical) {
             style.display = 'flex';
@@ -267,28 +310,6 @@ export default class SNode {
         style.margin = `${margin.top}px ${margin.right}px ${margin.bottom}px ${margin.left}px`;
         style.padding = `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
         return style;
-    }
-
-    setInnerRect() {
-        const innerRect = {
-            top: Number.POSITIVE_INFINITY,
-            left: Number.POSITIVE_INFINITY,
-            bottom: Number.NEGATIVE_INFINITY,
-            right: Number.NEGATIVE_INFINITY,
-            width: 0,
-            height: 0
-        };
-        if (this.nodes.length) {
-            this.nodes.filter(a => !a.absolute).forEach((a, i) => {
-                innerRect.top = Math.min(innerRect.top, a.frame.top);
-                innerRect.left = Math.min(innerRect.left, a.frame.left);
-                innerRect.bottom = Math.max(innerRect.bottom, a.frame.bottom);
-                innerRect.right = Math.max(innerRect.right, a.frame.right);
-            });
-            innerRect.width = innerRect.right - innerRect.left;
-            innerRect.height = innerRect.bottom - innerRect.top;
-        }
-        this.innerRect = innerRect;
     }
 
     static getConstraint(object) {
@@ -304,27 +325,6 @@ export default class SNode {
             height: (resizingConstraint & ResizingConstraint.Height) === resizingConstraint,
         };
         return constraint;
-    }
-
-    static getFrame(object, type) {
-        if (!object) {
-            return;
-        }
-        const frame = object.sketchObject.frame();
-        const width = Math.round(frame.width());
-        const height = Math.round(frame.height());
-        const left = type === 'MSArtboardGroup' ? 0 : Math.round(frame.x());
-        const top = type === 'MSArtboardGroup' ? 0 : Math.round(frame.y());
-        const right = left + width;
-        const bottom = top + height;
-        return {
-            top,
-            right,
-            bottom,
-            left,
-            width,
-            height
-        };
     }
 
     static overlaps(a, b) {

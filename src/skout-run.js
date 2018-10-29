@@ -17,7 +17,8 @@ export default function () {
         save: false,
         settings: false,
         debug: true,
-        folder: '/Users/lucazampetti/Desktop/SKOUT',
+        // folder: '/Users/lucazampetti/Desktop/SKOUT',
+        folder: '/Users/lzampetti/Desktop/SKOUT',
     });
 
     const artboards = getSelectedArtboards();
@@ -33,7 +34,6 @@ export default function () {
         } else {
             getHtml();
         }
-
     }
 
     function getHtml() {

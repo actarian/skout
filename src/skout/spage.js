@@ -119,8 +119,10 @@ ${props} }`;
         SStyle.collectedTextStyles = [];
         SImage.collectedImages = [];
         SSvg.collectedSvgs = [];
+        const layout = SPage.getLayout(object);
+        SOptions.layout = layout;
         const page = SPage.getNode(artboard);
-        page.layoutNode(SPage.getLayout(object), 0);
+        page.layoutNode(layout, 0);
         //
         return page;
     }
@@ -186,9 +188,19 @@ ${props} }`;
             overrides = SSymbol.getOverrides(object, overrides);
         }
         if (layers) {
-            node.nodes = layers.filter(x => (
+            layers = layers.filter(x => (
                 !x.hidden
-            )).map((layer, i) => {
+            ));
+            /*
+            layers.forEach(x => x);
+            if (layers.length &&
+                node.frame.width > SOptions.layout.totalWidth &&
+                node.innerRect.width < SOptions.layout.totalWidth) {
+                const container = SNode.newContainer(node);
+                layers = layers.filter(x => x.absolute).concat([container]);
+            }
+            */
+            layers = layers.map((layer, i) => {
                 overrides = overrides || [];
                 /*
                 // !!!
@@ -206,10 +218,59 @@ ${props} }`;
                 sub.zIndex = i;
                 return sub;
             });
+            node.nodes = layers;
         } else {
             node.nodes = [];
         }
         return node;
+    }
+
+    static checkContainer(layers) {
+        // !!!
+        const layout = SOptions.layout;
+        layers = layers.slice();
+        let isLargest = false;
+        if (layers.length > 1) {
+            const largest = layers.reduce((a, b) => a.frame.width >= b.frame.width && a.frame.height > b.frame.height ? a : b);
+            largest.isLargest = true;
+            const horizontals = nodes.sort((a, b) => a.frame.left - b.frame.left);
+            const isHorizontal = horizontals.reduce((a, b) => (a && b && a.frame.right <= b.frame.left) ? b : null);
+            this.isHorizontal = isHorizontal;
+            const verticals = nodes.sort((a, b) => a.frame.top - b.frame.top);
+            const isVertical = verticals.reduce((a, b) => (a && b && a.frame.bottom <= b.frame.top) ? b : null);
+            this.isVertical = isVertical;
+        }
+        nodes.forEach((a, i) => {
+            a.hasSibilings = nodes.length > 1;
+            if (a.hasSibilings) {
+                nodes.filter(b => b !== a).forEach(b => {
+                    a.hasOverlaps = a.hasOverlaps || SNode.overlaps(a.frame, b.frame);
+                    a.hasSmallOverlaps = a.hasSmallOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width >= layout.totalWidth && b.frame.width < layout.totalWidth);
+                    a.hasLargeOverlaps = a.hasLargeOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width < layout.totalWidth && b.frame.width >= layout.totalWidth);
+                });
+            }
+            if (a.hasSmallOverlaps) {
+                a.absolute = true;
+            } else if (a.hasLargeOverlaps) {
+                a.absolute = false;
+            } else {
+                a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
+            }
+        });
+        this.setInnerRect();
+        // !!!
+        /*
+        if (this.nodes.length &&
+            this.frame.width > this.layout.totalWidth &&
+            this.innerRect.width < this.layout.totalWidth) {
+            const container = SNode.newContainer(this);
+            this.nodes = this.nodes.filter(x => x.absolute).concat([container]);
+        }
+        */
+        this.padding.top = this.innerRect.top;
+        this.padding.right = this.frame.width - this.innerRect.right;
+        this.padding.bottom = this.frame.height - this.innerRect.bottom;
+        this.padding.left = this.innerRect.left;
     }
 
     static getLayout(object) {

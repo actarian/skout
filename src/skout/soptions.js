@@ -11,12 +11,15 @@ export default class SOptions {
             inline: false,
             //
             css: {
+                folder: 'css/',
                 export: true,
             },
             image: {
-                compression: 80,
+                folder: 'img/',
+                compression: 0.8,
             },
             svg: {
+                folder: 'svg/',
                 sprite: false,
             },
             //

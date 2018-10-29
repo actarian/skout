@@ -58,6 +58,29 @@ export default class SStyle {
         const styleTree = object.style().treeAsDictionary();
         const styleObject = SStyle.parseDictionary(styleTree);
         const textStyle = styleObject.textStyle;
+        /*
+        if (object.style().hasTextStyle()) {
+
+        }
+        if (object.style().supportsAdvancedBorderSettings()) {
+
+        }
+        */
+        const attributes = object.style().primitiveTextStyle().attributes();
+        console.log('NSFontNameAttribute', attributes.NSFont.fontDescriptor().objectForKey(NSFontNameAttribute));
+        console.log('NSFontSizeAttribute', attributes.NSFont.fontDescriptor().objectForKey(NSFontSizeAttribute));
+        console.log('MSAttributedStringColorAttribute', attributes.MSAttributedStringColorAttribute.hexValue());
+        console.log('NSKern', attributes.NSKern);
+        console.log('MSAttributedStringTextTransformAttribute', attributes.MSAttributedStringTextTransformAttribute);
+        console.log('NSUnderline', attributes.NSUnderline);
+        console.log('NSStrikethrough', attributes.NSStrikethrough);
+        console.log('textStyleVerticalAlignmentKey', attributes.textStyleVerticalAlignmentKey);
+        const pStyle = attributes.NSParagraphStyle.treeAsDictionary().style;
+        // console.log('pStyle', pStyle);
+        console.log('Alignment', pStyle.alignment);
+        console.log('ParagraphSpacing', pStyle.paragraphSpacing);
+        console.log('LineHeight', pStyle.minimumLineHeight);
+        console.log('LineBreakMode', pStyle.lineBreakMode);
         //
         const color = textStyle.MSAttributedStringColorAttribute.value;
         const fontSize = textStyle.NSFont.attributes.NSFontSizeAttribute + 'px';
@@ -71,7 +94,8 @@ export default class SStyle {
         const paragraphSpacing = paragraphStyle.paragraphSpacing;
         const lineHeight = paragraphStyle.maximumLineHeight; // !!!
         const verticalAlignment = ['center', 'B', 'C'][textStyle.textStyleVerticalAlignmentKey]; // !!!
-        const alignment = ['left', 'right', 'center', 'justify'][object.alignment]; // !!!
+        const alignment = 'left'; // object.style().attributes().alignment; // ['left', 'right', 'center', 'justify'][object.alignment]; // !!!
+
         //
         /*
         alignment: nsparagraph.style.alignment + '',

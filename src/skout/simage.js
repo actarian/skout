@@ -35,7 +35,7 @@ export default class SImage extends SNode {
         const newRep = NSBitmapImageRep.alloc().initWithCGImage(cgRef);
         newRep.setSize(image.size()); // get original size
         const imageData = newRep.representationUsingType_properties(NSJPEGFileType, {
-            NSImageCompressionFactor: 0.8
+            NSImageCompressionFactor: SOptions.image.compression
         });
         imageData.writeToFile(path);
         return path;
