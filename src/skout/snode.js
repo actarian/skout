@@ -308,7 +308,12 @@ export default class SNode {
             style.alignItems = 'flex-start';
         }
         style.margin = `${margin.top}px ${margin.right}px ${margin.bottom}px ${margin.left}px`;
-        style.padding = `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
+        if (this.nodes.length) {
+            style.padding = `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
+        }
+        if (this.sketchObject.rotation()) {
+            style.transform = `rotateZ(${this.sketchObject.rotation()}deg)`;
+        }
         return style;
     }
 

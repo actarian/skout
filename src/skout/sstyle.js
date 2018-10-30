@@ -55,48 +55,66 @@ export default class SStyle {
     }
 
     static parseStyle(object) {
-        const styleTree = object.style().treeAsDictionary();
-        const styleObject = SStyle.parseDictionary(styleTree);
-        const textStyle = styleObject.textStyle;
-        /*
-        if (object.style().hasTextStyle()) {
-
+        const style = {
+            textAlign: 'left',
+            color: '#000000',
+            fontFamily: 'Arial',
+            fontSize: '16px',
+            letterSpacing: '0px',
+            lineHeight: '20px',
+            verticalAlign: 'middle',
+        };
+        const objectStyle = object.style();
+        if (objectStyle.hasTextStyle()) {
+            const attributes = objectStyle.primitiveTextStyle().attributes();
+            const color = attributes.MSAttributedStringColorAttribute.hexValue();
+            const fontSize = attributes.NSFont.fontDescriptor().objectForKey(NSFontSizeAttribute) + 'px';
+            const fontFamily = attributes.NSFont.fontDescriptor().objectForKey(NSFontNameAttribute);
+            const letterSpacing = attributes.NSKern + 'px';
+            const textTransform = attributes.MSAttributedStringTextTransformAttribute ? ['none', 'uppercase', 'lowercase'][attributes.MSAttributedStringTextTransformAttribute] : 'none';
+            const underline = attributes.NSUnderline === 1 ? 'underline' : null;
+            const lineThrough = attributes.NSStrikethrough === 1 ? 'line-through' : null;
+            const textDecoration = lineThrough || underline;
+            //
+            const textStyleVerticalAlignmentKey = attributes.textStyleVerticalAlignmentKey;
+            const verticalAlign = textStyleVerticalAlignmentKey !== null ? ['middle'][textStyleVerticalAlignmentKey] : 'none';
+            //
+            const paragraphStyle = attributes.NSParagraphStyle.treeAsDictionary().style;
+            const paragraphSpacing = paragraphStyle.paragraphSpacing;
+            const lineHeight = paragraphStyle.minimumLineHeight + 'px';
+            const lineBreakMode = paragraphStyle.lineBreakMode;
+            const textAlign = ['left', 'right', 'center', 'justify'][paragraphStyle.alignment];
+            //
+            const opacity = objectStyle.contextSettings().opacity();
+            //
+            // console.log(object.name(), textAlign, textStyleVerticalAlignmentKey, objectStyle.contextSettings().opacity());
+            style.color = color;
+            style.fontSize = fontSize;
+            style.fontFamily = fontFamily;
+            style.letterSpacing = letterSpacing;
+            style.textAlign = textAlign;
+            style.lineHeight = lineHeight;
+            if (textTransform !== 'none') {
+                style.textTransform = textTransform;
+            }
+            if (verticalAlign !== 'none') {
+                style.verticalAlign = verticalAlign;
+            }
+            if (textDecoration) {
+                style.textDecoration = textDecoration;
+            }
+            if (opacity !== 1) {
+                style.opacity = opacity;
+            }
         }
+        // console.log(textStyle);
+        return style;
+
+        /*
         if (object.style().supportsAdvancedBorderSettings()) {
 
         }
         */
-        const attributes = object.style().primitiveTextStyle().attributes();
-        console.log('NSFontNameAttribute', attributes.NSFont.fontDescriptor().objectForKey(NSFontNameAttribute));
-        console.log('NSFontSizeAttribute', attributes.NSFont.fontDescriptor().objectForKey(NSFontSizeAttribute));
-        console.log('MSAttributedStringColorAttribute', attributes.MSAttributedStringColorAttribute.hexValue());
-        console.log('NSKern', attributes.NSKern);
-        console.log('MSAttributedStringTextTransformAttribute', attributes.MSAttributedStringTextTransformAttribute);
-        console.log('NSUnderline', attributes.NSUnderline);
-        console.log('NSStrikethrough', attributes.NSStrikethrough);
-        console.log('textStyleVerticalAlignmentKey', attributes.textStyleVerticalAlignmentKey);
-        const pStyle = attributes.NSParagraphStyle.treeAsDictionary().style;
-        // console.log('pStyle', pStyle);
-        console.log('Alignment', pStyle.alignment);
-        console.log('ParagraphSpacing', pStyle.paragraphSpacing);
-        console.log('LineHeight', pStyle.minimumLineHeight);
-        console.log('LineBreakMode', pStyle.lineBreakMode);
-        //
-        const color = textStyle.MSAttributedStringColorAttribute.value;
-        const fontSize = textStyle.NSFont.attributes.NSFontSizeAttribute + 'px';
-        const fontFamily = textStyle.NSFont.attributes.NSFontNameAttribute;
-        const letterSpacing = textStyle.NSKern + 'px';
-        const textTransform = ['none', 'uppercase', 'lowercase'][textStyle.MSAttributedStringTextTransformAttribute];
-        const underline = textStyle.NSUnderline === 1 ? 'underline' : null;
-        const lineThrough = textStyle.NSStrikethrough === 1 ? 'line-through' : null;
-        const textDecoration = lineThrough || underline;
-        const paragraphStyle = textStyle.NSParagraphStyle;
-        const paragraphSpacing = paragraphStyle.paragraphSpacing;
-        const lineHeight = paragraphStyle.maximumLineHeight; // !!!
-        const verticalAlignment = ['center', 'B', 'C'][textStyle.textStyleVerticalAlignmentKey]; // !!!
-        const alignment = 'left'; // object.style().attributes().alignment; // ['left', 'right', 'center', 'justify'][object.alignment]; // !!!
-
-        //
         /*
         alignment: nsparagraph.style.alignment + '',
             lineHeight: nsparagraph.style.maximumLineHeight + '',
@@ -113,25 +131,6 @@ export default class SStyle {
         NSTextAlignmentCenter
         NSTextAlignmentJustified
         */
-        const style = {
-            color,
-            fontSize,
-            fontFamily,
-            letterSpacing,
-            alignment,
-            lineHeight,
-        };
-        if (textTransform !== 'none') {
-            style.textTransform = textTransform;
-        }
-        if (verticalAlignment !== 'none') {
-            style.verticalAlignment = verticalAlignment;
-        }
-        if (textDecoration) {
-            style.textDecoration = textDecoration;
-        }
-        // console.log(textStyle);
-        return style;
         /*
         var attributes = {
         'NSColor': NSColor.colorWithRed_green_blue_alpha(0,0,1,1),
