@@ -27,7 +27,7 @@ export default class SStyle {
                     // console.log(this.className, sharedStyle.name());
                     result = {
                         className: className,
-                        style: SStyle.parseStyle(sharedStyle),
+                        style: SStyle.parseTextStyle(sharedStyle),
                     };
                 }
             }
@@ -54,7 +54,7 @@ export default class SStyle {
         return result;
     }
 
-    static parseStyle(object) {
+    static parseTextStyle(object) {
         const style = {
             textAlign: 'left',
             color: '#000000',
@@ -76,9 +76,6 @@ export default class SStyle {
             const lineThrough = attributes.NSStrikethrough === 1 ? 'line-through' : null;
             const textDecoration = lineThrough || underline;
             //
-            const textStyleVerticalAlignmentKey = attributes.textStyleVerticalAlignmentKey;
-            const verticalAlign = textStyleVerticalAlignmentKey !== null ? ['middle'][textStyleVerticalAlignmentKey] : 'none';
-            //
             const paragraphStyle = attributes.NSParagraphStyle.treeAsDictionary().style;
             const paragraphSpacing = paragraphStyle.paragraphSpacing;
             const lineHeight = paragraphStyle.minimumLineHeight + 'px';
@@ -87,7 +84,9 @@ export default class SStyle {
             //
             const opacity = objectStyle.contextSettings().opacity();
             //
-            // console.log(object.name(), textAlign, textStyleVerticalAlignmentKey, objectStyle.contextSettings().opacity());
+            const verticalAlign = (typeof object.verticalAlignment == 'function') ? ['text-top', 'middle', 'text-bottom'][object.verticalAlignment()] : 'none';
+            //
+            // console.log(object.name(), textAlign, objectStyle.contextSettings().opacity());
             style.color = color;
             style.fontSize = fontSize;
             style.fontFamily = fontFamily;
@@ -111,9 +110,7 @@ export default class SStyle {
         return style;
 
         /*
-        if (object.style().supportsAdvancedBorderSettings()) {
-
-        }
+        
         */
         /*
         alignment: nsparagraph.style.alignment + '',
@@ -260,6 +257,71 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
         newText.addAttribute_value('NSUnderline', underline);
 
         */
+    }
+
+    static parseStyle(object) {
+        const style = {};
+        const objectStyle = object.style();
+        let background = 'none';
+        if (objectStyle.hasEnabledFill()) {
+            const fill = objectStyle.fills().firstObject();
+            const fillImage = fill.image();
+            const fillGradient = SStyle.serializeStyle(this.styleText)['background-image']; // fill.gradient();
+            if (fillImage) {
+                background = `url('../img/${this.className}.png') no-repeat center`;
+                if (SOptions.folder) {
+                    SImage.saveToJpg(fillImage, SOptions.folder, 'img/', `${this.className}.png`);
+                } else {
+                    // backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
+                }
+            } else if (fillGradient) {
+                background = fillGradient;
+            } else {
+                const fillColor = SStyle.toRgb(fill.color());
+                background = `${fillColor}`;
+            }
+        }
+        let border = 'none';
+        if (objectStyle.hasEnabledBorder()) {
+            const _border = objectStyle.borders().firstObject();
+            const borderWidth = _border.thickness();
+            const borderColor = SStyle.toRgb(_border.color());
+            border = `${borderWidth}px solid ${borderColor}`;
+        }
+        let borderRadius = 'none';
+        if (this.type === 'MSRectangleShape') {
+            borderRadius = object.cornerRadiusFloat() + 'px';
+        } else if (this.type === 'MSOvalShape') {
+            borderRadius = '50%';
+        }
+        /*
+        if (object.style().supportsAdvancedBorderSettings()) {
+            // !!!
+        }
+        */
+        let boxShadow = 'none';
+        if (objectStyle.hasEnabledShadow()) {
+            const shadow = objectStyle.shadows().firstObject();
+            const shadowColor = shadow.color();
+            const shadowSpread = shadow.spread();
+            const shadowX = shadow.offsetX;
+            const shadowY = shadow.offsetY;
+            const shadowBlur = shadow.blurRadius();
+            boxShadow = `${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowSpread}px ${shadowColor}`;
+        }
+        if (background !== 'none') {
+            style.background = background;
+            style.backgroundSize = 'cover';
+        }
+        if (border !== 'none') {
+            style.border = border;
+        }
+        if (borderRadius !== 'none') {
+            style.borderRadius = borderRadius;
+        }
+        if (boxShadow !== 'none') {
+            style.boxShadow = boxShadow;
+        }
     }
 
     static parseDictionary(dictionary, output = {}) {

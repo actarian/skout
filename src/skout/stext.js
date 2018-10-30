@@ -16,7 +16,7 @@ export default class SText extends SNode {
     getStyle(...rest) {
         const style = SNode.prototype.getStyle.apply(this, rest);
         const sharedStyle = SStyle.getSharedStyle(this.object);
-        const localStyle = SStyle.parseStyle(this.sketchObject);
+        const localStyle = SStyle.parseTextStyle(this.sketchObject);
         if (SOptions.inline) {
             if (sharedStyle) {
                 Object.assign(style, sharedStyle.style);
