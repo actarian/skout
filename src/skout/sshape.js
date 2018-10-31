@@ -8,6 +8,11 @@ import SStyle from './sstyle';
 
 export default class SShape extends SNode {
 
+    constructor(node) {
+        super(node);
+        this.classes.push('sshape');
+    }
+
     attributes() {
         let backgroundCss = 'trasparent';
         let borderCss = 'none';
@@ -57,14 +62,15 @@ export default class SShape extends SNode {
         }
         const borderRadiusCss = this.type === 'MSRectangleShape' ? this.sketchObject.cornerRadiusFloat() + 'px' : '50%';
         const attributes = {
-            className: `shape ${this.className}`,
+            className: this.classes.join(' '),
         };
+        const layout = SOptions.layout;
         const style = {
             position: 'absolute',
             display: 'inline-block',
             top: this.frame.top + 'px',
             left: this.frame.left + 'px',
-            width: (this.frame.width === this.layout.maxWidth) ? '100%' : this.frame.width + 'px',
+            width: (this.frame.width === layout.maxWidth) ? '100%' : this.frame.width + 'px',
             height: this.frame.height + 'px',
             background: backgroundCss,
             border: borderCss,

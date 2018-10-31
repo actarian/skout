@@ -10,6 +10,11 @@ export default class SOptions {
             debug: true,
             inline: false,
             //
+            html: {
+                responsive: true,
+                exact: false,
+                inline: false,
+            },
             css: {
                 folder: 'css/',
                 export: true,

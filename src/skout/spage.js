@@ -4,6 +4,7 @@ import Artboard from 'sketch/dom';
 import toHTML from 'vdom-to-html';
 import VNode from 'virtual-dom/vnode/vnode';
 import VText from 'virtual-dom/vnode/vtext';
+import SContainer from './scontainer';
 import SImage from './simage';
 import SNode from './snode';
 import SOptions from './soptions';
@@ -49,6 +50,7 @@ export default class SPage extends SNode {
     }
 
     getCss() {
+        const layout = SOptions.layout;
         const collectedStyles = SStyle.collectedTextStyles.concat(SStyle.collectedStyles).filter(x => Object.keys(x.style).length > 0).map(x => {
             const props = Object.keys(x.style).map(k => {
                 const key = k.replace(/([A-Z])/g, "-$1").toLowerCase();
@@ -82,9 +84,18 @@ ${props} }`;
         
         .container {
             width: 100%;
-            max-width: ${this.layout.totalWidth + this.layout.gutterWidth * 2}px;
+            max-width: ${layout.totalWidth + layout.gutterWidth * 2}px;
             margin: 0 auto;
-            padding: 0 ${this.layout.gutterWidth};
+            padding: 0 ${layout.gutterWidth};
+        }
+
+        .stext {
+            display: inline-flex;
+        }
+
+        .stext > span {
+            width: 100%;
+            height: 100%;
         }
     
         ${collectedStyles}
@@ -122,7 +133,7 @@ ${props} }`;
         const layout = SPage.getLayout(object);
         SOptions.layout = layout;
         const page = SPage.getNode(artboard);
-        page.layoutNode(layout, 0);
+        page.layoutNode();
         //
         return page;
     }
@@ -191,15 +202,6 @@ ${props} }`;
             layers = layers.filter(x => (
                 !x.hidden
             ));
-            /*
-            layers.forEach(x => x);
-            if (layers.length &&
-                node.frame.width > SOptions.layout.totalWidth &&
-                node.innerRect.width < SOptions.layout.totalWidth) {
-                const container = SNode.newContainer(node);
-                layers = layers.filter(x => x.absolute).concat([container]);
-            }
-            */
             layers = layers.map((layer, i) => {
                 overrides = overrides || [];
                 /*
@@ -219,58 +221,22 @@ ${props} }`;
                 return sub;
             });
             node.nodes = layers;
+            node.setNodesPosition();
+            node.setInnerRect();
+            const layout = SOptions.layout;
+            if (SOptions.html.responsive &&
+                layers.length &&
+                node.frame.width > layout.totalWidth &&
+                node.innerRect.width < layout.totalWidth) {
+                const container = new SContainer(node);
+                container.nodes = layers.filter(x => !x.absolute);
+                container.setNodesPosition();
+                node.nodes = layers.filter(x => x.absolute).concat([container]);
+            }
         } else {
             node.nodes = [];
         }
         return node;
-    }
-
-    static checkContainer(layers) {
-        // !!!
-        const layout = SOptions.layout;
-        layers = layers.slice();
-        let isLargest = false;
-        if (layers.length > 1) {
-            const largest = layers.reduce((a, b) => a.frame.width >= b.frame.width && a.frame.height > b.frame.height ? a : b);
-            largest.isLargest = true;
-            const horizontals = nodes.sort((a, b) => a.frame.left - b.frame.left);
-            const isHorizontal = horizontals.reduce((a, b) => (a && b && a.frame.right <= b.frame.left) ? b : null);
-            this.isHorizontal = isHorizontal;
-            const verticals = nodes.sort((a, b) => a.frame.top - b.frame.top);
-            const isVertical = verticals.reduce((a, b) => (a && b && a.frame.bottom <= b.frame.top) ? b : null);
-            this.isVertical = isVertical;
-        }
-        nodes.forEach((a, i) => {
-            a.hasSibilings = nodes.length > 1;
-            if (a.hasSibilings) {
-                nodes.filter(b => b !== a).forEach(b => {
-                    a.hasOverlaps = a.hasOverlaps || SNode.overlaps(a.frame, b.frame);
-                    a.hasSmallOverlaps = a.hasSmallOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width >= layout.totalWidth && b.frame.width < layout.totalWidth);
-                    a.hasLargeOverlaps = a.hasLargeOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width < layout.totalWidth && b.frame.width >= layout.totalWidth);
-                });
-            }
-            if (a.hasSmallOverlaps) {
-                a.absolute = true;
-            } else if (a.hasLargeOverlaps) {
-                a.absolute = false;
-            } else {
-                a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
-            }
-        });
-        this.setInnerRect();
-        // !!!
-        /*
-        if (this.nodes.length &&
-            this.frame.width > this.layout.totalWidth &&
-            this.innerRect.width < this.layout.totalWidth) {
-            const container = SNode.newContainer(this);
-            this.nodes = this.nodes.filter(x => x.absolute).concat([container]);
-        }
-        */
-        this.padding.top = this.innerRect.top;
-        this.padding.right = this.frame.width - this.innerRect.right;
-        this.padding.bottom = this.frame.height - this.innerRect.bottom;
-        this.padding.left = this.innerRect.left;
     }
 
     static getLayout(object) {

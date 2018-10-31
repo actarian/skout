@@ -41,7 +41,6 @@ export default class SNode {
         this.padding = new SRect();
         this.frame = SNode.getFrame(object, type);
         this.parentFrame = parent ? parent.frame : this.frame;
-        this.layout = {};
         this.style = {};
         this.collectedNames = {};
         //
@@ -74,6 +73,38 @@ export default class SNode {
         };
     }
 
+    setNodesPosition() {
+        const layout = SOptions.layout;
+        const nodes = this.nodes.slice();
+        if (this.nodes.length > 1) {
+            const largest = nodes.reduce((a, b) => a.frame.width >= b.frame.width && a.frame.height > b.frame.height ? a : b);
+            largest.isLargest = true;
+            const horizontals = nodes.sort((a, b) => a.frame.left - b.frame.left);
+            const isHorizontal = horizontals.reduce((a, b) => (a && b && a.frame.right <= b.frame.left) ? b : null);
+            this.isHorizontal = isHorizontal;
+            const verticals = nodes.sort((a, b) => a.frame.top - b.frame.top);
+            const isVertical = verticals.reduce((a, b) => (a && b && a.frame.bottom <= b.frame.top) ? b : null);
+            this.isVertical = isVertical;
+        }
+        nodes.forEach((a, i) => {
+            a.hasSibilings = nodes.length > 1;
+            if (a.hasSibilings) {
+                nodes.filter(b => b !== a).forEach(b => {
+                    a.hasOverlaps = a.hasOverlaps || SNode.overlaps(a.frame, b.frame);
+                    a.hasSmallOverlaps = a.hasSmallOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width >= layout.totalWidth && b.frame.width < layout.totalWidth);
+                    a.hasLargeOverlaps = a.hasLargeOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width < layout.totalWidth && b.frame.width >= layout.totalWidth);
+                });
+            }
+            if (a.hasSmallOverlaps) {
+                a.absolute = true;
+            } else if (a.hasLargeOverlaps) {
+                a.absolute = false;
+            } else {
+                a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
+            }
+        });
+    }
+
     setInnerRect() {
         const innerRect = {
             top: Number.POSITIVE_INFINITY,
@@ -96,8 +127,7 @@ export default class SNode {
         this.innerRect = innerRect;
     }
 
-    layoutNode(layout) {
-        Object.assign(this.layout, layout);
+    layoutNode() {
         const nodes = this.nodes.slice();
         this.isLargest = this.isLargest || false;
         if (this.nodes.length > 1) {
@@ -110,6 +140,7 @@ export default class SNode {
             const isVertical = verticals.reduce((a, b) => (a && b && a.frame.bottom <= b.frame.top) ? b : null);
             this.isVertical = isVertical;
         }
+        const layout = SOptions.layout;
         nodes.forEach((a, i) => {
             a.hasSibilings = nodes.length > 1;
             if (a.hasSibilings) {
@@ -135,15 +166,6 @@ export default class SNode {
             }
         });
         this.setInnerRect();
-        // !!!
-        /*
-        if (this.nodes.length &&
-            this.frame.width > this.layout.totalWidth &&
-            this.innerRect.width < this.layout.totalWidth) {
-            const container = SNode.newContainer(this);
-            this.nodes = this.nodes.filter(x => x.absolute).concat([container]);
-        }
-        */
         this.padding.top = this.innerRect.top;
         this.padding.right = this.frame.width - this.innerRect.right;
         this.padding.bottom = this.frame.height - this.innerRect.bottom;
@@ -167,7 +189,7 @@ export default class SNode {
             this.nodes.sort((a, b) => (a.frame.top * 10000 + a.frame.left) - (b.frame.top * 10000 + b.frame.left));
         }
         this.nodes.forEach((a, i) => {
-            a.layoutNode(layout);
+            a.layoutNode();
         });
         if (SOptions.log.layers) {
             this.logLayers();
@@ -237,7 +259,7 @@ export default class SNode {
     }
 
     getStyle() {
-        const layout = this.layout;
+        const layout = SOptions.layout;
         const frame = this.frame;
         const parentFrame = this.parentFrame;
         const classes = this.classes;
@@ -280,7 +302,7 @@ export default class SNode {
         }
         // this.frame.width = layout.cols[col - 1] || this.frame.width;
         const style = {
-            display: 'block',
+            // display: 'block',
             position: this.absolute ? 'absolute' : 'relative',
             width: (frame.width === layout.maxWidth) ? '100%' : frame.width + 'px',
             height: frame.height + 'px',
@@ -335,61 +357,6 @@ export default class SNode {
     static overlaps(a, b) {
         const c = 0.1;
         return !(b.left + c > a.right || b.right < a.left + c || b.top + c > a.bottom || b.bottom < a.top + c);
-    }
-
-    static newContainer(node) {
-        const container = new SNode(node);
-        container.name = 'container';
-        container.type = 'Container';
-        container.className = 'container';
-        container.pathNames = [].concat(node.pathNames, [container]);
-        container.classes = [container.className];
-        container.frame = {
-            top: 0,
-            left: (node.frame.width - node.layout.totalWidth) / 2,
-            width: node.layout.totalWidth,
-            height: node.frame.height,
-        };
-        container.frame.right = container.frame.left + container.frame.width;
-        container.frame.bottom = container.frame.top + container.frame.height;
-        container.layout = node.layout;
-        container.style = {};
-        container.parent = node;
-        container.nodes = node.nodes.filter(a => !a.absolute);
-        container.setInnerRect();
-        const padding = {
-            left: (container.innerRect.left - container.frame.left),
-            top: (container.innerRect.top - container.frame.top),
-            bottom: (container.frame.bottom - container.innerRect.bottom),
-            right: (container.frame.right - container.innerRect.right),
-        };
-        container.nodes.forEach(x => {
-            x.frame.left -= padding.left;
-            x.frame.top -= padding.top;
-            x.frame.right = x.frame.left + x.frame.width;
-            x.frame.bottom = x.frame.top + x.frame.height;
-        });
-        container.render = () => {
-            const attributes = {
-                className: 'container',
-            };
-            const PADDING = true;
-            if (PADDING) {
-                const style = {
-                    padding: `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`,
-                };
-                if (SOptions.inline) {
-                    attributes.style = style;
-                } else {
-                    SStyle.collectedStyles.push({
-                        className: container.pathNames.join(' '),
-                        style: style,
-                    });
-                }
-            }
-            return new VNode('div', attributes, container.nodes.map(x => x.render()));
-        };
-        return container;
     }
 
     static getDocument() {

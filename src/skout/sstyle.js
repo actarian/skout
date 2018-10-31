@@ -22,14 +22,11 @@ export default class SStyle {
             const sharedStyle = styles.find(x => x.objectID() == object.sharedStyleId);
             if (sharedStyle) {
                 const className = SStyle.getClassName(sharedStyle.name());
-                const collected = SStyle.collectedTextStyles.find(x => x.className == className);
-                if (!collected) {
-                    // console.log(this.className, sharedStyle.name());
-                    result = {
-                        className: className,
-                        style: SStyle.parseTextStyle(sharedStyle),
-                    };
-                }
+                // console.log(this.className, sharedStyle.name());
+                result = {
+                    className: className,
+                    style: SStyle.parseTextStyle(sharedStyle),
+                };
             }
             /*
             const doc = SNode.getDocument();
@@ -55,15 +52,7 @@ export default class SStyle {
     }
 
     static parseTextStyle(object) {
-        const style = {
-            textAlign: 'left',
-            color: '#000000',
-            fontFamily: 'Arial',
-            fontSize: '16px',
-            letterSpacing: '0px',
-            lineHeight: '20px',
-            verticalAlign: 'middle',
-        };
+        const style = {};
         const objectStyle = object.style();
         if (objectStyle.hasTextStyle()) {
             const attributes = objectStyle.primitiveTextStyle().attributes();
@@ -77,16 +66,18 @@ export default class SStyle {
             const textDecoration = lineThrough || underline;
             //
             const paragraphStyle = attributes.NSParagraphStyle.treeAsDictionary().style;
-            const paragraphSpacing = paragraphStyle.paragraphSpacing;
-            const lineHeight = paragraphStyle.minimumLineHeight + 'px';
-            const lineBreakMode = paragraphStyle.lineBreakMode;
+            const lineHeight = paragraphStyle.maximumLineHeight > 0 ? (paragraphStyle.maximumLineHeight / attributes.NSFont.fontDescriptor().objectForKey(NSFontSizeAttribute)) : 1;
             const textAlign = ['left', 'right', 'center', 'justify'][paragraphStyle.alignment];
+            const paragraphSpacing = paragraphStyle.paragraphSpacing;
+            const lineBreakMode = paragraphStyle.lineBreakMode;
             //
             const opacity = objectStyle.contextSettings().opacity();
             //
-            const verticalAlign = (typeof object.verticalAlignment == 'function') ? ['text-top', 'middle', 'text-bottom'][object.verticalAlignment()] : 'none';
+            const alignItems = (typeof object.verticalAlignment == 'function') ? ['flex-start', 'center', 'flex-end'][object.verticalAlignment()] : 'flex-start';
             //
+            console.log('lineHeight', lineHeight, (paragraphStyle.maximumLineHeight || attributes.NSFont.fontDescriptor().objectForKey(NSFontSizeAttribute)));
             // console.log(object.name(), textAlign, objectStyle.contextSettings().opacity());
+            style.alignItems = alignItems;
             style.color = color;
             style.fontSize = fontSize;
             style.fontFamily = fontFamily;
@@ -95,9 +86,6 @@ export default class SStyle {
             style.lineHeight = lineHeight;
             if (textTransform !== 'none') {
                 style.textTransform = textTransform;
-            }
-            if (verticalAlign !== 'none') {
-                style.verticalAlign = verticalAlign;
             }
             if (textDecoration) {
                 style.textDecoration = textDecoration;
