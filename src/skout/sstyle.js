@@ -73,11 +73,7 @@ export default class SStyle {
             //
             const opacity = objectStyle.contextSettings().opacity();
             //
-            const alignItems = (typeof object.verticalAlignment == 'function') ? ['flex-start', 'center', 'flex-end'][object.verticalAlignment()] : 'flex-start';
-            //
-            console.log('lineHeight', lineHeight, (paragraphStyle.maximumLineHeight || attributes.NSFont.fontDescriptor().objectForKey(NSFontSizeAttribute)));
-            // console.log(object.name(), textAlign, objectStyle.contextSettings().opacity());
-            style.alignItems = alignItems;
+            // console.log('lineHeight', lineHeight, (paragraphStyle.maximumLineHeight || attributes.NSFont.fontDescriptor().objectForKey(NSFontSizeAttribute)));
             style.color = color;
             style.fontSize = fontSize;
             style.fontFamily = fontFamily;

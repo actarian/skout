@@ -11,7 +11,7 @@ export default class SOptions {
             inline: false,
             //
             html: {
-                responsive: true,
+                responsive: false,
                 exact: false,
                 inline: false,
             },

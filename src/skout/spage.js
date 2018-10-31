@@ -95,7 +95,6 @@ ${props} }`;
 
         .stext > span {
             width: 100%;
-            height: 100%;
         }
     
         ${collectedStyles}
@@ -133,7 +132,12 @@ ${props} }`;
         const layout = SPage.getLayout(object);
         SOptions.layout = layout;
         const page = SPage.getNode(artboard);
-        page.layoutNode();
+        page.zIndex = 0;
+        page.parentFrame = layout.frame;
+        if (SOptions.html.relative) {
+            page.setRelativeLayout();
+        }
+        page.setStyle();
         //
         return page;
     }
@@ -193,8 +197,10 @@ ${props} }`;
                 node = new SNode(node);
         }
         let layers = object.layers;
+        let parentFrame = node.frame;
         if (object.symbolId) {
             const symbol = SNode.getDocument().getSymbolMasterWithID(object.symbolId);
+            parentFrame = SNode.getFrame(symbol, 'MSSymbolInstance');
             layers = symbol.layers;
             overrides = SSymbol.getOverrides(object, overrides);
         }
@@ -218,23 +224,29 @@ ${props} }`;
                 */
                 const sub = SPage.getNode(layer, node, overrides);
                 sub.zIndex = i;
+                sub.parentFrame = parentFrame;
                 return sub;
             });
             node.nodes = layers;
-            node.setNodesPosition();
-            node.setInnerRect();
-            const layout = SOptions.layout;
-            if (SOptions.html.responsive &&
-                layers.length &&
-                node.frame.width > layout.totalWidth &&
-                node.innerRect.width < layout.totalWidth) {
-                const container = new SContainer(node);
-                container.nodes = layers.filter(x => !x.absolute);
-                container.setNodesPosition();
-                node.nodes = layers.filter(x => x.absolute).concat([container]);
+            if (SOptions.html.responsive) {
+                node.setRelativePosition();
+                node.setInnerRect();
+                const layout = SOptions.layout;
+                if (layers.length &&
+                    node.frame.width > layout.totalWidth &&
+                    node.innerRect.width < layout.totalWidth) {
+                    const container = new SContainer(node);
+                    container.nodes = layers.filter(x => x.relative);
+                    container.setInnerRect();
+                    container.setRelativePosition();
+                    node.nodes = layers.filter(x => x.absolute).concat([container]);
+                }
             }
         } else {
             node.nodes = [];
+            if (SOptions.html.responsive) {
+                node.setInnerRect();
+            }
         }
         return node;
     }
@@ -255,7 +267,15 @@ ${props} }`;
             numberOfColumns: numberOfColumns,
             columnWidth: columnWidth,
             gutterWidth: gutterWidth,
-            cols: Array.apply(null, Array(numberOfColumns)).map((x, i) => Math.min(totalWidth, Math.floor((columnWidth + gutterWidth) * (i + 1) - gutterWidth)))
+            cols: Array.apply(null, Array(numberOfColumns)).map((x, i) => Math.min(totalWidth, Math.floor((columnWidth + gutterWidth) * (i + 1) - gutterWidth))),
+            frame: {
+                top: 0,
+                left: 0,
+                right: width,
+                bottom: height,
+                width: width,
+                height: height,
+            },
         };
     }
 

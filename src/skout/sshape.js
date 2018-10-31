@@ -65,19 +65,22 @@ export default class SShape extends SNode {
             className: this.classes.join(' '),
         };
         const layout = SOptions.layout;
-        const style = {
-            position: 'absolute',
-            display: 'inline-block',
+        const style = this.style;
+        style.position = 'absolute';
+        style.display = 'inline-block';
+        style.background = backgroundCss;
+        style.border = borderCss;
+        style.boxShadow = boxShadowCss;
+        style.borderRadius = borderRadiusCss;
+        style.backgroundSize = 'cover';
+        /*
+        {
             top: this.frame.top + 'px',
             left: this.frame.left + 'px',
             width: (this.frame.width === layout.maxWidth) ? '100%' : this.frame.width + 'px',
             height: this.frame.height + 'px',
-            background: backgroundCss,
-            border: borderCss,
-            boxShadow: boxShadowCss,
-            borderRadius: borderRadiusCss,
-            backgroundSize: 'cover',
         };
+        */
         if (SOptions.inline) {
             attributes.style = style;
         } else {

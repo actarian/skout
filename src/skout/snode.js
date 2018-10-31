@@ -40,9 +40,10 @@ export default class SNode {
         this.margin = new SRect();
         this.padding = new SRect();
         this.frame = SNode.getFrame(object, type);
-        this.parentFrame = parent ? parent.frame : this.frame;
         this.style = {};
         this.collectedNames = {};
+        this.absolute = true;
+        this.relative = false;
         //
         Object.defineProperty(this, 'parent', {
             value: parent,
@@ -73,36 +74,19 @@ export default class SNode {
         };
     }
 
-    setNodesPosition() {
-        const layout = SOptions.layout;
-        const nodes = this.nodes.slice();
-        if (this.nodes.length > 1) {
-            const largest = nodes.reduce((a, b) => a.frame.width >= b.frame.width && a.frame.height > b.frame.height ? a : b);
-            largest.isLargest = true;
-            const horizontals = nodes.sort((a, b) => a.frame.left - b.frame.left);
-            const isHorizontal = horizontals.reduce((a, b) => (a && b && a.frame.right <= b.frame.left) ? b : null);
-            this.isHorizontal = isHorizontal;
-            const verticals = nodes.sort((a, b) => a.frame.top - b.frame.top);
-            const isVertical = verticals.reduce((a, b) => (a && b && a.frame.bottom <= b.frame.top) ? b : null);
-            this.isVertical = isVertical;
-        }
-        nodes.forEach((a, i) => {
-            a.hasSibilings = nodes.length > 1;
-            if (a.hasSibilings) {
-                nodes.filter(b => b !== a).forEach(b => {
-                    a.hasOverlaps = a.hasOverlaps || SNode.overlaps(a.frame, b.frame);
-                    a.hasSmallOverlaps = a.hasSmallOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width >= layout.totalWidth && b.frame.width < layout.totalWidth);
-                    a.hasLargeOverlaps = a.hasLargeOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width < layout.totalWidth && b.frame.width >= layout.totalWidth);
-                });
-            }
-            if (a.hasSmallOverlaps) {
-                a.absolute = true;
-            } else if (a.hasLargeOverlaps) {
-                a.absolute = false;
-            } else {
-                a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
-            }
-        });
+    static getConstraint(object) {
+        // const resizesContent = (typeof object.sketchObject.resizesContent == 'function') ? object.sketchObject.resizesContent() : 0;
+        const resizingConstraint = (typeof object.sketchObject.resizingConstraint == 'function') ? object.sketchObject.resizingConstraint() : 0;
+        const constraint = {
+            none: resizingConstraint === ResizingConstraint.None,
+            top: (resizingConstraint & ResizingConstraint.Top) === resizingConstraint,
+            right: (resizingConstraint & ResizingConstraint.Right) === resizingConstraint,
+            bottom: (resizingConstraint & ResizingConstraint.Bottom) === resizingConstraint,
+            left: (resizingConstraint & ResizingConstraint.Left) === resizingConstraint,
+            width: (resizingConstraint & ResizingConstraint.Width) === resizingConstraint,
+            height: (resizingConstraint & ResizingConstraint.Height) === resizingConstraint,
+        };
+        return constraint;
     }
 
     setInnerRect() {
@@ -115,7 +99,7 @@ export default class SNode {
             height: 0
         };
         if (this.nodes.length) {
-            this.nodes.filter(a => !a.absolute).forEach((a, i) => {
+            this.nodes.filter(a => a.relative).forEach((a, i) => {
                 innerRect.top = Math.min(innerRect.top, a.frame.top);
                 innerRect.left = Math.min(innerRect.left, a.frame.left);
                 innerRect.bottom = Math.max(innerRect.bottom, a.frame.bottom);
@@ -127,9 +111,9 @@ export default class SNode {
         this.innerRect = innerRect;
     }
 
-    layoutNode() {
+    setRelativePosition() {
+        const layout = SOptions.layout;
         const nodes = this.nodes.slice();
-        this.isLargest = this.isLargest || false;
         if (this.nodes.length > 1) {
             const largest = nodes.reduce((a, b) => a.frame.width >= b.frame.width && a.frame.height > b.frame.height ? a : b);
             largest.isLargest = true;
@@ -140,7 +124,6 @@ export default class SNode {
             const isVertical = verticals.reduce((a, b) => (a && b && a.frame.bottom <= b.frame.top) ? b : null);
             this.isVertical = isVertical;
         }
-        const layout = SOptions.layout;
         nodes.forEach((a, i) => {
             a.hasSibilings = nodes.length > 1;
             if (a.hasSibilings) {
@@ -150,13 +133,6 @@ export default class SNode {
                     a.hasLargeOverlaps = a.hasLargeOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width < layout.totalWidth && b.frame.width >= layout.totalWidth);
                 });
             }
-            /*
-            if (a.frame.width >= layout.totalWidth) {
-                a.absolute = (a.hasOverlaps && a.isLargest) ? false : true;
-            } else {
-                a.absolute = (a.hasOverlaps && a.isLargest) ? true : false;
-            }
-            */
             if (a.hasSmallOverlaps) {
                 a.absolute = true;
             } else if (a.hasLargeOverlaps) {
@@ -164,13 +140,16 @@ export default class SNode {
             } else {
                 a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
             }
+            a.relative = !a.absolute;
         });
-        this.setInnerRect();
+    }
+
+    setRelativeLayout() {
+        this.isLargest = this.isLargest || false;
         this.padding.top = this.innerRect.top;
         this.padding.right = this.frame.width - this.innerRect.right;
         this.padding.bottom = this.frame.height - this.innerRect.bottom;
         this.padding.left = this.innerRect.left;
-        // console.log('shouldPrependContainer', this.className, this.frame.width, this.layout.totalWidth, this.innerRect.width);
         if (this.isHorizontal) {
             this.nodes.sort((a, b) => a.frame.left - b.frame.left).forEach((b, i) => {
                 if (i > 0) {
@@ -189,12 +168,18 @@ export default class SNode {
             this.nodes.sort((a, b) => (a.frame.top * 10000 + a.frame.left) - (b.frame.top * 10000 + b.frame.left));
         }
         this.nodes.forEach((a, i) => {
-            a.layoutNode();
+            a.setRelativeLayout();
         });
         if (SOptions.log.layers) {
             this.logLayers();
         }
-        this.style = this.getStyle();
+    }
+
+    merge(object) {
+        if (object) {
+            Object.assign(this, object);
+        }
+        return this;
     }
 
     getNames(parent) {
@@ -221,41 +206,6 @@ export default class SNode {
         this.className = className;
         this.classes = classes;
         this.pathNames = pathNames;
-    }
-
-    merge(object) {
-        if (object) {
-            Object.assign(this, object);
-        }
-        return this;
-    }
-
-    render() {
-        return new VNode('div', this.attributes(), this.nodes.map(x => x.render()));
-    }
-
-    attributes() {
-        const attributes = {
-            className: this.classes.join(' '),
-        };
-        const style = this.style;
-        if (SOptions.inline) {
-            attributes.style = style;
-        } else {
-            SStyle.collectedStyles.push({
-                className: this.pathNames.join(' > .'),
-                style: style,
-            });
-        }
-        return attributes;
-    }
-
-    logLayers() {
-        console.log(this.className, ' '.repeat(50 - this.className.length), (this.absolute ? 'abs' : 'rel'), this.frame.width, 'x', this.frame.height);
-        this.nodes.forEach((a, i) => {
-            console.log(this.className, '=>', a.className, ' '.repeat(50 - this.className.length - 4 - a.className.length), (a.absolute ? 'abs' : 'rel'), a.frame.width, 'x', a.frame.height);
-        });
-        console.log(' ', ' ');
     }
 
     getStyle() {
@@ -288,50 +238,90 @@ export default class SNode {
             console.log(this.className, this.layout.position, 'isLargest', this.isLargest);
         }
         */
-        if (parentFrame && parentFrame.width >= layout.maxWidth) {
-            const col = layout.cols.reduce((prev, curr, i) => {
-                return (Math.abs(curr - frame.width) <= 1 ? (i + 1) : prev);
-            });
-            if (col === layout.numberOfColumns) {
-                classes.push('container'); // !!!
-                frame.width = layout.maxWidth;
-                this.absolute = false; // !!!
-            } else if (col < layout.numberOfColumns) {
-                classes.push('col-' + col);
+        let style = {};
+        if (SOptions.html.relative) {
+            // relative positioning
+            if (parentFrame && parentFrame.width >= layout.maxWidth) {
+                const col = layout.cols.reduce((prev, curr, i) => {
+                    return (Math.abs(curr - frame.width) <= 1 ? (i + 1) : prev);
+                });
+                if (col === layout.numberOfColumns) {
+                    classes.push('container'); // !!!
+                    frame.width = layout.maxWidth;
+                    this.absolute = false; // !!!
+                } else if (col < layout.numberOfColumns) {
+                    classes.push('col-' + col);
+                }
             }
-        }
-        // this.frame.width = layout.cols[col - 1] || this.frame.width;
-        const style = {
-            // display: 'block',
-            position: this.absolute ? 'absolute' : 'relative',
-            width: (frame.width === layout.maxWidth) ? '100%' : frame.width + 'px',
-            height: frame.height + 'px',
-            // width: this.constraint.width ? frame.width + 'px' : (frame.width / parentFrame.width * 100) + '%',
-            // height: this.constraint.height ? frame.height + 'px' : (frame.height / parentFrame.height * 100) + '%',
-            zIndex: this.zIndex,
-            // background: 'rgba(0,0,0,0.05)'
-        };
-        if (this.absolute) {
-            style.top = frame.top + 'px';
-            style.left = frame.left + 'px';
-        }
-        if (this.isHorizontal) {
-            style.display = 'flex';
-            style.flexDirection = 'row';
-            style.justifyContent = 'center';
-            style.alignItems = 'center';
-            style.height = frame.height + 'px';
-            // style.minHeight = '100%';
-        }
-        if (this.isVertical) {
-            style.display = 'flex';
-            style.flexDirection = 'column';
-            style.justifyContent = 'flex-start';
-            style.alignItems = 'flex-start';
-        }
-        style.margin = `${margin.top}px ${margin.right}px ${margin.bottom}px ${margin.left}px`;
-        if (this.nodes.length) {
-            style.padding = `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
+            // this.frame.width = layout.cols[col - 1] || this.frame.width;
+            style = {
+                // display: 'block',
+                position: this.absolute ? 'absolute' : 'relative',
+                width: (frame.width === layout.maxWidth) ? '100%' : frame.width + 'px',
+                height: frame.height + 'px',
+                // width: this.constraint.width ? frame.width + 'px' : (frame.width / parentFrame.width * 100) + '%',
+                // height: this.constraint.height ? frame.height + 'px' : (frame.height / parentFrame.height * 100) + '%',
+                zIndex: this.zIndex,
+                // background: 'rgba(0,0,0,0.05)'
+            };
+            if (this.absolute) {
+                style.top = frame.top + 'px';
+                style.left = frame.left + 'px';
+            }
+            if (this.isHorizontal) {
+                style.display = 'flex';
+                style.flexDirection = 'row';
+                style.justifyContent = 'center';
+                style.alignItems = 'center';
+                style.height = frame.height + 'px';
+                // style.minHeight = '100%';
+            }
+            if (this.isVertical) {
+                style.display = 'flex';
+                style.flexDirection = 'column';
+                style.justifyContent = 'flex-start';
+                style.alignItems = 'flex-start';
+            }
+            style.margin = `${margin.top}px ${margin.right}px ${margin.bottom}px ${margin.left}px`;
+            if (this.nodes.length) {
+                style.padding = `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
+            }
+        } else {
+            // absolute positioning
+            style = {
+                position: 'absolute',
+                top: this.constraint.top ? frame.top + 'px' : (frame.top / parentFrame.height * 100) + '%',
+                left: this.constraint.left ? frame.left + 'px' : (frame.left / parentFrame.width * 100) + '%',
+                zIndex: this.zIndex,
+            };
+            if (this.constraint.right) {
+                style.right = (parentFrame.width - frame.right) + 'px';
+            }
+            if (this.constraint.bottom) {
+                style.bottom = (parentFrame.height - frame.bottom) + 'px';
+            }
+            /*
+            if (!this.constraint.left && !this.constraint.right) {
+                style.left = '50%';
+                style.marginLeft = this.constraint.width ? (frame.width * -0.5) + 'px' : (frame.width / parentFrame.width * -50) + '%';
+            }
+            */
+            if (this.constraint.left && this.constraint.right) {
+                style.width = 'auto';
+            } else {
+                style.width = this.constraint.width ? frame.width + 'px' : (frame.width / parentFrame.width * 100) + '%';
+            }
+            /*
+            if (!this.constraint.top && !this.constraint.bottom) {
+                style.top = '50%';
+                style.marginTop = this.constraint.height ? (frame.height * -0.5) + 'px' : (frame.height / parentFrame.height * -50) + '%';
+            }
+            */
+            if (this.constraint.top && this.constraint.bottom) {
+                style.width = 'auto';
+            } else {
+                style.height = this.constraint.height ? frame.height + 'px' : (frame.height / parentFrame.height * 100) + '%';
+            }
         }
         if (this.sketchObject.rotation()) {
             style.transform = `rotateZ(${this.sketchObject.rotation()}deg)`;
@@ -339,19 +329,37 @@ export default class SNode {
         return style;
     }
 
-    static getConstraint(object) {
-        // const resizesContent = (typeof object.sketchObject.resizesContent == 'function') ? object.sketchObject.resizesContent() : 0;
-        const resizingConstraint = (typeof object.sketchObject.resizingConstraint == 'function') ? object.sketchObject.resizingConstraint() : 0;
-        const constraint = {
-            none: resizingConstraint === ResizingConstraint.None,
-            top: (resizingConstraint & ResizingConstraint.Top) === resizingConstraint,
-            right: (resizingConstraint & ResizingConstraint.Right) === resizingConstraint,
-            bottom: (resizingConstraint & ResizingConstraint.Bottom) === resizingConstraint,
-            left: (resizingConstraint & ResizingConstraint.Left) === resizingConstraint,
-            width: (resizingConstraint & ResizingConstraint.Width) === resizingConstraint,
-            height: (resizingConstraint & ResizingConstraint.Height) === resizingConstraint,
+    setStyle() {
+        this.style = this.getStyle();
+        this.nodes.forEach(x => x.setStyle());
+    }
+
+    render() {
+        return new VNode('div', this.attributes(), this.nodes.map(x => x.render()));
+    }
+
+    attributes() {
+        const attributes = {
+            className: this.classes.join(' '),
         };
-        return constraint;
+        const style = this.style;
+        if (SOptions.inline) {
+            attributes.style = style;
+        } else {
+            SStyle.collectedStyles.push({
+                className: this.pathNames.join(' > .'),
+                style: style,
+            });
+        }
+        return attributes;
+    }
+
+    logLayers() {
+        console.log(this.className, ' '.repeat(50 - this.className.length), (this.absolute ? 'abs' : 'rel'), this.frame.width, 'x', this.frame.height);
+        this.nodes.forEach((a, i) => {
+            console.log(this.className, '=>', a.className, ' '.repeat(50 - this.className.length - 4 - a.className.length), (a.absolute ? 'abs' : 'rel'), a.frame.width, 'x', a.frame.height);
+        });
+        console.log(' ', ' ');
     }
 
     static overlaps(a, b) {
