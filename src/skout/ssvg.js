@@ -117,8 +117,14 @@ export default class SSvg extends SNode {
         let svg = '';
         if (SOptions.svg.sprite) {
             svg = NSString.alloc().initWithContentsOfFile(folder + '/svg/' + filePath + '.svg');
-            svg = svg.replace(/(<!--.*)|(<\?xml.*)|(<svg.*)|(<\/svg.*)|(<title.*)|(<desc.*)|(<defs.*)|(<use.*)/gm, '');
+            svg = svg.replace(/(<!--.*)|(<\?xml.*)|(<svg.*)|(<\/svg.*)|(<title.*)|(<desc.*)|(<defs.*)|(<\/defs.*)|(<use.*)/gm, '');
             // |(<mask.*)
+            /*
+            toVDOM(svg, function (error, tree) {
+                if (error) throw error;
+                console.log('tree', tree);
+            });
+            */
             // console.log('svg', svg);
         }
         return svg;

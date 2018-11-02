@@ -1,5 +1,7 @@
 /* jshint esversion: 6 */
 
+import beautify from 'beautify';
+// const beautify = require('beautify'); 
 import Artboard from 'sketch/dom';
 import toHTML from 'vdom-to-html';
 import VNode from 'virtual-dom/vnode/vnode';
@@ -130,7 +132,14 @@ ${props} }`;
 `;
         }
         html = html.replace('##svg-sprite##', svgSprite);
+        html = beautify(html, {
+            format: 'html'
+        });
         SUtil.saveTextFile(html, folder, 'index.html');
+        /*
+        // !!!
+        prettier.format("foo ( );", { semi: false, parser: "babylon" });
+        */
     }
 
     static fromArtboard(object) {

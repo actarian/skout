@@ -23,7 +23,10 @@
     },
     "author": "actarian <lzampetti@gmail.com>",
     "dependencies": {
+        "beautify": "0.0.8",
+        "clean-html": "^1.5.0",
         "vdom-to-html": "^2.3.1",
-        "virtual-dom": "^2.1.1"
+        "virtual-dom": "^2.1.1",
+        "virtual-html": "^2.0.0"
     }
 }
