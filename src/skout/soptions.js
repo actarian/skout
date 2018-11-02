@@ -11,7 +11,7 @@ export default class SOptions {
             inline: false,
             //
             html: {
-                responsive: false,
+                responsive: true,
                 exact: false,
                 inline: false,
             },
@@ -25,7 +25,7 @@ export default class SOptions {
             },
             svg: {
                 folder: 'svg/',
-                sprite: false,
+                sprite: true,
             },
             //
             log: {

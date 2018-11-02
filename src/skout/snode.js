@@ -20,13 +20,12 @@ const ResizingConstraint = Object.freeze({
 export default class SNode {
 
     constructor(node) {
-        // console.log('SNode =>', node.type);
         const type = node.type;
         const object = node.object;
         const parent = node.parent;
+        const frame = node.frame;
         const groups = SUtil.toGroupNames(object.name);
         const name = groups.pop();
-        //
         this.object = object;
         this.sketchObject = object.sketchObject;
         this.id = object.id;
@@ -36,20 +35,17 @@ export default class SNode {
         this.zIndex = 0;
         this.constraint = SNode.getConstraint(object);
         this.styleText = object.sketchObject.CSSAttributeString().trim();
-        // console.log(`.${this.pathNames.join(' > .')}`);
         this.margin = new SRect();
         this.padding = new SRect();
-        this.frame = SNode.getFrame(object, type);
+        this.frame = frame;
         this.style = {};
         this.collectedNames = {};
         this.absolute = true;
         this.relative = false;
-        //
         Object.defineProperty(this, 'parent', {
             value: parent,
             writable: true
         });
-        //
         this.getNames(parent);
     }
 
@@ -372,5 +368,3 @@ export default class SNode {
     }
 
 }
-
-SNode.collectedStyles = '';

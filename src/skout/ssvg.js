@@ -33,12 +33,12 @@ export default class SSvg extends SNode {
         // console.log(this.parent.type);
         if (this.parentType === 'MSSymbolInstance' || this.type === 'MSLayerGroup') {
             SSvg.collectedSvgs.push({
-                name: this.id,
+                name: this.fileName,
                 sketchObject: this.sketchObject,
+                frame: this.frame,
             });
             const attributes = {
-                className: this.className,
-                src: SSvg.filePath(this.fileName),
+                className: this.className
             };
             const style = {
                 position: 'absolute',
@@ -55,7 +55,16 @@ export default class SSvg extends SNode {
                     style: style,
                 });
             }
-            return new VNode('img', attributes, []);
+            if (SOptions.svg.sprite) {
+                return new VNode('svg', attributes, [
+                    new VNode('use', {
+                        'href': `#${this.fileName}`
+                    }, [])
+                ]);
+            } else {
+                attributes.src = SSvg.filePath(this.fileName);
+                return new VNode('img', attributes, []);
+            }
             // return new VNode('svg', this.attributes(), this.nodes.map(x => x.render()));
         } else if (this.type === 'MSShapeGroup') {
             return new VNode('g', null, this.nodes.map(x => x.render()));
@@ -81,6 +90,7 @@ export default class SSvg extends SNode {
 
     static save(folder, filePath, object) {
         var copy = object.duplicate();
+        copy.setName(filePath);
         copy.exportOptions().removeAllExportFormats();
         var exportOption = copy.exportOptions().addExportFormat();
         exportOption.setScale(1);
@@ -104,6 +114,14 @@ export default class SSvg extends SNode {
         };
         sketch.export(copy, options);
         copy.removeFromParent();
+        let svg = '';
+        if (SOptions.svg.sprite) {
+            svg = NSString.alloc().initWithContentsOfFile(folder + '/svg/' + filePath + '.svg');
+            svg = svg.replace(/(<!--.*)|(<\?xml.*)|(<svg.*)|(<\/svg.*)|(<title.*)|(<desc.*)|(<defs.*)|(<use.*)/gm, '');
+            // |(<mask.*)
+            // console.log('svg', svg);
+        }
+        return svg;
     }
 
     static isSvg(object) {

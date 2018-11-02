@@ -34,14 +34,14 @@ export default class SPage extends SNode {
                 ]),
             ]),
             new VNode('body', null, [
-                new VNode('div', this.attributes(), nodes)
+                new VNode('div', this.attributes(), nodes),
+                new VText('##svg-sprite##')
             ])
         ]);
     }
 
     getHtml() {
         const html = toHTML(this.render());
-        // console.log('html =>\n', html);
         console.log('collectedImages', SImage.collectedImages.length);
         console.log('collectedSvgs', SSvg.collectedSvgs.length);
         console.log('collectedStyles', SStyle.collectedStyles.length);
@@ -53,13 +53,12 @@ export default class SPage extends SNode {
         const layout = SOptions.layout;
         const collectedStyles = SStyle.collectedTextStyles.concat(SStyle.collectedStyles).filter(x => Object.keys(x.style).length > 0).map(x => {
             const props = Object.keys(x.style).map(k => {
-                const key = k.replace(/([A-Z])/g, "-$1").toLowerCase();
+                const key = k.replace(/([A-Z])/g, '-$1').toLowerCase();
                 return `    ${key}: ${x.style[k]};`;
             }).join('\r');
             return `.${x.className} { 
 ${props} }`;
         }).join('\r\r');
-        // console.log('collectedStyles\r', collectedStyles.substr(0, 500));
         return `
         html {
             box-sizing: border-box;
@@ -103,28 +102,43 @@ ${props} }`;
 
     exportToFolder(folder) {
         SNode.folder = folder;
-        const html = this.getHtml();
+        let html = this.getHtml();
         SImage.collectedImages.forEach(x => x.save(folder, x.name));
-        SSvg.collectedSvgs.forEach(x => SSvg.save(folder, x.name, x.sketchObject));
+        SSvg.collectedSvgs.forEach(x => x.svg = SSvg.save(folder, x.name, x.sketchObject));
         if (SOptions.css.export) {
             SUtil.saveTextFile(SPage.collectedStyles, folder + '/css', 'skout.css');
         }
+        let svgSprite = '';
+        if (false && SOptions.svg.sprite) {
+            svgSprite = `
+    <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" style="display: none;">${SSvg.collectedSvgs.map(x => `
+        <symbol id="${x.name}" viewBox="0 0 ${x.frame.width} ${x.frame.height}">
+            ${x.svg}
+        </symbol>`).join('')}
+    </svg>
+`;
+        }
+        if (SOptions.svg.sprite) {
+            svgSprite = `
+    <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <defs>${SSvg.collectedSvgs.map(x => `
+            <g id="${x.name}">
+                ${x.svg}
+            </g>`).join('')}
+        </defs>
+    </svg>
+`;
+        }
+        html = html.replace('##svg-sprite##', svgSprite);
         SUtil.saveTextFile(html, folder, 'index.html');
     }
 
     static fromArtboard(object) {
-        // console.log('fromArtboard', width, height);
-        // console.log(layout);
         const artboard = Artboard.fromNative(object);
-        // const doc = SNode.getDocument();
-        // console.log(doc, context.document.documentData().metadata());
-        // const doc = context.document;
-        //
         // MSDocument.currentDocument().documentData().allLayerStyles();
         // context.document.documentData().allLayerStyles();
         // MSDocument.currentDocument().documentData().allTextStyles();
         // context.document.documentData().allTextStyles();
-        //            
         SStyle.collectedStyles = [];
         SStyle.collectedTextStyles = [];
         SImage.collectedImages = [];
@@ -138,20 +152,21 @@ ${props} }`;
             page.setRelativeLayout();
         }
         page.setStyle();
-        //
         return page;
     }
 
-    static getName(name) {
-        return name.split('/').pop().trim().replace(/ /g, '-').toLowerCase(); // name.replace(/\//g, '-').replace(/ /g, '');
-    }
-
     static getNode(object, parent, overrides) {
+        overrides = overrides || {};
         const type = String(object.sketchObject.className());
+        const frame = SNode.getFrame(object, type);
+        const override = overrides[object.id];
+        let parentFrame = frame;
+        let layers = object.layers || [];
         let node = {
             type,
             object,
             parent,
+            frame,
         };
         // console.log(type, name);
         /*
@@ -170,7 +185,27 @@ ${props} }`;
                 node = new SPage(node);
                 break;
             case 'MSSymbolInstance':
+                // console.log(overrides);
                 node = new SSymbol(node);
+                let symbolId = object.symbolId;
+                if (override && override.symbolID) {
+                    symbolId = override.symbolID;
+                }
+                const symbol = SNode.getDocument().getSymbolMasterWithID(symbolId);
+                parentFrame = SNode.getFrame(symbol, 'MSSymbolInstance');
+                overrides = {};
+                const objectOverrides = object.sketchObject.overrides(); // SSymbol.getOverrides(object, overrides);
+                if (objectOverrides) {
+                    Object.keys(objectOverrides).forEach(x => {
+                        overrides[x] = objectOverrides[x];
+                    });
+                }
+                if (typeof override == 'object') {
+                    Object.keys(override).forEach(x => {
+                        overrides[x] = override[x];
+                    });
+                }
+                layers = symbol.layers || [];
                 break;
             case 'MSLayerGroup':
                 if (SSvg.isSvg(object)) {
@@ -189,6 +224,9 @@ ${props} }`;
                 break;
             case 'MSTextLayer':
                 node = new SText(node);
+                if (override) {
+                    node.innerText = override;
+                }
                 break;
             case 'MSBitmapLayer':
                 node = new SImage(node);
@@ -196,46 +234,27 @@ ${props} }`;
             default:
                 node = new SNode(node);
         }
-        let layers = object.layers;
-        let parentFrame = node.frame;
-        if (object.symbolId) {
-            const symbol = SNode.getDocument().getSymbolMasterWithID(object.symbolId);
-            parentFrame = SNode.getFrame(symbol, 'MSSymbolInstance');
-            layers = symbol.layers;
-            overrides = SSymbol.getOverrides(object, overrides);
-        }
         if (layers) {
             layers = layers.filter(x => (
                 !x.hidden
             ));
             layers = layers.map((layer, i) => {
-                overrides = overrides || [];
-                /*
-                // !!!
-                overrides.forEach(x => {
-                    if (x.key == layer.id) {
-                        if (typeof x.value == 'string') {
-                            layer.text = x.value;
-                        } else {
-                            Object.assign(layer, x.value);
-                        }
-                    }
-                });
-                */
-                const sub = SPage.getNode(layer, node, overrides);
-                sub.zIndex = i;
-                sub.parentFrame = parentFrame;
-                return sub;
+                const snode = SPage.getNode(layer, node, overrides);
+                snode.zIndex = i;
+                snode.parentFrame = parentFrame;
+                return snode;
             });
             node.nodes = layers;
             if (SOptions.html.responsive) {
                 node.setRelativePosition();
                 node.setInnerRect();
                 const layout = SOptions.layout;
-                if (layers.length &&
+                // !!!
+                if (false && layers.length &&
                     node.frame.width > layout.totalWidth &&
                     node.innerRect.width < layout.totalWidth) {
                     const container = new SContainer(node);
+                    container.parentFrame = node.frame;
                     container.nodes = layers.filter(x => x.relative);
                     container.setInnerRect();
                     container.setRelativePosition();
