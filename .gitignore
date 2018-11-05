@@ -1,6 +1,9 @@
 # build artifacts
 skout.sketchplugin
 
+# materials
+materials/
+
 # mac
 .DS_Store
 

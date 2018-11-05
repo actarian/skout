@@ -23,8 +23,8 @@ export default function () {
         save: false,
         settings: false,
         debug: true,
-        folder: '/Users/lucazampetti/Desktop/SKOUT',
-        // folder: '/Users/lzampetti/Desktop/SKOUT',
+        // folder: '/Users/lucazampetti/Desktop/SKOUT',
+        folder: '/Users/lzampetti/Desktop/SKOUT',
     });
 
     if (SOptions.component.export) {
