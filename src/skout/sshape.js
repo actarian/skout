@@ -1,5 +1,13 @@
 /* jshint esversion: 6 */
 
+/**
+ * @license
+ * Copyright Luca Zampetti. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
+ */
+
 import VNode from 'virtual-dom/vnode/vnode';
 import SImage from './simage';
 import SNode from './snode';
@@ -84,10 +92,7 @@ export default class SShape extends SNode {
         if (SOptions.inline) {
             attributes.style = style;
         } else {
-            SStyle.collectedStyles.push({
-                className: this.pathNames.join(' > .'),
-                style: style,
-            });
+            this.collectStyle(style);
         }
         return attributes;
     }
@@ -112,7 +117,7 @@ export default class SShape extends SNode {
     }
 
     render() {
-        return new VNode('span', this.attributes(), []);
+        return new VNode('div', this.attributes(), []);
     }
 
 }

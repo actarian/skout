@@ -1,5 +1,14 @@
 /* jshint esversion: 6 */
 
+/**
+ * @license
+ * Copyright Luca Zampetti. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
+ */
+
+import SOptions from './soptions';
 
 export default class SStyle {
 
@@ -25,6 +34,7 @@ export default class SStyle {
                 // console.log(this.className, sharedStyle.name());
                 result = {
                     className: className,
+                    selector: '.' + className,
                     style: SStyle.parseTextStyle(sharedStyle),
                 };
             }
@@ -373,6 +383,17 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
     static getClassName(name) {
         name = SStyle.getFileName(name);
         return name; // + SStyle.getClassNameCount(name);
+    }
+
+    static stylesToCss(styles) {
+        return styles.filter(x => Object.keys(x.style).length > 0).map(x => {
+            const props = Object.keys(x.style).map(k => {
+                const key = k.replace(/([A-Z])/g, '-$1').toLowerCase();
+                return `    ${key}: ${x.style[k]};`;
+            }).join('\r');
+            return `${x.selector} { 
+${props} }`;
+        }).join('\r\r');
     }
 
     // UNUSED !!!

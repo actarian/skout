@@ -1,5 +1,13 @@
 /* jshint esversion: 6 */
 
+/**
+ * @license
+ * Copyright Luca Zampetti. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
+ */
+
 export default class SOptions {
 
     static defaults(options) {
@@ -10,6 +18,10 @@ export default class SOptions {
             debug: true,
             inline: false,
             //
+            component: {
+                export: true,
+                inline: true,
+            },
             html: {
                 responsive: true,
                 exact: false,

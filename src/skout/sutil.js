@@ -1,5 +1,15 @@
 /* jshint esversion: 6 */
 
+/**
+ * @license
+ * Copyright Luca Zampetti. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
+ */
+
+import beautify from 'js-beautify';
+
 const GOOGLE_UA = 'UA-128159763-1';
 const GOOGLE_UUID = 'google.analytics.uuid';
 
@@ -11,6 +21,12 @@ export default class SUtil {
 
     static toGroupNames(name) {
         return name.toLowerCase().split('/').map(x => x.trim().replace(/ /g, '-'));
+    }
+
+    static toComponentName(name) {
+        return name.toLowerCase().replace(/(?:^\w|[A-Z]|\b\w|-+)/g, (match, index) => {
+            return match === '-' ? '' : match.toUpperCase();
+        }) + 'Component';
     }
 
     static toHash(text) {
@@ -25,6 +41,15 @@ export default class SUtil {
         return hash;
     }
 
+    static copyResource(resource, folder) {
+        SUtil.addFolder(folder);
+        const toPath = `${folder}/${resource}`;
+        const toUrl = NSURL.alloc().initFileURLWithPath(toPath);
+        const fromUrl = context.plugin.urlForResourceNamed(resource);
+        SUtil.removeItem(toPath);
+        NSFileManager.defaultManager().copyItemAtURL_toURL_error_(fromUrl, toUrl, nil);
+    }
+
     static addFolder(path) {
         if (!NSFileManager.defaultManager().fileExistsAtPath_(path)) {
             NSFileManager.defaultManager().createDirectoryAtPath_attributes(path, {
@@ -33,7 +58,7 @@ export default class SUtil {
         }
     }
 
-    static removeFolder(path) {
+    static removeItem(path) {
         if (NSFileManager.defaultManager().fileExistsAtPath_(path)) {
             NSFileManager.defaultManager().removeItemAtPath_error_(path, nil);
         }
@@ -101,6 +126,45 @@ export default class SUtil {
         const session = NSURLSession.sharedSession();
         const task = session.dataTaskWithURL(NSURL.URLWithString(NSString.stringWithString(url)));
         task.resume();
+    }
+
+    static beautifyHtml(html) {
+        html = html.replace(/<svg/gm, '\r<svg');
+        return beautify.html(html, {
+            indent_with_tabs: true,
+            preserve_newlines: true,
+            max_preserve_newlines: 0,
+            keep_array_indentation: true,
+            break_chained_methods: true,
+            wrap_line_length: 0,
+            wrap_attributes: false,
+            end_with_newline: true,
+            extra_liners: true,
+            unformatted: []
+        });
+    }
+
+    static beautifyCss(css) {
+        return beautify.css(css, {
+            indent_with_tabs: true,
+            preserve_newlines: true,
+            max_preserve_newlines: 1,
+            keep_array_indentation: true,
+            break_chained_methods: true,
+            wrap_line_length: 0,
+            end_with_newline: true,
+            brace_style: 'collapse,preserve-inline',
+        });
+    }
+
+    static beautifyJs(js) {
+        return beautify.js(js);
+    }
+
+    static getResourceText(resourceName) {
+        const url = context.plugin.urlForResourceNamed(resourceName);
+        const resource = NSString.alloc().initWithContentsOfURL(url);
+        return resource;
     }
 
 }

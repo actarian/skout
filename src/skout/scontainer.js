@@ -1,9 +1,16 @@
 /* jshint esversion: 6 */
 
+/**
+ * @license
+ * Copyright Luca Zampetti. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
+ */
+
 import VNode from 'virtual-dom/vnode/vnode';
 import SNode from './snode';
 import SOptions from './soptions';
-import SStyle from './sstyle';
 
 export default class SContainer extends SNode {
 
@@ -54,10 +61,7 @@ export default class SContainer extends SNode {
             if (SOptions.inline) {
                 attributes.style = style;
             } else {
-                SStyle.collectedStyles.push({
-                    className: this.pathNames.join(' '),
-                    style: style,
-                });
+                this.collectStyle(style);
             }
         }
         return new VNode('div', attributes, this.nodes.map(x => x.render()));

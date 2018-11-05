@@ -1,5 +1,13 @@
 /* jshint esversion: 6 */
 
+/**
+ * @license
+ * Copyright Luca Zampetti. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
+ */
+
 import sketch from 'sketch';
 import VNode from 'virtual-dom/vnode/vnode';
 import SOptions from './soptions';
@@ -24,6 +32,8 @@ export default class SNode {
         const object = node.object;
         const parent = node.parent;
         const frame = node.frame;
+        const childOfSymbol = node.childOfSymbol;
+        const collectedStyles = node.collectedStyles;
         const groups = SUtil.toGroupNames(object.name);
         const name = groups.pop();
         this.object = object;
@@ -40,6 +50,8 @@ export default class SNode {
         this.frame = frame;
         this.style = {};
         this.collectedNames = {};
+        this.childOfSymbol = childOfSymbol;
+        this.collectedStyles = collectedStyles;
         this.absolute = true;
         this.relative = false;
         Object.defineProperty(this, 'parent', {
@@ -286,8 +298,8 @@ export default class SNode {
             // absolute positioning
             style = {
                 position: 'absolute',
-                top: this.constraint.top ? frame.top + 'px' : (frame.top / parentFrame.height * 100) + '%',
-                left: this.constraint.left ? frame.left + 'px' : (frame.left / parentFrame.width * 100) + '%',
+                top: this.constraint.top ? frame.top + 'px' : (frame.top / parentFrame.height * 100).toFixed(2) + '%',
+                left: this.constraint.left ? frame.left + 'px' : (frame.left / parentFrame.width * 100).toFixed(2) + '%',
                 zIndex: this.zIndex,
             };
             if (this.constraint.right) {
@@ -305,7 +317,7 @@ export default class SNode {
             if (this.constraint.left && this.constraint.right) {
                 style.width = 'auto';
             } else {
-                style.width = this.constraint.width ? frame.width + 'px' : (frame.width / parentFrame.width * 100) + '%';
+                style.width = this.constraint.width ? frame.width + 'px' : (frame.width / parentFrame.width * 100).toFixed(2) + '%';
             }
             /*
             if (!this.constraint.top && !this.constraint.bottom) {
@@ -316,7 +328,7 @@ export default class SNode {
             if (this.constraint.top && this.constraint.bottom) {
                 style.width = 'auto';
             } else {
-                style.height = this.constraint.height ? frame.height + 'px' : (frame.height / parentFrame.height * 100) + '%';
+                style.height = this.constraint.height ? frame.height + 'px' : (frame.height / parentFrame.height * 100).toFixed(2) + '%';
             }
         }
         if (this.sketchObject.rotation()) {
@@ -328,6 +340,39 @@ export default class SNode {
     setStyle() {
         this.style = this.getStyle();
         this.nodes.forEach(x => x.setStyle());
+    }
+
+    collectStyle(style) {
+        let selector = SOptions.component.export ?
+            this.pathNames.map((x, i) => {
+                return i === 0 ? (this.childOfSymbol ? ':host' : '.' + x) : x;
+            }).join(' > .') :
+            '.' + this.pathNames.join(' > .');
+        const styleObj = {
+            className: this.className,
+            selector: selector,
+            style: style,
+        };
+        if (this.type == 'MSSymbolInstance') {
+            this.parent.collectedStyles.push(styleObj);
+        } else {
+            this.collectedStyles.push(styleObj);
+        }
+        if (!SOptions.component.export || !this.childOfSymbol) {
+            SStyle.collectedStyles.push(styleObj);
+        }
+    }
+
+    collectSharedStyle(sharedStyle) {
+        if (SOptions.component.export) {
+            this.collectedStyles.push(sharedStyle);
+        } else {
+            const collected = SStyle.collectedTextStyles.find(x => x.className == sharedStyle.className);
+            if (!collected) {
+                SStyle.collectedTextStyles.push(sharedStyle);
+            }
+        }
+        this.classes.push(sharedStyle.className);
     }
 
     render() {
@@ -342,10 +387,7 @@ export default class SNode {
         if (SOptions.inline) {
             attributes.style = style;
         } else {
-            SStyle.collectedStyles.push({
-                className: this.pathNames.join(' > .'),
-                style: style,
-            });
+            this.collectStyle(style);
         }
         return attributes;
     }

@@ -1,10 +1,17 @@
 /* jshint esversion: 6 */
 
+/**
+ * @license
+ * Copyright Luca Zampetti. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
+ */
+
 import sketch from 'sketch';
 import VNode from 'virtual-dom/vnode/vnode';
 import SNode from './snode';
 import SOptions from './soptions';
-import SStyle from './sstyle';
 
 export default class SSvg extends SNode {
 
@@ -30,7 +37,6 @@ export default class SSvg extends SNode {
     }
 
     render() {
-        // console.log(this.parent.type);
         if (this.parentType === 'MSSymbolInstance' || this.type === 'MSLayerGroup') {
             SSvg.collectedSvgs.push({
                 name: this.fileName,
@@ -50,10 +56,7 @@ export default class SSvg extends SNode {
             if (SOptions.inline) {
                 attributes.style = style;
             } else {
-                SStyle.collectedStyles.push({
-                    className: this.pathNames.join(' > .'),
-                    style: style,
-                });
+                this.collectStyle(style);
             }
             if (SOptions.svg.sprite) {
                 return new VNode('svg', attributes, [
@@ -65,23 +68,7 @@ export default class SSvg extends SNode {
                 attributes.src = SSvg.filePath(this.fileName);
                 return new VNode('img', attributes, []);
             }
-            // return new VNode('svg', this.attributes(), this.nodes.map(x => x.render()));
-        } else if (this.type === 'MSShapeGroup') {
-            return new VNode('g', null, this.nodes.map(x => x.render()));
-        } else if (this.type === 'MSShapePathLayer') {
-            return new VNode('path', null, []);
         }
-        /*
-        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-            viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-        <g id="Layer_2_1_">
-        </g>
-        <g id="Layer_1_1_">
-            <path d="M219.4,134.3l-169.3,170c-20.5,20.5-20.5,53.2,0,73c20.5,20.5,53.2,20.5,73,0l133-132l133.3,130c20.5,20.5,53.2,22.5,73,2
-                c10.2-10.2,15-23.2,15-36.9c0-13-4.8-26.6-15-36.9L293.1,134.3c-9.6-9.6-23.2-15-36.9-15C242.6,119.3,229.6,124.8,219.4,134.3z"/>
-        </g>
-        </svg>
-        */
     }
 
     static filePath(name) {
@@ -94,20 +81,8 @@ export default class SSvg extends SNode {
         copy.exportOptions().removeAllExportFormats();
         var exportOption = copy.exportOptions().addExportFormat();
         exportOption.setScale(1);
-        /*
-        var path = folder + '/' + filePath;
-        // console.log('SSvg.save', path);
-        var slices = MSExportRequest.exportRequestsFromExportableLayer(copy);
-        for (var i = 0; i < slices.count(); i++) {
-            const doc = context.document;
-            // console.log(doc);
-            // doc.saveArtboardOrSlice(slices[i], path);
-            // [doc saveArtboardOrSlice: slices[i] toFile: path];
-        }
-        */
         const options = {
             compact: true,
-            // 'use-id-for-name': true,
             overwrite: true,
             formats: 'svg',
             output: folder + '/svg',
@@ -117,24 +92,24 @@ export default class SSvg extends SNode {
         let svg = '';
         if (SOptions.svg.sprite) {
             svg = NSString.alloc().initWithContentsOfFile(folder + '/svg/' + filePath + '.svg');
-            svg = svg.replace(/(<!--.*)|(<\?xml.*)|(<svg.*)|(<\/svg.*)|(<title.*)|(<desc.*)|(<defs.*)|(<\/defs.*)|(<use.*)/gm, '');
-            // |(<mask.*)
-            /*
-            toVDOM(svg, function (error, tree) {
-                if (error) throw error;
-                console.log('tree', tree);
-            });
-            */
+            const fill = (/<use.*fill="#(\w*)".*>/gm).exec(svg);
+            if (fill) {
+                svg = svg.replace(/path d/gm, `path fill="#${fill[1]}" d`);
+            }
+            svg = svg.replace(/(<!--.*)|(<\?xml.*)|(<svg.*)|(<\/svg.*)|(<title.*)|(<desc.*)|(<g.*)|(<\/g.*)|(<mask.*)|(<\/mask.*)|(<defs.*)|(<\/defs.*)|(<use.*)/gm, '');
+            // const parser = new DOMParser();
+            // const svg = parser.parseFromString(svg, 'text/html');
             // console.log('svg', svg);
         }
         return svg;
     }
 
     static isSvg(object) {
-        var flag = true;
+        const allowedClasses = ['MSLayerGroup', 'MSShapeGroup', 'MSShapePathLayer'];
+        let flag = true;
         object.layers.forEach(x => {
             const className = String(x.sketchObject.className());
-            if (className !== 'MSShapeGroup' && className !== 'MSShapePathLayer') {
+            if (allowedClasses.indexOf(className) === -1) {
                 flag = false;
             }
         });

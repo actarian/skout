@@ -1,0 +1,13 @@
+{
+    "name": "skout-modules",
+    "version": "0.0.1",
+    "author": "Luca Zampetti <lzampetti@gmail.com>",
+    "license": "MIT",
+    "scripts": {
+        "start": "http-server \"./\" -o",
+        "postinstall": "npm run start"
+    },
+    "devDependencies": {
+        "http-server": "^0.11.1"
+    }
+}

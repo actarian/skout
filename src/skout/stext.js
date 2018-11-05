@@ -1,5 +1,13 @@
 /* jshint esversion: 6 */
 
+/**
+ * @license
+ * Copyright Luca Zampetti. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
+ */
+
 import VNode from 'virtual-dom/vnode/vnode';
 import VText from 'virtual-dom/vnode/vtext';
 import SNode from './snode';
@@ -28,18 +36,11 @@ export default class SText extends SNode {
             }
         } else {
             if (sharedStyle) {
-                const collected = SStyle.collectedTextStyles.find(x => x.className == sharedStyle.className);
-                if (!collected) {
-                    SStyle.collectedTextStyles.push(sharedStyle);
-                }
-                this.classes.push(sharedStyle.className);
+                this.collectSharedStyle(sharedStyle);
             } else {
                 Object.assign(style, localStyle);
             }
-            SStyle.collectedStyles.push({
-                className: this.pathNames.join(' > .'),
-                style: style,
-            });
+            this.collectStyle(style);
         }
         return style;
     }
@@ -55,7 +56,7 @@ export default class SText extends SNode {
     }
 
     render() {
-        return new VNode('span', this.attributes(), [
+        return new VNode('div', this.attributes(), [
             new VNode('span', null, [
                 new VText(this.innerText)
             ])

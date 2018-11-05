@@ -1,6 +1,13 @@
 /* jshint esversion: 6 */
 
-import beautify from 'beautify';
+/**
+ * @license
+ * Copyright Luca Zampetti. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
+ */
+
 // const beautify = require('beautify'); 
 import Artboard from 'sketch/dom';
 import toHTML from 'vdom-to-html';
@@ -22,19 +29,31 @@ export default class SPage extends SNode {
     render() {
         const nodes = this.nodes.map(x => x.render());
         SPage.collectedStyles = this.getCss();
+        const headNodes = [
+            new VNode('base', {
+                href: '.'
+            }, []),
+            new VNode('link', {
+                rel: 'icon',
+                type: 'image/x-icon',
+                href: 'favicon.ico'
+            }, []),
+            SOptions.css.export ? new VNode('link', {
+                rel: 'stylesheet',
+                type: 'text/css',
+                href: 'css/skout.css'
+            }, []) : new VNode('style', null, [
+                new VText(SPage.collectedStyles)
+            ])
+        ];
+        if (SOptions.component.export) {
+            SSymbol.collectedSymbols.forEach(x => headNodes.push(new VNode('script', {
+                src: `components/${x.className}/${x.className}.component.js`,
+                type: 'module',
+            }, [])));
+        }
         return new VNode('html', null, [
-            new VNode('head', null, [
-                new VNode('base', {
-                    href: '.'
-                }, []),
-                SOptions.css.export ? new VNode('link', {
-                    rel: 'stylesheet',
-                    type: 'text/css',
-                    href: 'css/skout.css'
-                }, []) : new VNode('style', null, [
-                    new VText(SPage.collectedStyles)
-                ]),
-            ]),
+            new VNode('head', null, headNodes),
             new VNode('body', null, [
                 new VNode('div', this.attributes(), nodes),
                 new VText('##svg-sprite##')
@@ -48,19 +67,13 @@ export default class SPage extends SNode {
         console.log('collectedSvgs', SSvg.collectedSvgs.length);
         console.log('collectedStyles', SStyle.collectedStyles.length);
         console.log('collectedTextStyles', SStyle.collectedTextStyles.length);
+        console.log('collectedSymbols', SSymbol.collectedSymbols.length);
         return html;
     }
 
     getCss() {
         const layout = SOptions.layout;
-        const collectedStyles = SStyle.collectedTextStyles.concat(SStyle.collectedStyles).filter(x => Object.keys(x.style).length > 0).map(x => {
-            const props = Object.keys(x.style).map(k => {
-                const key = k.replace(/([A-Z])/g, '-$1').toLowerCase();
-                return `    ${key}: ${x.style[k]};`;
-            }).join('\r');
-            return `.${x.className} { 
-${props} }`;
-        }).join('\r\r');
+        const collectedStyles = SStyle.stylesToCss(SStyle.collectedTextStyles.concat(SStyle.collectedStyles.filter(x => !SOptions.component.export || x.selector.indexOf(':host') === -1)));
         return `
         html {
             box-sizing: border-box;
@@ -108,18 +121,10 @@ ${props} }`;
         SImage.collectedImages.forEach(x => x.save(folder, x.name));
         SSvg.collectedSvgs.forEach(x => x.svg = SSvg.save(folder, x.name, x.sketchObject));
         if (SOptions.css.export) {
-            SUtil.saveTextFile(SPage.collectedStyles, folder + '/css', 'skout.css');
+            const css = SUtil.beautifyCss(SPage.collectedStyles);
+            SUtil.saveTextFile(css, folder + '/css', 'skout.css');
         }
         let svgSprite = '';
-        if (false && SOptions.svg.sprite) {
-            svgSprite = `
-    <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" style="display: none;">${SSvg.collectedSvgs.map(x => `
-        <symbol id="${x.name}" viewBox="0 0 ${x.frame.width} ${x.frame.height}">
-            ${x.svg}
-        </symbol>`).join('')}
-    </svg>
-`;
-        }
         if (SOptions.svg.sprite) {
             svgSprite = `
     <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -132,14 +137,18 @@ ${props} }`;
 `;
         }
         html = html.replace('##svg-sprite##', svgSprite);
-        html = beautify(html, {
-            format: 'html'
-        });
+        html = SUtil.beautifyHtml(html);
         SUtil.saveTextFile(html, folder, 'index.html');
-        /*
-        // !!!
-        prettier.format("foo ( );", { semi: false, parser: "babylon" });
-        */
+        if (SOptions.component.export) {
+            SUtil.copyResource('component.js', `${folder}/components`);
+            SUtil.copyResource('favicon.ico', folder);
+            SUtil.copyResource('LICENSE', folder);
+            SUtil.copyResource('package.json', folder);
+            // let js = SUtil.getResourceText(`component.js`);
+            // js = SUtil.beautifyJs(js);
+            // SUtil.saveTextFile(js, `${folder}/components`, `component.js`);
+            SSymbol.collectedSymbols.forEach(x => SSymbol.save(folder, x));
+        }
     }
 
     static fromArtboard(object) {
@@ -164,18 +173,24 @@ ${props} }`;
         return page;
     }
 
-    static getNode(object, parent, overrides) {
+    static getNode(object, parent, overrides, childOfSymbol) {
         overrides = overrides || {};
         const type = String(object.sketchObject.className());
         const frame = SNode.getFrame(object, type);
         const override = overrides[object.id];
         let parentFrame = frame;
         let layers = object.layers || [];
+        let collectedStyles = [];
+        if (parent) {
+            collectedStyles = parent.collectedStyles;
+        }
         let node = {
             type,
             object,
             parent,
             frame,
+            childOfSymbol,
+            collectedStyles,
         };
         // console.log(type, name);
         /*
@@ -194,16 +209,21 @@ ${props} }`;
                 node = new SPage(node);
                 break;
             case 'MSSymbolInstance':
-                // console.log(overrides);
-                node = new SSymbol(node);
                 let symbolId = object.symbolId;
                 if (override && override.symbolID) {
                     symbolId = override.symbolID;
                 }
                 const symbol = SNode.getDocument().getSymbolMasterWithID(symbolId);
+                layers = symbol.layers || [];
+                object.layers = layers;
+                //
+                node = new SSymbol(node);
+                node.collectedStyles = [];
+                childOfSymbol = true;
+                //
                 parentFrame = SNode.getFrame(symbol, 'MSSymbolInstance');
                 overrides = {};
-                const objectOverrides = object.sketchObject.overrides(); // SSymbol.getOverrides(object, overrides);
+                const objectOverrides = object.sketchObject.overrides();
                 if (objectOverrides) {
                     Object.keys(objectOverrides).forEach(x => {
                         overrides[x] = objectOverrides[x];
@@ -214,7 +234,6 @@ ${props} }`;
                         overrides[x] = override[x];
                     });
                 }
-                layers = symbol.layers || [];
                 break;
             case 'MSLayerGroup':
                 if (SSvg.isSvg(object)) {
@@ -248,9 +267,10 @@ ${props} }`;
                 !x.hidden
             ));
             layers = layers.map((layer, i) => {
-                const snode = SPage.getNode(layer, node, overrides);
+                const snode = SPage.getNode(layer, node, overrides, childOfSymbol);
                 snode.zIndex = i;
                 snode.parentFrame = parentFrame;
+                // snode.collectedStyles = parentCollectedStyles;
                 return snode;
             });
             node.nodes = layers;

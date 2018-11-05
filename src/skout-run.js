@@ -1,6 +1,12 @@
 /* jshint esversion: 6 */
 
-// documentation: https://developer.sketchapp.com/reference/api/
+/**
+ * @license
+ * Copyright Luca Zampetti. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
+ */
 
 import sketch from 'sketch';
 import SOptions from './skout/soptions';
@@ -17,9 +23,17 @@ export default function () {
         save: false,
         settings: false,
         debug: true,
-        // folder: '/Users/lucazampetti/Desktop/SKOUT',
-        folder: '/Users/lzampetti/Desktop/SKOUT',
+        folder: '/Users/lucazampetti/Desktop/SKOUT',
+        // folder: '/Users/lzampetti/Desktop/SKOUT',
     });
+
+    if (SOptions.component.export) {
+        SOptions.svg.sprite = false;
+    }
+
+    if (SOptions.debug) {
+        AppController.sharedInstance().pluginManager().reloadPlugins();
+    }
 
     const artboards = getSelectedArtboards();
     if (artboards.length != 1) {
