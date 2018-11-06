@@ -262,9 +262,9 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
             const fillImage = fill.image();
             const fillGradient = SStyle.serializeStyle(this.styleText)['background-image']; // fill.gradient();
             if (fillImage) {
-                background = `url('../img/${this.className}.png') no-repeat center`;
+                background = `url('../${SOptions.image.folder}/${this.className}.png') no-repeat center`;
                 if (SOptions.folder) {
-                    SImage.saveToJpg(fillImage, SOptions.folder, 'img/', `${this.className}.png`);
+                    SImage.saveToJpg(fillImage, SOptions.folder, `${SOptions.image.folder}/`, `${this.className}.png`);
                 } else {
                     // backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
                 }

@@ -31,9 +31,9 @@ export default class SShape extends SNode {
             const image = fill.image();
             const gradient = SStyle.serializeStyle(this.styleText)['background-image']; // fill.gradient();
             if (image) {
-                backgroundCss = `url('../img/${this.className}.png') no-repeat center`;
+                backgroundCss = `url('../${SOptions.image.folder}/${this.className}.png') no-repeat center`;
                 if (SNode.folder) {
-                    SImage.saveToJpg(image, SNode.folder, 'img/', `${this.className}.png`);
+                    SImage.saveToJpg(image, SNode.folder, `${SOptions.image.folder}/`, `${this.className}.png`);
                 } else {
                     // backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
                 }

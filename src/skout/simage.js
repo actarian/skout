@@ -21,7 +21,7 @@ export default class SImage extends SNode {
     }
 
     render() {
-        const filePath = `img/${this.fileName}-${this.id}.png`;
+        const filePath = `${SOptions.image.folder}/${this.fileName}-${this.id}.png`;
         SImage.collectedImages.push({
             name: filePath,
             save: (folder, filePath) => {

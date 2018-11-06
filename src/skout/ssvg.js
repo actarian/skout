@@ -72,7 +72,7 @@ export default class SSvg extends SNode {
     }
 
     static filePath(name) {
-        return 'svg/' + name + '.svg';
+        return `${SOptions.svg.folder}/${name}.svg`;
     }
 
     static save(folder, filePath, object) {
@@ -85,13 +85,13 @@ export default class SSvg extends SNode {
             compact: true,
             overwrite: true,
             formats: 'svg',
-            output: folder + '/svg',
+            output: `${folder}/${SOptions.svg.folder}`,
         };
         sketch.export(copy, options);
         copy.removeFromParent();
         let svg = '';
         if (SOptions.svg.sprite) {
-            svg = NSString.alloc().initWithContentsOfFile(folder + '/svg/' + filePath + '.svg');
+            svg = NSString.alloc().initWithContentsOfFile(`${folder}/${SOptions.svg.folder}/${filePath}.svg`);
             const fill = (/<use.*fill="#(\w*)".*>/gm).exec(svg);
             if (fill) {
                 svg = svg.replace(/path d/gm, `path fill="#${fill[1]}" d`);

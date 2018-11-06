@@ -41,14 +41,14 @@ export default class SPage extends SNode {
             SOptions.css.export ? new VNode('link', {
                 rel: 'stylesheet',
                 type: 'text/css',
-                href: 'css/skout.css'
+                href: SOptions.css.folder + '/skout.css'
             }, []) : new VNode('style', null, [
                 new VText(SPage.collectedStyles)
             ])
         ];
         if (SOptions.component.export) {
             SSymbol.collectedSymbols.forEach(x => headNodes.push(new VNode('script', {
-                src: `components/${x.className}/${x.className}.component.js`,
+                src: `${SOptions.component.folder}/${x.className}/${x.className}.component.js`,
                 type: 'module',
             }, [])));
         }
@@ -122,7 +122,7 @@ export default class SPage extends SNode {
         SSvg.collectedSvgs.forEach(x => x.svg = SSvg.save(folder, x.name, x.sketchObject));
         if (SOptions.css.export) {
             const css = SUtil.beautifyCss(SPage.collectedStyles);
-            SUtil.saveTextFile(css, folder + '/css', 'skout.css');
+            SUtil.saveTextFile(css, folder + '/' + SOptions.css.folder, 'skout.css');
         }
         let svgSprite = '';
         if (SOptions.svg.sprite) {
@@ -140,13 +140,13 @@ export default class SPage extends SNode {
         html = SUtil.beautifyHtml(html);
         SUtil.saveTextFile(html, folder, 'index.html');
         if (SOptions.component.export) {
-            SUtil.copyResource('component.js', `${folder}/components`);
+            SUtil.copyResource('component.js', `${folder}/${SOptions.component.folder}`);
             SUtil.copyResource('favicon.ico', folder);
             SUtil.copyResource('LICENSE', folder);
             SUtil.copyResource('package.json', folder);
             // let js = SUtil.getResourceText(`component.js`);
             // js = SUtil.beautifyJs(js);
-            // SUtil.saveTextFile(js, `${folder}/components`, `component.js`);
+            // SUtil.saveTextFile(js, `${folder}/${SOptions.component.folder}`, `component.js`);
             SSymbol.collectedSymbols.forEach(x => SSymbol.save(folder, x));
         }
     }
@@ -167,7 +167,7 @@ export default class SPage extends SNode {
         page.zIndex = 0;
         page.parentFrame = layout.frame;
         if (SOptions.html.relative) {
-            page.setRelativeLayout();
+            page.setMarginAndPaddings();
         }
         page.setStyle();
         return page;
@@ -275,7 +275,7 @@ export default class SPage extends SNode {
             });
             node.nodes = layers;
             if (SOptions.html.relative) {
-                node.setRelativePosition();
+                node.setPosition();
                 node.setInnerRect();
                 const layout = SOptions.layout;
                 // !!!
@@ -286,7 +286,7 @@ export default class SPage extends SNode {
                     container.parentFrame = node.frame;
                     container.nodes = layers.filter(x => x.relative);
                     container.setInnerRect();
-                    container.setRelativePosition();
+                    container.setPosition();
                     node.nodes = layers.filter(x => x.absolute).concat([container]);
                 }
             }

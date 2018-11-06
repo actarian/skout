@@ -97,29 +97,29 @@ export default class SUtil {
             NSUserDefaults.standardUserDefaults().setObject_forKey(uuid, GOOGLE_UUID);
         }
         let url = 'https://www.google-analytics.com/collect?v=1';
-        // Tracking ID
+        // trackingid
         url += '&tid=' + GOOGLE_UA;
-        // Source
+        // source
         url += '&ds=sketch' + MSApplicationMetadata.metadata().appVersion;
-        // Client ID
+        // clientid
         url += '&cid=' + uuid;
         // pageview, screenview, event, transaction, item, social, exception, timing
         url += '&t=event';
-        // App Name
+        // appname
         url += '&an=' + encodeURI(context.plugin.name());
-        // App ID
+        // appid
         url += '&aid=' + context.plugin.identifier();
-        // App Version
+        // appversion
         url += '&av=' + context.plugin.version();
-        // Event category
+        // eventcategory
         url += '&ec=' + encodeURI(category);
-        // Event action
+        // eventaction
         url += '&ea=' + encodeURI(action);
-        // Event label
+        // eventlabel
         if (label) {
             url += '&el=' + encodeURI(label);
         }
-        // Event value
+        // eventvalue
         if (value) {
             url += '&ev=' + encodeURI(value);
         }

@@ -32,7 +32,7 @@ export default class SContainer extends SNode {
         this.classes.push('scontainer');
     }
 
-    setRelativePosition() {
+    setPosition() {
         const padding = {
             left: (this.innerRect.left - this.frame.left),
             top: (this.innerRect.top - this.frame.top),

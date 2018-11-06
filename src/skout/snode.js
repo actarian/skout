@@ -129,7 +129,7 @@ export default class SNode {
         this.innerRect = innerRect;
     }
 
-    setRelativePosition() {
+    setPosition() {
         const layout = SOptions.layout;
         const nodes = this.nodes.slice();
         if (this.nodes.length > 1) {
@@ -159,13 +159,10 @@ export default class SNode {
                 a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
             }
             a.relative = !a.absolute;
-            if (a.name === 'claim-whatsapp') {
-                console.log('setRelativePosition', a.hasSmallOverlaps, a.hasLargeOverlaps, a.hasOverlaps, a.absolute);
-            }
         });
     }
 
-    setRelativeLayout() {
+    setMarginAndPaddings() {
         this.isLargest = this.isLargest || false;
         this.padding.top = this.innerRect.top;
         this.padding.right = this.frame.width - this.innerRect.right;
@@ -189,7 +186,7 @@ export default class SNode {
             this.nodes.sort((a, b) => (a.frame.top * 10000 + a.frame.left) - (b.frame.top * 10000 + b.frame.left));
         }
         this.nodes.forEach((a, i) => {
-            a.setRelativeLayout();
+            a.setMarginAndPaddings();
         });
         if (SOptions.log.layers) {
             this.logLayers();

@@ -20,23 +20,25 @@ export default class SOptions {
             //
             component: {
                 export: false,
+                folder: 'components',
                 inline: true,
             },
             html: {
-                relative: true,
-                absolute: false,
-                inline: false,
+                export: true,
+                relative: false,
             },
             css: {
-                folder: 'css/',
                 export: true,
+                folder: 'css',
             },
             image: {
-                folder: 'img/',
+                export: true,
+                folder: 'img',
                 compression: 0.8,
             },
             svg: {
-                folder: 'svg/',
+                export: true,
+                folder: 'svg',
                 sprite: true,
             },
             //
