@@ -27,4 +27,13 @@ export default class SRect {
         return this;
     }
 
+    static differs(a, b) {
+        return a.height != b.height || a.width != b.width || a.y !== b.y || a.x !== b.x;
+    }
+
+    static overlaps(a, b) {
+        const c = 0.1;
+        return !(b.left + c > a.right || b.right < a.left + c || b.top + c > a.bottom || b.bottom < a.top + c);
+    }
+
 }

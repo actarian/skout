@@ -36,7 +36,7 @@ export default class SNode {
         const collectedStyles = node.collectedStyles;
         const groups = SUtil.toGroupNames(object.name);
         const name = groups.pop();
-        this.object = object;
+        // this.object = object;
         this.sketchObject = object.sketchObject;
         this.id = object.id;
         this.name = name;
@@ -54,6 +54,16 @@ export default class SNode {
         this.collectedStyles = collectedStyles;
         this.absolute = true;
         this.relative = false;
+        Object.defineProperty(this, 'object', {
+            value: object,
+            writable: true
+        });
+        /*
+        Object.defineProperty(this, 'sketchObject', {
+            value: sketchObject,
+            writable: true
+        });
+        */
         Object.defineProperty(this, 'parent', {
             value: parent,
             writable: true
@@ -136,9 +146,9 @@ export default class SNode {
             a.hasSibilings = nodes.length > 1;
             if (a.hasSibilings) {
                 nodes.filter(b => b !== a).forEach(b => {
-                    a.hasOverlaps = a.hasOverlaps || SNode.overlaps(a.frame, b.frame);
-                    a.hasSmallOverlaps = a.hasSmallOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width >= layout.totalWidth && b.frame.width < layout.totalWidth);
-                    a.hasLargeOverlaps = a.hasLargeOverlaps || (SNode.overlaps(a.frame, b.frame) && a.frame.width < layout.totalWidth && b.frame.width >= layout.totalWidth);
+                    a.hasOverlaps = a.hasOverlaps || SRect.overlaps(a.frame, b.frame);
+                    a.hasSmallOverlaps = a.hasSmallOverlaps || (SRect.overlaps(a.frame, b.frame) && a.frame.width >= layout.totalWidth && b.frame.width < layout.totalWidth);
+                    a.hasLargeOverlaps = a.hasLargeOverlaps || (SRect.overlaps(a.frame, b.frame) && a.frame.width < layout.totalWidth && b.frame.width >= layout.totalWidth);
                 });
             }
             if (a.hasSmallOverlaps) {
@@ -149,6 +159,9 @@ export default class SNode {
                 a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
             }
             a.relative = !a.absolute;
+            if (a.name === 'claim-whatsapp') {
+                console.log('setRelativePosition', a.hasSmallOverlaps, a.hasLargeOverlaps, a.hasOverlaps, a.absolute);
+            }
         });
     }
 
@@ -339,6 +352,15 @@ export default class SNode {
 
     setStyle() {
         this.style = this.getStyle();
+        const shapes = ['MSRectangleShape', 'MSOvalShape'];
+        const shape = this.nodes.find((x, i) => {
+            return i === 0 && shapes.indexOf(x.type) != -1 && !SRect.differs(this.frame, x.frame);
+        });
+        if (shape) {
+            // console.log('shape', shape.type);
+            const shapeStyle = shape.getShapeStyle();
+            Object.assign(this.style, shapeStyle);
+        }
         this.nodes.forEach(x => x.setStyle());
     }
 
@@ -375,8 +397,15 @@ export default class SNode {
         this.classes.push(sharedStyle.className);
     }
 
+    renderNodes() {
+        const shapes = ['MSRectangleShape', 'MSOvalShape'];
+        return this.nodes.filter((x, i) => {
+            return i > 0 || shapes.indexOf(x.type) === -1 || SRect.differs(this.frame, x.frame);
+        }).map(x => x.render());
+    }
+
     render() {
-        return new VNode('div', this.attributes(), this.nodes.map(x => x.render()));
+        return new VNode('div', this.attributes(), this.renderNodes());
     }
 
     attributes() {
@@ -398,11 +427,6 @@ export default class SNode {
             console.log(this.className, '=>', a.className, ' '.repeat(50 - this.className.length - 4 - a.className.length), (a.absolute ? 'abs' : 'rel'), a.frame.width, 'x', a.frame.height);
         });
         console.log(' ', ' ');
-    }
-
-    static overlaps(a, b) {
-        const c = 0.1;
-        return !(b.left + c > a.right || b.right < a.left + c || b.top + c > a.bottom || b.bottom < a.top + c);
     }
 
     static getDocument() {

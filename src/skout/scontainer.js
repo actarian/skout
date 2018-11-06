@@ -64,7 +64,7 @@ export default class SContainer extends SNode {
                 this.collectStyle(style);
             }
         }
-        return new VNode('div', attributes, this.nodes.map(x => x.render()));
+        return new VNode('div', attributes, this.renderNodes());
     }
 
 }

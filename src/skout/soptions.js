@@ -19,12 +19,12 @@ export default class SOptions {
             inline: false,
             //
             component: {
-                export: true,
+                export: false,
                 inline: true,
             },
             html: {
-                responsive: true,
-                exact: false,
+                relative: true,
+                absolute: false,
                 inline: false,
             },
             css: {

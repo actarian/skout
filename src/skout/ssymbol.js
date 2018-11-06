@@ -23,8 +23,7 @@ export default class SSymbol extends SNode {
 
     render() {
         if (SOptions.component.export) {
-            const styles = [];
-            const nodes = this.nodes.map(x => x.render(styles));
+            const nodes = this.renderNodes();
             const html = nodes.map(x => toHTML(x)).join('\n');
             const tagName = `${this.className}-component`;
             SSymbol.collectedSymbols.push({

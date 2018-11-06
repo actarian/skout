@@ -27,7 +27,7 @@ import SUtil from './sutil';
 export default class SPage extends SNode {
 
     render() {
-        const nodes = this.nodes.map(x => x.render());
+        const nodes = this.renderNodes();
         SPage.collectedStyles = this.getCss();
         const headNodes = [
             new VNode('base', {
@@ -274,7 +274,7 @@ export default class SPage extends SNode {
                 return snode;
             });
             node.nodes = layers;
-            if (SOptions.html.responsive) {
+            if (SOptions.html.relative) {
                 node.setRelativePosition();
                 node.setInnerRect();
                 const layout = SOptions.layout;
@@ -292,7 +292,7 @@ export default class SPage extends SNode {
             }
         } else {
             node.nodes = [];
-            if (SOptions.html.responsive) {
+            if (SOptions.html.relative) {
                 node.setInnerRect();
             }
         }

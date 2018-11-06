@@ -18,10 +18,10 @@ export default class SShape extends SNode {
 
     constructor(node) {
         super(node);
-        this.classes.push('sshape');
+        // this.classes.push('sshape');
     }
 
-    attributes() {
+    getShapeStyle() {
         let backgroundCss = 'trasparent';
         let borderCss = 'none';
         let boxShadowCss = 'none';
@@ -69,13 +69,7 @@ export default class SShape extends SNode {
             boxShadowCss = `${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowSpread}px ${shadowColor}`;
         }
         const borderRadiusCss = this.type === 'MSRectangleShape' ? this.sketchObject.cornerRadiusFloat() + 'px' : '50%';
-        const attributes = {
-            className: this.classes.join(' '),
-        };
-        const layout = SOptions.layout;
         const style = this.style;
-        style.position = 'absolute';
-        style.display = 'inline-block';
         style.background = backgroundCss;
         style.border = borderCss;
         style.boxShadow = boxShadowCss;
@@ -89,6 +83,17 @@ export default class SShape extends SNode {
             height: this.frame.height + 'px',
         };
         */
+        return style;
+    }
+
+    attributes() {
+        const style = this.getShapeStyle();
+        style.position = 'absolute';
+        style.display = 'inline-block';
+        const attributes = {
+            className: this.classes.join(' '),
+        };
+        // const layout = SOptions.layout;
         if (SOptions.inline) {
             attributes.style = style;
         } else {
