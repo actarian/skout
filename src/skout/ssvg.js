@@ -21,17 +21,17 @@ export default class SSvg extends SNode {
             version: '1.1',
             x: '0px',
             y: '0px',
-            viewBox: `0 0 ${this.frame.width} ${this.frame.height}`,
+            viewBox: `0 0 ${this.rect.width} ${this.rect.height}`,
             xmlns: 'http://www.w3.org/2000/svg',
             'xmlns:xlink': 'http://www.w3.org/1999/xlink',
             'xml:space': 'preserve',
             style: {
                 position: 'absolute',
-                top: this.frame.top + 'px',
-                left: this.frame.left + 'px',
+                top: this.rect.top + 'px',
+                left: this.rect.left + 'px',
                 width: '100%',
                 height: '100%',
-                enableBackground: `new 0 0 ${this.frame.width} ${this.frame.height}`,
+                enableBackground: `new 0 0 ${this.rect.width} ${this.rect.height}`,
             },
         };
     }
@@ -41,15 +41,15 @@ export default class SSvg extends SNode {
             SSvg.collectedSvgs.push({
                 name: this.fileName,
                 sketchObject: this.sketchObject,
-                frame: this.frame,
+                rect: this.rect,
             });
             const attributes = {
                 className: this.className
             };
             const style = {
                 position: 'absolute',
-                top: this.frame.top + 'px',
-                left: this.frame.left + 'px',
+                top: this.rect.top + 'px',
+                left: this.rect.left + 'px',
                 width: '100%',
                 height: '100%',
             };

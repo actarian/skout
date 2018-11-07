@@ -13,10 +13,11 @@ import Artboard from 'sketch/dom';
 import toHTML from 'vdom-to-html';
 import VNode from 'virtual-dom/vnode/vnode';
 import VText from 'virtual-dom/vnode/vtext';
-import SContainer from './scontainer';
 import SImage from './simage';
+import SLayout from './slayout';
 import SNode from './snode';
 import SOptions from './soptions';
+import SRect from './srect';
 import SShape from './sshape';
 import SStyle from './sstyle';
 import SSvg from './ssvg';
@@ -161,11 +162,11 @@ export default class SPage extends SNode {
         SStyle.collectedTextStyles = [];
         SImage.collectedImages = [];
         SSvg.collectedSvgs = [];
-        const layout = SPage.getLayout(object);
+        const layout = SLayout.fromArtboard(object);
         SOptions.layout = layout;
         const page = SPage.getNode(artboard);
         page.zIndex = 0;
-        page.parentFrame = layout.frame;
+        page.parentRect = layout.rect;
         if (SOptions.html.relative) {
             page.setMarginAndPaddings();
         }
@@ -176,9 +177,9 @@ export default class SPage extends SNode {
     static getNode(object, parent, overrides, childOfSymbol) {
         overrides = overrides || {};
         const type = String(object.sketchObject.className());
-        const frame = SNode.getFrame(object, type);
+        const rect = SRect.fromObject(object);
         const override = overrides[object.id];
-        let parentFrame = frame;
+        let parentRect = rect;
         let layers = object.layers || [];
         let collectedStyles = [];
         if (parent) {
@@ -188,7 +189,7 @@ export default class SPage extends SNode {
             type,
             object,
             parent,
-            frame,
+            rect,
             childOfSymbol,
             collectedStyles,
         };
@@ -221,7 +222,7 @@ export default class SPage extends SNode {
                 node.collectedStyles = [];
                 childOfSymbol = true;
                 //
-                parentFrame = SNode.getFrame(symbol, 'MSSymbolInstance');
+                parentRect = SRect.fromObject(symbol);
                 overrides = {};
                 const objectOverrides = object.sketchObject.overrides();
                 if (objectOverrides) {
@@ -269,62 +270,37 @@ export default class SPage extends SNode {
             layers = layers.map((layer, i) => {
                 const snode = SPage.getNode(layer, node, overrides, childOfSymbol);
                 snode.zIndex = i;
-                snode.parentFrame = parentFrame;
+                snode.parentRect = parentRect;
                 // snode.collectedStyles = parentCollectedStyles;
                 return snode;
             });
             node.nodes = layers;
             if (SOptions.html.relative) {
                 node.setPosition();
-                node.setInnerRect();
+                node.setContainer();
+                /*
+                node.innerRect = SRect.fromNodes(node.nodes);
                 const layout = SOptions.layout;
                 // !!!
                 if (false && layers.length &&
-                    node.frame.width > layout.totalWidth &&
+                    node.rect.width > layout.totalWidth &&
                     node.innerRect.width < layout.totalWidth) {
                     const container = new SContainer(node);
-                    container.parentFrame = node.frame;
+                    container.parentRect = node.rect;
                     container.nodes = layers.filter(x => x.relative);
-                    container.setInnerRect();
+                    container.innerRect = SRect.fromNodes(container.nodes);
                     container.setPosition();
                     node.nodes = layers.filter(x => x.absolute).concat([container]);
                 }
+                */
             }
         } else {
             node.nodes = [];
             if (SOptions.html.relative) {
-                node.setInnerRect();
+                node.innerRect = node.rect; // SRect.fromNodes(node.nodes);
             }
         }
         return node;
-    }
-
-    static getLayout(object) {
-        const frame = object.frame();
-        const width = parseInt(frame.width());
-        const height = parseInt(frame.height());
-        const layout = object.layout();
-        const totalWidth = layout ? layout.totalWidth() : width;
-        const numberOfColumns = layout ? layout.numberOfColumns() : 1;
-        const columnWidth = layout ? layout.columnWidth() : width;
-        const gutterWidth = layout ? layout.gutterWidth() : 0;
-        return {
-            maxWidth: width,
-            maxHeight: height,
-            totalWidth: totalWidth,
-            numberOfColumns: numberOfColumns,
-            columnWidth: columnWidth,
-            gutterWidth: gutterWidth,
-            cols: Array.apply(null, Array(numberOfColumns)).map((x, i) => Math.min(totalWidth, Math.floor((columnWidth + gutterWidth) * (i + 1) - gutterWidth))),
-            frame: {
-                top: 0,
-                left: 0,
-                right: width,
-                bottom: height,
-                width: width,
-                height: height,
-            },
-        };
     }
 
 }

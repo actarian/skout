@@ -8,16 +8,21 @@
  * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
  */
 
+const SRectDefault = {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+};
+
 export default class SRect {
 
     constructor(object) {
-        this.top = 0;
-        this.right = 0;
-        this.bottom = 0;
-        this.left = 0;
-        this.width = 0;
-        this.height = 0;
+        Object.assign(this, SRectDefault);
         this.merge(object);
+        this.update();
     }
 
     merge(object) {
@@ -25,6 +30,87 @@ export default class SRect {
             Object.assign(this, object);
         }
         return this;
+    }
+
+    move(left, top) {
+        this.left = left;
+        this.top = top;
+        this.update();
+    }
+
+    update() {
+        this.right = this.left + this.width;
+        this.bottom = this.top + this.height;
+    }
+
+    toString() {
+        return `{ x:${this.left}, y:${this.top}, w:${this.width}, h:${this.height} }`;
+    }
+
+    static fromCGRect(rect) {
+        const x = Math.round(rect.origin.x);
+        const y = Math.round(rect.origin.y);
+        const width = Math.round(rect.size.width);
+        const height = Math.round(rect.size.height);
+        return new SRect({
+            left: x,
+            top: y,
+            width: width,
+            height: height,
+            right: x + width,
+            bottom: y + height,
+        });
+    }
+
+    static fromCGSize(size) {
+        const width = Math.round(size.width);
+        const height = Math.round(size.height);
+        return new SRect({
+            left: 0,
+            top: 0,
+            width: width,
+            height: height,
+            right: width,
+            bottom: height,
+        });
+    }
+
+    static fromObject(object) {
+        if (object) {
+            const type = String(object.sketchObject.className());
+            let rect = object.sketchObject.frame().rect();
+            if (type === 'MSArtboardGroup') {
+                rect = SRect.fromCGSize(rect.size);
+            } else {
+                rect = SRect.fromCGRect(rect);
+            }
+            // console.log('SRect.fromObject', rect.toString());
+            return rect;
+        }
+    }
+
+    static fromRects(rects) {
+        const rect = {
+            top: Number.POSITIVE_INFINITY,
+            left: Number.POSITIVE_INFINITY,
+            bottom: Number.NEGATIVE_INFINITY,
+            right: Number.NEGATIVE_INFINITY,
+            width: 0,
+            height: 0
+        };
+        rects.forEach((x, i) => {
+            rect.top = Math.min(rect.top, x.top);
+            rect.left = Math.min(rect.left, x.left);
+            rect.bottom = Math.max(rect.bottom, x.bottom);
+            rect.right = Math.max(rect.right, x.right);
+        });
+        rect.width = rect.right - rect.left;
+        rect.height = rect.bottom - rect.top;
+        return new SRect(rect);
+    }
+
+    static fromNodes(nodes) {
+        return SRect.fromRects(nodes.filter(x => x.relative).map(x => x.rect));
     }
 
     static differs(a, b) {

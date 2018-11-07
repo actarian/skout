@@ -11,6 +11,7 @@
 import VNode from 'virtual-dom/vnode/vnode';
 import SNode from './snode';
 import SOptions from './soptions';
+import SRect from './srect';
 
 export default class SContainer extends SNode {
 
@@ -20,30 +21,30 @@ export default class SContainer extends SNode {
         this.name = 'container';
         this.type = 'Container';
         this.className = 'container';
-        this.frame = {
+        this.rect = new SRect({
             top: 0,
-            left: (node.frame.width - layout.totalWidth) / 2,
+            left: (node.rect.width - layout.totalWidth) / 2,
             width: layout.totalWidth,
-            height: node.frame.height,
-        };
-        this.frame.right = this.frame.left + this.frame.width;
-        this.frame.bottom = this.frame.top + this.frame.height;
+            height: node.rect.height,
+        });
+        this.rect.right = this.rect.left + this.rect.width;
+        this.rect.bottom = this.rect.top + this.rect.height;
         this.style = {};
         this.classes.push('scontainer');
     }
 
     setPosition() {
         const padding = {
-            left: (this.innerRect.left - this.frame.left),
-            top: (this.innerRect.top - this.frame.top),
-            bottom: (this.frame.bottom - this.innerRect.bottom),
-            right: (this.frame.right - this.innerRect.right),
+            left: (this.innerRect.left - this.rect.left),
+            top: (this.innerRect.top - this.rect.top),
+            bottom: (this.rect.bottom - this.innerRect.bottom),
+            right: (this.rect.right - this.innerRect.right),
         };
         this.nodes.forEach(x => {
-            x.frame.left -= padding.left;
-            x.frame.top -= padding.top;
-            x.frame.right = x.frame.left + x.frame.width;
-            x.frame.bottom = x.frame.top + x.frame.height;
+            x.rect.left -= padding.left;
+            x.rect.top -= padding.top;
+            x.rect.right = x.rect.left + x.rect.width;
+            x.rect.bottom = x.rect.top + x.rect.height;
         });
         this.padding = padding;
     }

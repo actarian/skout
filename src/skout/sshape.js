@@ -77,10 +77,10 @@ export default class SShape extends SNode {
         style.backgroundSize = 'cover';
         /*
         {
-            top: this.frame.top + 'px',
-            left: this.frame.left + 'px',
-            width: (this.frame.width === layout.maxWidth) ? '100%' : this.frame.width + 'px',
-            height: this.frame.height + 'px',
+            top: this.rect.top + 'px',
+            left: this.rect.left + 'px',
+            width: (this.rect.width === layout.maxWidth) ? '100%' : this.rect.width + 'px',
+            height: this.rect.height + 'px',
         };
         */
         return style;
