@@ -170,6 +170,7 @@ export default class SPage extends SNode {
         if (SOptions.html.relative) {
             page.setMarginAndPaddings();
         }
+        page.setPathNames();
         page.setStyle();
         return page;
     }

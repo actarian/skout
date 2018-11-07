@@ -67,7 +67,8 @@ export default class SNode {
             writable: true
         });
         */
-        this.getNames(parent);
+        this.fileName = SStyle.getFileName(this.name);
+        this.classes = [];
     }
 
     static getConstraint(object) {
@@ -126,7 +127,7 @@ export default class SNode {
         const innerRect = SRect.fromNodes(relatives);
         const layout = SOptions.layout;
         this.innerRect = innerRect;
-        if (false && nodes.length && rect.width > layout.totalWidth && innerRect.width < layout.totalWidth) {
+        if (nodes.length && rect.width > layout.totalWidth && innerRect.width < layout.totalWidth) {
             const containerRect = new SRect({
                 top: innerRect.top,
                 left: (rect.width - layout.totalWidth) / 2,
@@ -143,32 +144,6 @@ export default class SNode {
         }
         this.relatives = relatives;
         this.absolutes = absolutes;
-    }
-
-    getNames(parent) {
-        const fileName = SStyle.getFileName(this.name);
-        let parentType = 'Root',
-            pathNames = [],
-            nameCount = 0;
-        if (parent) {
-            parentType = parent.type;
-            if (parent.type == 'MSSymbolInstance') {
-                pathNames = [parent.className];
-            } else if (Array.isArray(parent.pathNames)) {
-                pathNames = parent.pathNames.slice();
-            }
-            nameCount = parent.collectedNames[fileName] || 0;
-            nameCount++;
-            parent.collectedNames[fileName] = nameCount;
-        }
-        const className = fileName + (nameCount > 1 ? '-' + nameCount : ''); // SStyle.getClassName(name);
-        const classes = [className];
-        pathNames.push(className);
-        this.parentType = parentType;
-        this.fileName = fileName;
-        this.className = className;
-        this.classes = classes;
-        this.pathNames = pathNames;
     }
 
     setMarginAndPaddings() {
@@ -360,7 +335,7 @@ export default class SNode {
         });
         if (shape) {
             // console.log('shape', shape.type);
-            const shapeStyle = shape.getShapeStyle();
+            const shapeStyle = SStyle.parseStyle(shape); // shape.getShapeStyle();
             Object.assign(this.style, shapeStyle);
         }
         this.nodes.forEach(x => x.setStyle());
@@ -397,6 +372,43 @@ export default class SNode {
             }
         }
         this.classes.push(sharedStyle.className);
+    }
+
+    setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
+        const fileName = this.fileName;
+        let pathNames = [],
+            nameCount = 0;
+        if (parentType == 'MSSymbolInstance') {
+            pathNames = [parentClassName];
+        } else if (Array.isArray(parentPathNames)) {
+            pathNames = parentPathNames.slice();
+        }
+        nameCount = parentCollectedNames[fileName] || 0;
+        nameCount++;
+        parentCollectedNames[fileName] = nameCount;
+        const className = fileName + (nameCount > 1 ? '-' + nameCount : '');
+        pathNames.push(className);
+        this.parentType = parentType;
+        this.className = className;
+        this.classes.push(className);
+        this.pathNames = pathNames;
+        this.collectedNames = [];
+        if (this.containerRect) {
+            const absolute = this.renderableNodes(this.absolutes, this.rect);
+            absolute.forEach((a, i) => {
+                a.setPathNames(className, this.pathNames, this.collectedNames, this.type);
+            });
+            const relatives = this.renderableNodes(this.relatives, this.containerRect);
+            const containerPathNames = pathNames.slice();
+            containerPathNames.push('container');
+            relatives.forEach((a, i) => {
+                a.setPathNames('container', containerPathNames);
+            });
+        } else {
+            this.nodes.forEach((a, i) => {
+                a.setPathNames(className, this.pathNames, this.collectedNames, this.type);
+            });
+        }
     }
 
     renderableNodes(nodes, rect) {

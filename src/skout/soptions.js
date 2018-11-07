@@ -26,7 +26,7 @@ export default class SOptions {
             html: {
                 export: true,
                 exact: true,
-                relative: false,
+                relative: true,
             },
             css: {
                 export: true,

@@ -87,7 +87,7 @@ export default class SShape extends SNode {
     }
 
     attributes() {
-        const style = this.getShapeStyle();
+        const style = SStyle.parseStyle(this); // this.getShapeStyle();
         style.position = 'absolute';
         style.display = 'inline-block';
         const attributes = {

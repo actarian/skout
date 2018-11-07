@@ -253,21 +253,23 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
         */
     }
 
-    static parseStyle(object) {
+    static parseStyle(node) {
         const style = {};
+        const object = node.sketchObject;
         const objectStyle = object.style();
         let background = 'none';
         if (objectStyle.hasEnabledFill()) {
             const fill = objectStyle.fills().firstObject();
             const fillImage = fill.image();
-            const fillGradient = SStyle.serializeStyle(this.styleText)['background-image']; // fill.gradient();
+            const fillGradient = SStyle.serializeStyle(node.styleText)['background-image']; // fill.gradient();
             if (fillImage) {
-                background = `url('../${SOptions.image.folder}/${this.className}.png') no-repeat center`;
+                background = `url('../${SOptions.image.folder}/${node.className}.png') no-repeat center`;
                 if (SOptions.folder) {
-                    SImage.saveToJpg(fillImage, SOptions.folder, `${SOptions.image.folder}/`, `${this.className}.png`);
-                } else {
-                    // backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
+                    SImage.saveToJpg(fillImage, SOptions.folder, `${SOptions.image.folder}/`, `${node.className}.png`);
                 }
+                /* else {
+                                    backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
+                                }*/
             } else if (fillGradient) {
                 background = fillGradient;
             } else {
@@ -316,6 +318,7 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
         if (boxShadow !== 'none') {
             style.boxShadow = boxShadow;
         }
+        return style;
     }
 
     static parseDictionary(dictionary, output = {}) {
@@ -389,7 +392,18 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
         return styles.filter(x => Object.keys(x.style).length > 0).map(x => {
             const props = Object.keys(x.style).map(k => {
                 const key = k.replace(/([A-Z])/g, '-$1').toLowerCase();
-                return `    ${key}: ${x.style[k]};`;
+                let rule;
+                switch (key) {
+                    case 'color':
+                        rule = `    ${key}: '#${x.style[k]}';`;
+                        break;
+                    case 'font-family':
+                        rule = `    ${key}: '${x.style[k]}';`;
+                        break;
+                    default:
+                        rule = `    ${key}: ${x.style[k]};`;
+                }
+                return rule;
             }).join('\r');
             return `${x.selector} { 
 ${props} }`;
