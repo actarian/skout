@@ -25,6 +25,8 @@ const ResizingConstraint = Object.freeze({
     Height: 47,
 });
 
+const StyleShapes = ['MSRectangleShape', 'MSOvalShape'];
+
 export default class SNode {
 
     constructor(node) {
@@ -335,15 +337,10 @@ export default class SNode {
     setStyle() {
         this.style = this.getStyle();
         // !!!
-        const shapes = ['MSRectangleShape', 'MSOvalShape'];
-        const shape = this.nodes.find((x, i) => {
-            return i === 0 && shapes.indexOf(x.type) != -1 && !SRect.differs(this.rect, x.rect);
-        });
-
+        const shape = this.nodes.find(x => x.isShapeForRect(this.rect));
         if (this.name == 'home-hero') {
             console.log(this.nodes.map(x => x.name).join(', '));
         }
-
         if (shape) {
             // console.log('shape', shape.type, shape.parent.name);
             const shapeStyle = SStyle.parseStyle(shape); // shape.getShapeStyle();
@@ -424,11 +421,12 @@ export default class SNode {
         }
     }
 
+    isShapeForRect(rect) {
+        return this.zIndex === 0 && StyleShapes.indexOf(this.type) !== -1 && SRect.equals(rect, this.rect);
+    }
+
     renderableNodes(nodes, rect) {
-        const shapes = ['MSRectangleShape', 'MSOvalShape'];
-        return nodes.filter((x, i) => {
-            return i > 0 || shapes.indexOf(x.type) === -1 || SRect.differs(rect, x.rect);
-        });
+        return nodes.filter(x => !x.isShapeForRect(rect));
     }
 
     renderNodes() {

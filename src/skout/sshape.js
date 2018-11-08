@@ -27,7 +27,6 @@ export default class SShape extends SNode {
         const attributes = {
             className: this.classes.join(' '),
         };
-        // const layout = SOptions.layout;
         if (SOptions.inline) {
             attributes.style = style;
         } else {
