@@ -89,7 +89,7 @@ export default class SNode {
     setPosition() {
         const layout = SOptions.layout;
         const nodes = this.nodes.slice();
-        if (this.nodes.length > 1) {
+        if (nodes.length > 1) {
             const largest = nodes.reduce((a, b) => a.rect.width >= b.rect.width && a.rect.height > b.rect.height ? a : b);
             largest.isLargest = true;
             const horizontals = nodes.sort((a, b) => a.rect.left - b.rect.left);
@@ -155,24 +155,29 @@ export default class SNode {
         padding.right = rect.width - innerRect.right;
         padding.bottom = rect.height - innerRect.bottom;
         padding.left = innerRect.left;
+        let nodes = this.relatives;
+        // nodes = this.nodes;
         if (this.isHorizontal) {
-            this.nodes.sort((a, b) => a.rect.left - b.rect.left).forEach((b, i) => {
+            nodes.sort((a, b) => a.rect.left - b.rect.left).forEach((b, i) => {
                 if (i > 0) {
-                    const a = this.nodes[i - 1];
+                    const a = nodes[i - 1];
                     a.margin.right = b.rect.left - a.rect.right;
                 }
             });
         } else if (this.isVertical) {
-            this.nodes.sort((a, b) => a.rect.top - b.rect.top).forEach((b, i) => {
+            nodes.sort((a, b) => a.rect.top - b.rect.top).forEach((b, i) => {
                 if (i > 0) {
-                    const a = this.nodes[i - 1];
+                    const a = nodes[i - 1];
                     a.margin.bottom = b.rect.top - a.rect.bottom;
                 }
             });
         } else {
-            this.nodes.sort((a, b) => (a.rect.top * 10000 + a.rect.left) - (b.rect.top * 10000 + b.rect.left));
+            nodes.sort((a, b) => (a.rect.top * 10000 + a.rect.left) - (b.rect.top * 10000 + b.rect.left));
         }
-        this.nodes.forEach((a, i) => {
+        // const absolutes = this.absolutes;
+        // const nodes = absolutes.slice().concat(relatives);
+        nodes = this.nodes;
+        nodes.forEach((a, i) => {
             a.setMarginAndPaddings();
         });
         if (SOptions.log.layers) {
@@ -191,10 +196,10 @@ export default class SNode {
         const layout = SOptions.layout;
         const rect = this.rect;
         const parentRect = this.parentRect;
-        const classes = this.classes;
         const margin = this.margin;
         const padding = this.padding;
         /*
+        const classes = this.classes;
         this.layout.position = 'relative';
         if (this.hasSibilings && this.hasOverlaps && this.isLargest) {
             this.layout.position = 'absolute';
@@ -329,12 +334,18 @@ export default class SNode {
 
     setStyle() {
         this.style = this.getStyle();
+        // !!!
         const shapes = ['MSRectangleShape', 'MSOvalShape'];
         const shape = this.nodes.find((x, i) => {
             return i === 0 && shapes.indexOf(x.type) != -1 && !SRect.differs(this.rect, x.rect);
         });
+
+        if (this.name == 'home-hero') {
+            console.log(this.nodes.map(x => x.name).join(', '));
+        }
+
         if (shape) {
-            // console.log('shape', shape.type);
+            // console.log('shape', shape.type, shape.parent.name);
             const shapeStyle = SStyle.parseStyle(shape); // shape.getShapeStyle();
             Object.assign(this.style, shapeStyle);
         }
@@ -357,7 +368,9 @@ export default class SNode {
         } else {
             this.collectedStyles.push(styleObj);
         }
-        if (!SOptions.component.export || !this.childOfSymbol) {
+        if (this.childOfSymbol) {
+            SStyle.collectedComponentStyles.push(styleObj);
+        } else {
             SStyle.collectedStyles.push(styleObj);
         }
     }

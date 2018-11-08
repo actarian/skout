@@ -50,6 +50,12 @@ export default class SUtil {
         NSFileManager.defaultManager().copyItemAtURL_toURL_error_(fromUrl, toUrl, nil);
     }
 
+    static readResource(resource) {
+        const fromUrl = context.plugin.urlForResourceNamed(resource);
+        const source = NSString.alloc().initWithContentsOfURL(fromUrl);
+        return source;
+    }
+
     static addFolder(path) {
         if (!NSFileManager.defaultManager().fileExistsAtPath_(path)) {
             NSFileManager.defaultManager().createDirectoryAtPath_attributes(path, {

@@ -29,7 +29,9 @@ export default class SPage extends SNode {
 
     render() {
         const nodes = this.renderNodes();
-        SPage.collectedStyles = this.getCss();
+        const css = SStyle.getCss();
+        SPage.css = css;
+        // SPage.collectedStyles = this.getCss();
         const headNodes = [
             new VNode('base', {
                 href: '.'
@@ -39,14 +41,27 @@ export default class SPage extends SNode {
                 type: 'image/x-icon',
                 href: 'favicon.ico'
             }, []),
-            SOptions.css.export ? new VNode('link', {
+        ];
+        if (SOptions.css.export) {
+            Object.keys(css.styles).forEach(s => {
+                headNodes.push(new VNode('link', {
+                    rel: 'stylesheet',
+                    type: 'text/css',
+                    href: `${SOptions.css.folder}/${s}.css`
+                }, []));
+            });
+            /*
+            headNodes.push(new VNode('link', {
                 rel: 'stylesheet',
                 type: 'text/css',
-                href: SOptions.css.folder + '/skout.css'
-            }, []) : new VNode('style', null, [
-                new VText(SPage.collectedStyles)
-            ])
-        ];
+                href: SOptions.css.folder + '/all.css'
+            }, []));
+            */
+        } else {
+            headNodes.push(new VNode('style', null, [
+                new VText(css.all)
+            ]));
+        }
         if (SOptions.component.export) {
             SSymbol.collectedSymbols.forEach(x => headNodes.push(new VNode('script', {
                 src: `${SOptions.component.folder}/${x.className}/${x.className}.component.js`,
@@ -67,53 +82,10 @@ export default class SPage extends SNode {
         console.log('collectedImages', SImage.collectedImages.length);
         console.log('collectedSvgs', SSvg.collectedSvgs.length);
         console.log('collectedStyles', SStyle.collectedStyles.length);
+        console.log('collectedComponentStyles', SStyle.collectedComponentStyles.length);
         console.log('collectedTextStyles', SStyle.collectedTextStyles.length);
         console.log('collectedSymbols', SSymbol.collectedSymbols.length);
         return html;
-    }
-
-    getCss() {
-        const layout = SOptions.layout;
-        const collectedStyles = SStyle.stylesToCss(SStyle.collectedTextStyles.concat(SStyle.collectedStyles.filter(x => !SOptions.component.export || x.selector.indexOf(':host') === -1)));
-        return `
-        html {
-            box-sizing: border-box;
-        }
-    
-        body {
-            margin: 0;
-            padding: 0;
-        }
-        
-        *,
-        *::before,
-        *::after {
-            box-sizing: inherit;
-        }
-    
-        img {
-            display: block;
-            width: 100%;
-            height: auto;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: ${layout.totalWidth + layout.gutterWidth * 2}px;
-            margin: 0 auto;
-            padding: 0 ${layout.gutterWidth};
-        }
-
-        .stext {
-            display: inline-flex;
-        }
-
-        .stext > span {
-            width: 100%;
-        }
-    
-        ${collectedStyles}
-                        `;
     }
 
     exportToFolder(folder) {
@@ -122,8 +94,10 @@ export default class SPage extends SNode {
         SImage.collectedImages.forEach(x => x.save(folder, x.name));
         SSvg.collectedSvgs.forEach(x => x.svg = SSvg.save(folder, x.name, x.sketchObject));
         if (SOptions.css.export) {
-            const css = SUtil.beautifyCss(SPage.collectedStyles);
-            SUtil.saveTextFile(css, folder + '/' + SOptions.css.folder, 'skout.css');
+            Object.keys(SPage.css.styles).forEach(s => {
+                SUtil.saveTextFile(SPage.css.styles[s], `${folder}/${SOptions.css.folder}`, `${s}.css`);
+            });
+            SUtil.saveTextFile(SPage.css.all, `${folder}/${SOptions.css.folder}`, 'all.css');
         }
         let svgSprite = '';
         if (SOptions.svg.sprite) {
@@ -159,6 +133,7 @@ export default class SPage extends SNode {
         // MSDocument.currentDocument().documentData().allTextStyles();
         // context.document.documentData().allTextStyles();
         SStyle.collectedStyles = [];
+        SStyle.collectedComponentStyles = [];
         SStyle.collectedTextStyles = [];
         SImage.collectedImages = [];
         SSvg.collectedSvgs = [];
@@ -240,6 +215,7 @@ export default class SPage extends SNode {
             case 'MSLayerGroup':
                 if (SSvg.isSvg(object)) {
                     node = new SSvg(node);
+                    layers = [];
                 } else {
                     node = new SNode(node);
                 }
@@ -247,6 +223,7 @@ export default class SPage extends SNode {
             case 'MSShapeGroup':
             case 'MSShapePathLayer':
                 node = new SSvg(node);
+                layers = [];
                 break;
             case 'MSRectangleShape':
             case 'MSOvalShape':
@@ -276,6 +253,11 @@ export default class SPage extends SNode {
                 return snode;
             });
             node.nodes = layers;
+
+            if (node.name == 'home-hero') {
+                console.log(node.nodes.map(x => x.name).join(', '));
+            }
+
             if (SOptions.html.relative) {
                 node.setPosition();
                 node.setContainer();

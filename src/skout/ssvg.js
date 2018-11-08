@@ -15,29 +15,9 @@ import SOptions from './soptions';
 
 export default class SSvg extends SNode {
 
-    attributes() {
-        return {
-            className: this.className,
-            version: '1.1',
-            x: '0px',
-            y: '0px',
-            viewBox: `0 0 ${this.rect.width} ${this.rect.height}`,
-            xmlns: 'http://www.w3.org/2000/svg',
-            'xmlns:xlink': 'http://www.w3.org/1999/xlink',
-            'xml:space': 'preserve',
-            style: {
-                position: 'absolute',
-                top: this.rect.top + 'px',
-                left: this.rect.left + 'px',
-                width: '100%',
-                height: '100%',
-                enableBackground: `new 0 0 ${this.rect.width} ${this.rect.height}`,
-            },
-        };
-    }
-
     render() {
-        if (this.parentType === 'MSSymbolInstance' || this.type === 'MSLayerGroup') {
+        if (this.parentType === 'MSSymbolInstance' ||
+            this.type === 'MSLayerGroup') {
             SSvg.collectedSvgs.push({
                 name: this.fileName,
                 sketchObject: this.sketchObject,
@@ -115,6 +95,29 @@ export default class SSvg extends SNode {
         });
         return flag;
     }
+
+    /*
+    attributes() {
+        return {
+            className: this.className,
+            version: '1.1',
+            x: '0px',
+            y: '0px',
+            viewBox: `0 0 ${this.rect.width} ${this.rect.height}`,
+            xmlns: 'http://www.w3.org/2000/svg',
+            'xmlns:xlink': 'http://www.w3.org/1999/xlink',
+            'xml:space': 'preserve',
+            style: {
+                position: 'absolute',
+                top: this.rect.top + 'px',
+                left: this.rect.left + 'px',
+                width: '100%',
+                height: '100%',
+                enableBackground: `new 0 0 ${this.rect.width} ${this.rect.height}`,
+            },
+        };
+    }
+    */
 
 }
 

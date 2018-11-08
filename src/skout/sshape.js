@@ -9,7 +9,6 @@
  */
 
 import VNode from 'virtual-dom/vnode/vnode';
-import SImage from './simage';
 import SNode from './snode';
 import SOptions from './soptions';
 import SStyle from './sstyle';
@@ -21,7 +20,47 @@ export default class SShape extends SNode {
         // this.classes.push('sshape');
     }
 
-    getShapeStyle() {
+    attributes() {
+        const style = SStyle.parseStyle(this); // this.getShapeStyle();
+        style.position = 'absolute';
+        style.display = 'inline-block';
+        const attributes = {
+            className: this.classes.join(' '),
+        };
+        // const layout = SOptions.layout;
+        if (SOptions.inline) {
+            attributes.style = style;
+        } else {
+            this.collectStyle(style);
+        }
+        return attributes;
+    }
+
+    render() {
+        return new VNode('div', this.attributes(), []);
+    }
+
+    save(folder, filePath) {
+        var path = folder + '/' + filePath;
+        const objectStyle = this.sketchObject.style();
+        if (objectStyle.hasEnabledFill()) {
+            const fill = objectStyle.fills().firstObject();
+            const image = fill.image();
+            /*
+            const cgRef = image.CGImageForProposedRect_context_hints(null, nil, nil);
+            const newRep = NSBitmapImageRep.alloc().initWithCGImage(cgRef);
+            newRep.setSize(image.size()); // get original size
+            const imageData = newRep.representationUsingType_properties(NSJPEGFileType, {
+                NSImageCompressionFactor: 0.8
+            });
+            imageData.writeToFile(path);
+            */
+        }
+        return path;
+    }
+
+    /*
+    __getShapeStyle() {
         let backgroundCss = 'trasparent';
         let borderCss = 'none';
         let boxShadowCss = 'none';
@@ -37,15 +76,6 @@ export default class SShape extends SNode {
                 } else {
                     // backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
                 }
-                /*
-                SImage.collectedImages.push({
-                    name: filePath,
-                    save: (folder, filePath) => {
-                        return this.save(folder, filePath);
-                    },
-                });
-                backgroundCss = `url('${filePath}') no-repeat center`;
-                */
             } else if (gradient) {
                 backgroundCss = gradient;
             } else {
@@ -75,54 +105,7 @@ export default class SShape extends SNode {
         style.boxShadow = boxShadowCss;
         style.borderRadius = borderRadiusCss;
         style.backgroundSize = 'cover';
-        /*
-        {
-            top: this.rect.top + 'px',
-            left: this.rect.left + 'px',
-            width: (this.rect.width === layout.maxWidth) ? '100%' : this.rect.width + 'px',
-            height: this.rect.height + 'px',
-        };
-        */
         return style;
     }
-
-    attributes() {
-        const style = SStyle.parseStyle(this); // this.getShapeStyle();
-        style.position = 'absolute';
-        style.display = 'inline-block';
-        const attributes = {
-            className: this.classes.join(' '),
-        };
-        // const layout = SOptions.layout;
-        if (SOptions.inline) {
-            attributes.style = style;
-        } else {
-            this.collectStyle(style);
-        }
-        return attributes;
-    }
-
-    save(folder, filePath) {
-        var path = folder + '/' + filePath;
-        const objectStyle = this.sketchObject.style();
-        if (objectStyle.hasEnabledFill()) {
-            const fill = objectStyle.fills().firstObject();
-            const image = fill.image();
-            /*
-            const cgRef = image.CGImageForProposedRect_context_hints(null, nil, nil);
-            const newRep = NSBitmapImageRep.alloc().initWithCGImage(cgRef);
-            newRep.setSize(image.size()); // get original size
-            const imageData = newRep.representationUsingType_properties(NSJPEGFileType, {
-                NSImageCompressionFactor: 0.8
-            });
-            imageData.writeToFile(path);
-            */
-        }
-        return path;
-    }
-
-    render() {
-        return new VNode('div', this.attributes(), []);
-    }
-
+    */
 }

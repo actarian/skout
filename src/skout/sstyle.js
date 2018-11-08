@@ -8,7 +8,9 @@
  * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
  */
 
+import SImage from './simage';
 import SOptions from './soptions';
+import SUtil from './sutil';
 
 export default class SStyle {
 
@@ -255,21 +257,21 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
 
     static parseStyle(node) {
         const style = {};
-        const object = node.sketchObject;
-        const objectStyle = object.style();
+        const sketchObject = node.sketchObject;
+        const objectStyle = sketchObject.style();
         let background = 'none';
         if (objectStyle.hasEnabledFill()) {
             const fill = objectStyle.fills().firstObject();
             const fillImage = fill.image();
             const fillGradient = SStyle.serializeStyle(node.styleText)['background-image']; // fill.gradient();
             if (fillImage) {
-                background = `url('../${SOptions.image.folder}/${node.className}.png') no-repeat center`;
+                background = `url('../${SOptions.image.folder}/${node.fileName}.png') no-repeat center`;
                 if (SOptions.folder) {
-                    SImage.saveToJpg(fillImage, SOptions.folder, `${SOptions.image.folder}/`, `${node.className}.png`);
+                    SImage.saveToJpg(fillImage, SOptions.folder, `${SOptions.image.folder}/`, `${node.fileName}.png`);
                 }
                 /* else {
-                                    backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
-                                }*/
+                    backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
+                }*/
             } else if (fillGradient) {
                 background = fillGradient;
             } else {
@@ -285,13 +287,13 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
             border = `${borderWidth}px solid ${borderColor}`;
         }
         let borderRadius = 'none';
-        if (this.type === 'MSRectangleShape') {
-            borderRadius = object.cornerRadiusFloat() + 'px';
-        } else if (this.type === 'MSOvalShape') {
+        if (node.type === 'MSRectangleShape') {
+            borderRadius = sketchObject.cornerRadiusFloat() + 'px';
+        } else if (node.type === 'MSOvalShape') {
             borderRadius = '50%';
         }
         /*
-        if (object.style().supportsAdvancedBorderSettings()) {
+        if (sketchObject.style().supportsAdvancedBorderSettings()) {
             // !!!
         }
         */
@@ -395,7 +397,7 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
                 let rule;
                 switch (key) {
                     case 'color':
-                        rule = `    ${key}: '#${x.style[k]}';`;
+                        rule = `    ${key}: #${x.style[k]};`;
                         break;
                     case 'font-family':
                         rule = `    ${key}: '${x.style[k]}';`;
@@ -408,6 +410,44 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
             return `${x.selector} { 
 ${props} }`;
         }).join('\r\r');
+    }
+
+    static getCss() {
+        const layout = SOptions.layout;
+        const base = SUtil.beautifyCss(SUtil.readResource('base.css'));
+        const grid = SUtil.beautifyCss(`
+        .container {
+            width: 100%;
+            max-width: ${layout.totalWidth + layout.gutterWidth * 2}px;
+            margin: 0 auto;
+            padding: 0 ${layout.gutterWidth};
+        }
+        `);
+        const typography = SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedTextStyles));
+        const page = SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedStyles));
+        const components = SOptions.component.export ? null : SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedComponentStyles));
+        const css = {
+            styles: {
+                base,
+                grid,
+                typography,
+            },
+            all: '',
+        };
+        if (!SOptions.component.export) {
+            css.styles.components = components;
+        }
+        css.styles.page = page;
+        Object.keys(css.styles).forEach(s => {
+            css.styles[s] = `
+/* --------------
+skout! ${s}
+-------------- */
+
+` + css.styles[s];
+            css.all += css.styles[s];
+        });
+        return css;
     }
 
     // UNUSED !!!
@@ -602,4 +642,5 @@ ${props} }`;
 
 SStyle.collectedNames = {};
 SStyle.collectedStyles = [];
+SStyle.collectedComponentStyles = [];
 SStyle.collectedTextStyles = [];
