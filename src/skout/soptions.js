@@ -13,10 +13,10 @@ export default class SOptions {
     static defaults(options) {
         Object.assign(SOptions, {
             //
-            save: true,
-            settings: true,
             debug: true,
             inline: false,
+            save: true,
+            settings: true,
             //
             component: {
                 export: false,

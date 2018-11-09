@@ -8,7 +8,6 @@
  * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
  */
 
-// const beautify = require('beautify'); 
 import Artboard from 'sketch/dom';
 import toHTML from 'vdom-to-html';
 import VNode from 'virtual-dom/vnode/vnode';
@@ -119,9 +118,6 @@ export default class SPage extends SNode {
             SUtil.copyResource('favicon.ico', folder);
             SUtil.copyResource('LICENSE', folder);
             SUtil.copyResource('package.json', folder);
-            // let js = SUtil.getResourceText(`component.js`);
-            // js = SUtil.beautifyJs(js);
-            // SUtil.saveTextFile(js, `${folder}/${SOptions.component.folder}`, `component.js`);
             SSymbol.collectedSymbols.forEach(x => SSymbol.save(folder, x));
         }
     }
@@ -255,8 +251,6 @@ export default class SPage extends SNode {
                 snode.zIndex = i;
                 snode.parentRect = node.rect;
                 snode.originalParentRect = originalRect;
-                // snode.setConstraint();
-                // snode.collectedStyles = parentCollectedStyles;
                 return snode;
             });
             node.nodes = layers;
@@ -268,26 +262,11 @@ export default class SPage extends SNode {
             if (SOptions.html.relative) {
                 node.setPosition();
                 node.setContainer();
-                /*
-                node.innerRect = SRect.fromNodes(node.nodes);
-                const layout = SOptions.layout;
-                // !!!
-                if (false && layers.length &&
-                    node.rect.width > layout.totalWidth &&
-                    node.innerRect.width < layout.totalWidth) {
-                    const container = new SContainer(node);
-                    container.parentRect = node.rect;
-                    container.nodes = layers.filter(x => x.relative);
-                    container.innerRect = SRect.fromNodes(container.nodes);
-                    container.setPosition();
-                    node.nodes = layers.filter(x => x.absolute).concat([container]);
-                }
-                */
             }
         } else {
             node.nodes = [];
             if (SOptions.html.relative) {
-                node.innerRect = node.rect; // SRect.fromNodes(node.nodes);
+                node.innerRect = node.rect;
             }
         }
         return node;
