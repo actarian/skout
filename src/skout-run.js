@@ -17,11 +17,14 @@ import SUtil from './skout/sutil';
 // var Document = require('sketch/dom');
 // var Artboard = require('sketch/dom').Artboard;
 
+const SModalOk = 1000;
+const SModalCancel = 1001;
+
 export default function () {
 
     SOptions.defaults({
         save: false,
-        settings: false,
+        settings: true,
         debug: true,
         folder: '/Users/lucazampetti/Desktop/SKOUT',
         // folder: '/Users/lzampetti/Desktop/SKOUT',
@@ -37,16 +40,21 @@ export default function () {
 
     const artboards = getSelectedArtboards();
     if (artboards.length != 1) {
-        message('Please select a single artboards 🙌 ');
+        message(`Please select a single artboards 🌈 `);
 
     } else {
         if (SOptions.settings) {
             const modal = newSettingsModal((settings) => {
+                console.log('settings', settings);
+                /*
                 SOptions.set(settings);
                 getHtml();
-            }, (cancel) => message('canceled!'), (error) => message(error));
+                */
+
+            }, (cancel) => message(`canceled! 🌈`), (error) => message(error));
         } else {
             getHtml();
+
         }
     }
 
@@ -54,16 +62,16 @@ export default function () {
         const page = SPage.fromArtboard(artboards[0]);
         // console.log('pages', JSON.stringify(pages).replace(/(")(\w*)(\":)/g, ' $2: '));
         // console.log('pages', pages);
-        // message(pages.length + ' page found 🙌 ');
+        // message(`${pages.length} pages found 🌈 `);
         if (SOptions.save) {
             const modal = newSelectFolderModal((folder) => {
                 SOptions.folder = folder.path;
                 page.exportToFolder(SOptions.folder);
-                message('saved to folder ' + SOptions.folder + ' 🙌 ');
-            }, (cancel) => message('canceled!'), (error) => message(error));
+                message(`saved to folder ${SOptions.folder} 🌈 `);
+            }, (cancel) => message(`canceled! 🌈`), (error) => message(error));
         } else if (SOptions.folder) {
             page.exportToFolder(SOptions.folder);
-            console.log('saved to folder ' + SOptions.folder + ' 🙌 ');
+            console.log(`saved to folder ${SOptions.folder} 🌈 `);
         } else {
             const html = page.getHtml();
         }
@@ -92,8 +100,8 @@ export default function () {
             modal.setCanChooseDirectories(true);
             modal.setCanChooseFiles(false);
             modal.setCanCreateDirectories(false);
-            modal.setTitle('Select an output folder');
-            modal.setPrompt('Output folder');
+            modal.setTitle(`Select an output folder`);
+            modal.setPrompt(`Output folder`);
             modal.runModal();
             */
             var modal = NSOpenPanel.openPanel();
@@ -103,8 +111,8 @@ export default function () {
             modal.setCanChooseDirectories(true);
             modal.setCanChooseFiles(false);
             modal.setCanCreateDirectories(true);
-            modal.setTitle('Select an output folder');
-            modal.setPrompt('Output folder');
+            modal.setTitle(`Select an output folder`);
+            modal.setPrompt(`Output folder`);
             const response = modal.runModal();
             if (response == NSOKButton) {
                 const result = {
@@ -120,7 +128,7 @@ export default function () {
             }
             return modal;
         } else {
-            const result = 'Impossible to open 🙌 ';
+            const result = `Impossible to open 🌈 `;
             if (typeof error == 'function') {
                 error(result);
             }
@@ -131,10 +139,12 @@ export default function () {
         const doc = context.document;
         if (doc) {
             const modal = COSAlertWindow.alloc().init(); // .new();
-            modal.addTextLabelWithValue('ciao');
-            modal.setInformativeText('informative text');
-            // modal.setIcon(NSImage.alloc().initByReferencingFile(context.plugin.urlForResourceNamed('icon@2x.png').path()));
-            modal.setMessageText('Skout export options');
+            const iconUrl = context.plugin.urlForResourceNamed('icon@2x.png');
+            modal.setIcon(NSImage.alloc().initByReferencingURL(iconUrl));
+            //
+            modal.addTextLabelWithValue(`ciao`);
+            modal.setInformativeText(`informative text`);
+            modal.setMessageText(`Skout export options`);
             // Creating dialog buttons
             modal.addButtonWithTitle('Export');
             modal.addButtonWithTitle('Cancel');
@@ -148,7 +158,7 @@ export default function () {
             if (false) {
                 // Create and configure your inputs here
                 const label = NSTextField.alloc().initWithFrame(NSMakeRect(10, 0, vw - 20, 40));
-                label.setStringValue('Lorem ipsum');
+                label.setStringValue(`Lorem ipsum`);
                 label.setBezeled(0);
                 label.setDrawsBackground(0);
                 label.setEditable(0);
@@ -159,11 +169,11 @@ export default function () {
             if (false) {
                 // TextField 1
                 const inputField1 = NSTextField.alloc().initWithFrame(NSMakeRect(0, vh - 85, 130, 20));
-                inputField1.setStringValue('AAAA');
+                inputField1.setStringValue(`AAAA`);
                 view.addSubview(inputField1);
                 // TextField 2
                 const inputField2 = NSTextField.alloc().initWithFrame(NSMakeRect(140, vh - 85, 130, 20));
-                inputField2.setStringValue('BBBB');
+                inputField2.setStringValue(`BBBB`);
                 view.addSubview(inputField2);
             }
 
@@ -181,9 +191,9 @@ export default function () {
             radioMatrix.setCellSize(CGSizeMake(100, 25));
             // Adding the radio buttons to the form
             const cells = radioMatrix.cells();
-            cells.objectAtIndex(0).setTitle('Responsive');
-            cells.objectAtIndex(1).setTitle('Percentual');
-            cells.objectAtIndex(2).setTitle('Exact');
+            cells.objectAtIndex(0).setTitle(`Responsive`);
+            cells.objectAtIndex(1).setTitle(`Percentual`);
+            cells.objectAtIndex(2).setTitle(`Exact`);
             // Adding the matrix to the form
             view.addSubview(radioMatrix);
 
@@ -191,12 +201,13 @@ export default function () {
             const checkbox = NSButton.alloc().initWithFrame(NSMakeRect(0, vh - 140, vw, 20));
             checkbox.setButtonType(NSSwitchButton);
             checkbox.setBezelStyle(0);
-            checkbox.setTitle('Svg sprite');
+            checkbox.setTitle(`Svg sprite`);
             checkbox.setState(NSOffState);
             view.addSubview(checkbox);
 
             const response = modal.runModal();
-            if (response == NSOKButton) {
+            console.log('response', response);
+            if (response == SModalOk) {
                 // const selectedRadioIndex = cells.indexOfObject(radioMatrix.selectedCell());
                 const result = {
                     svgSprite: checkbox.stringValue() == '1',
@@ -207,14 +218,14 @@ export default function () {
                 if (typeof complete == 'function') {
                     complete(result);
                 }
-            } else if (response == 1001) {
+            } else if (response == SModalCancel) {
                 if (typeof cancel == 'function') {
                     cancel();
                 }
             }
             return modal;
         } else {
-            const result = 'Impossible to open 🙌 ';
+            const result = `Impossible to open 🌈 `;
             if (typeof error == 'function') {
                 error(result);
             }

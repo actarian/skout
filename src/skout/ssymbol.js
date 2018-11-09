@@ -17,10 +17,6 @@ import SUtil from './sutil';
 
 export default class SSymbol extends SNode {
 
-    constructor(node) {
-        super(node);
-    }
-
     render() {
         if (SOptions.component.export) {
             const nodes = this.renderNodes();

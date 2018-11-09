@@ -392,18 +392,19 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
 
     static stylesToCss(styles) {
         return styles.filter(x => Object.keys(x.style).length > 0).map(x => {
-            const props = Object.keys(x.style).map(k => {
+            const props = Object.keys(x.style).filter(k => x.style[k] !== '0px 0px 0px 0px').map(k => {
                 const key = k.replace(/([A-Z])/g, '-$1').toLowerCase();
+                const value = x.style[k];
                 let rule;
                 switch (key) {
                     case 'color':
-                        rule = `    ${key}: #${x.style[k]};`;
+                        rule = `    ${key}: #${value};`;
                         break;
                     case 'font-family':
-                        rule = `    ${key}: '${x.style[k]}';`;
+                        rule = `    ${key}: '${value}';`;
                         break;
                     default:
-                        rule = `    ${key}: ${x.style[k]};`;
+                        rule = `    ${key}: ${value == '0px' ? 0 : value};`;
                 }
                 return rule;
             }).join('\r');
@@ -417,6 +418,8 @@ ${props} }`;
         const base = SUtil.beautifyCss(SUtil.readResource('base.css'));
         const grid = SUtil.beautifyCss(`
         .container {
+            display: flex;
+            justify-content: center;
             width: 100%;
             max-width: ${layout.totalWidth + layout.gutterWidth * 2}px;
             margin: 0 auto;

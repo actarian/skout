@@ -37,13 +37,13 @@ export default class SNode {
         const name = groups.pop();
         this.type = node.type;
         this.rect = node.rect;
+        this.originalRect = node.originalRect;
         this.childOfSymbol = node.childOfSymbol;
         this.collectedStyles = node.collectedStyles;
         this.id = object.id;
         this.name = name;
         this.groups = groups;
         this.zIndex = 0;
-        this.constraint = SNode.getConstraint(object);
         this.styleText = object.sketchObject.CSSAttributeString().trim();
         this.margin = new SRect();
         this.padding = new SRect();
@@ -88,19 +88,52 @@ export default class SNode {
         return constraint;
     }
 
+    setConstraint() {
+        const constraint = SNode.getConstraint(this.object);
+        const parent = this.parent;
+        if (parent) {
+            const parentRect = parent.rect;
+            const originalRect = parent.originalRect;
+            const rect = this.rect;
+            if (parentRect.width !== originalRect.width) {
+                const sx = parentRect.width / originalRect.width;
+                if (constraint.left && constraint.right) {
+                    rect.right = parentRect.width - (originalRect.width - rect.right);
+                    rect.width = rect.right - rect.left;
+                } else {
+                    if (!constraint.width) {
+                        rect.width *= sx;
+                        rect.right = rect.left + rect.width;
+                    }
+                    if (constraint.right) {
+                        rect.right = parentRect.width - (originalRect.width - rect.right);
+                        rect.left = rect.right - rect.width;
+                    }
+                }
+            }
+            if (parentRect.height !== originalRect.height) {
+                const sy = parentRect.height / originalRect.height;
+                if (constraint.top && constraint.bottom) {
+                    rect.bottom = parentRect.height - (originalRect.height - rect.bottom);
+                    rect.height = rect.bottom - rect.top;
+                } else {
+                    if (!constraint.height) {
+                        rect.height *= sy;
+                        rect.bottom = rect.top + rect.height;
+                    }
+                    if (constraint.bottom) {
+                        rect.bottom = parentRect.height - (originalRect.height - rect.bottom);
+                        rect.top = rect.bottom - rect.height;
+                    }
+                }
+            }
+        }
+        this.constraint = constraint;
+    }
+
     setPosition() {
         const layout = SOptions.layout;
         const nodes = this.nodes.slice();
-        if (nodes.length > 1) {
-            const largest = nodes.reduce((a, b) => a.rect.width >= b.rect.width && a.rect.height > b.rect.height ? a : b);
-            largest.isLargest = true;
-            const horizontals = nodes.sort((a, b) => a.rect.left - b.rect.left);
-            const isHorizontal = horizontals.reduce((a, b) => (a && b && a.rect.right <= b.rect.left) ? b : null);
-            this.isHorizontal = isHorizontal;
-            const verticals = nodes.sort((a, b) => a.rect.top - b.rect.top);
-            const isVertical = verticals.reduce((a, b) => (a && b && a.rect.bottom <= b.rect.top) ? b : null);
-            this.isVertical = isVertical;
-        }
         nodes.forEach((a, i) => {
             a.hasSibilings = nodes.length > 1;
             if (a.hasSibilings) {
@@ -110,6 +143,21 @@ export default class SNode {
                     a.hasLargeOverlaps = a.hasLargeOverlaps || (SRect.overlaps(a.rect, b.rect) && a.rect.width < layout.totalWidth && b.rect.width >= layout.totalWidth);
                 });
             }
+        });
+        const overlaps = nodes.filter(a => a.hasOverlaps);
+        if (overlaps.length) {
+            const largest = overlaps.reduce((a, b) => a.rect.width >= b.rect.width && a.rect.height > b.rect.height ? a : b);
+            largest.isLargest = true;
+        }
+        if (nodes.length > 1) {
+            const horizontals = nodes.sort((a, b) => a.rect.left - b.rect.left);
+            const isHorizontal = horizontals.reduce((a, b) => (a && b && a.rect.right <= b.rect.left) ? b : null);
+            this.isHorizontal = isHorizontal;
+            const verticals = nodes.sort((a, b) => a.rect.top - b.rect.top);
+            const isVertical = verticals.reduce((a, b) => (a && b && a.rect.bottom <= b.rect.top) ? b : null);
+            this.isVertical = isVertical;
+        }
+        nodes.forEach((a, i) => {
             if (a.hasSmallOverlaps) {
                 a.absolute = true;
             } else if (a.hasLargeOverlaps) {
@@ -143,6 +191,12 @@ export default class SNode {
             const containerInnerRect = SRect.fromNodes(relatives);
             this.containerRect = containerRect;
             this.containerInnerRect = containerInnerRect;
+            this.innerRect = new SRect({
+                left: 0,
+                top: innerRect.top,
+                width: rect.width,
+                height: innerRect.height,
+            });
         }
         this.relatives = relatives;
         this.absolutes = absolutes;
@@ -152,12 +206,12 @@ export default class SNode {
         const rect = this.rect;
         const innerRect = this.innerRect;
         const padding = this.padding;
+        const nodes = this.containerRect ? this.relatives : this.nodes;
         this.isLargest = this.isLargest || false;
         padding.top = innerRect.top;
         padding.right = rect.width - innerRect.right;
         padding.bottom = rect.height - innerRect.bottom;
         padding.left = innerRect.left;
-        let nodes = this.relatives;
         // nodes = this.nodes;
         if (this.isHorizontal) {
             nodes.sort((a, b) => a.rect.left - b.rect.left).forEach((b, i) => {
@@ -176,10 +230,7 @@ export default class SNode {
         } else {
             nodes.sort((a, b) => (a.rect.top * 10000 + a.rect.left) - (b.rect.top * 10000 + b.rect.left));
         }
-        // const absolutes = this.absolutes;
-        // const nodes = absolutes.slice().concat(relatives);
-        nodes = this.nodes;
-        nodes.forEach((a, i) => {
+        this.nodes.forEach((a, i) => {
             a.setMarginAndPaddings();
         });
         if (SOptions.log.layers) {
@@ -336,11 +387,12 @@ export default class SNode {
 
     setStyle() {
         this.style = this.getStyle();
-        // !!!
         const shape = this.nodes.find(x => x.isShapeForRect(this.rect));
-        if (this.name == 'home-hero') {
+        /*
+        if (this.name == 'search-bar') {
             console.log(this.nodes.map(x => x.name).join(', '));
         }
+        */
         if (shape) {
             // console.log('shape', shape.type, shape.parent.name);
             const shapeStyle = SStyle.parseStyle(shape); // shape.getShapeStyle();

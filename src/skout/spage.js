@@ -142,6 +142,7 @@ export default class SPage extends SNode {
         const page = SPage.getNode(artboard);
         page.zIndex = 0;
         page.parentRect = layout.rect;
+        page.originalRect = layout.rect;
         if (SOptions.html.relative) {
             page.setMarginAndPaddings();
         }
@@ -153,9 +154,10 @@ export default class SPage extends SNode {
     static getNode(object, parent, overrides, childOfSymbol) {
         overrides = overrides || {};
         const type = String(object.sketchObject.className());
-        const rect = SRect.fromObject(object);
         const override = overrides[object.id];
+        const rect = SRect.fromObject(object);
         let parentRect = rect;
+        let originalRect = rect;
         let layers = object.layers || [];
         let collectedStyles = [];
         if (parent) {
@@ -166,6 +168,7 @@ export default class SPage extends SNode {
             object,
             parent,
             rect,
+            originalRect,
             childOfSymbol,
             collectedStyles,
         };
@@ -198,7 +201,8 @@ export default class SPage extends SNode {
                 node.collectedStyles = [];
                 childOfSymbol = true;
                 //
-                parentRect = SRect.fromObject(symbol);
+                originalRect = SRect.fromObject(symbol);
+                node.originalRect = originalRect;
                 overrides = {};
                 const objectOverrides = object.sketchObject.overrides();
                 if (objectOverrides) {
@@ -241,6 +245,7 @@ export default class SPage extends SNode {
             default:
                 node = new SNode(node);
         }
+        node.setConstraint();
         if (layers) {
             layers = layers.filter(x => (
                 !x.hidden
@@ -248,16 +253,18 @@ export default class SPage extends SNode {
             layers = layers.map((layer, i) => {
                 const snode = SPage.getNode(layer, node, overrides, childOfSymbol);
                 snode.zIndex = i;
-                snode.parentRect = parentRect;
+                snode.parentRect = node.rect;
+                snode.originalParentRect = originalRect;
+                // snode.setConstraint();
                 // snode.collectedStyles = parentCollectedStyles;
                 return snode;
             });
             node.nodes = layers;
-
+            /*
             if (node.name == 'home-hero') {
                 console.log(node.nodes.map(x => x.name).join(', '));
             }
-
+            */
             if (SOptions.html.relative) {
                 node.setPosition();
                 node.setContainer();
