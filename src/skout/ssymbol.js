@@ -17,36 +17,49 @@ import SUtil from './sutil';
 
 export default class SSymbol extends SNode {
 
-    render() {
-        if (SOptions.component.export) {
-            const nodes = this.renderNodes();
-            const html = nodes.map(x => toHTML(x)).join('\n');
-            const tagName = `${this.className}-component`;
-            SSymbol.collectedSymbols.push({
-                className: this.className,
-                componentName: SUtil.toComponentName(this.className),
-                tagName: tagName,
-                html: html,
-                css: SStyle.stylesToCss(this.collectedStyles),
-            });
-            const attributes = this.attributes();
-            return new VNode(tagName, attributes, []);
-        } else {
-            return SNode.prototype.render.call(this);
-        }
-    }
+	render() {
+		if (SOptions.component.export) {
+			const nodes = this.renderNodes();
+			let html = nodes.map(x => toHTML(x)).join('\n');
+			if (!SOptions.inline) {
+				const styles = new VNode('link', {
+					rel: 'stylesheet',
+					type: 'text/css',
+					href: `${SOptions.css.folder}/grid.css`
+				}, []);
+				html = toHTML(styles) + html;
+			}
+			const tagName = `${this.className}-component`;
+			SSymbol.collectedSymbols.push({
+				className: this.className,
+				componentName: SUtil.toComponentName(this.className),
+				tagName: tagName,
+				html: html,
+				css: SStyle.stylesToCss(this.collectedStyles),
+			});
+			const attributes = this.attributes();
+			return new VNode(tagName, attributes, []);
+		} else {
+			return SNode.prototype.render.call(this);
+		}
+	}
 
-    static save(folder, object) {
-        const path = `${SOptions.component.folder}/${object.className}`;
-        const filePath = `${object.className}.component`;
-        const css = object.css;
-        const html = SUtil.beautifyHtml(object.html);
-        if (!SOptions.component.inline) {
-            SUtil.saveTextFile(css, `${folder}/${path}`, `${filePath}.css`);
-            SUtil.saveTextFile(html, `${folder}/${path}`, `${filePath}.html`);
-        }
-        let getters = SOptions.component.inline ?
-            `static get style() {
+	static save(folder, object) {
+		const path = `${SOptions.component.folder}/${object.className}`;
+		const filePath = `${object.className}.component`;
+		const css = object.css;
+		const html = SUtil.beautifyHtml(object.html);
+		if (SOptions.component.extract) {
+			SUtil.saveTextFile(css, `${folder}/${path}`, `${filePath}.css`);
+			SUtil.saveTextFile(html, `${folder}/${path}`, `${filePath}.html`);
+		}
+		let getters = SOptions.component.extract ? `static get styleUrl() {
+			return '${path}/${filePath}.css';
+		}
+
+		static get templateUrl() {
+			return '${path}/${filePath}.html';
+		}` : `static get style() {
         return \`
 ${css}\`;
     }
@@ -54,14 +67,8 @@ ${css}\`;
     static get template() {
         return \`
 ${html}\`;
-    }` : `static get styleUrl() {
-        return '${path}/${filePath}.css';
-    }
-
-    static get templateUrl() {
-        return '${path}/${filePath}.html';
     }`;
-        const js = SUtil.beautifyJs(`
+		const js = SUtil.beautifyJs(`
 /* jshint esversion: 6 */
 
 import Component from '../component.js';
@@ -78,8 +85,8 @@ ${getters}
 
 window.customElements.define('${object.tagName}', ${object.componentName});
 `);
-        SUtil.saveTextFile(js, `${folder}/${path}`, `${filePath}.js`);
-    }
+		SUtil.saveTextFile(js, `${folder}/${path}`, `${filePath}.js`);
+	}
 
 }
 

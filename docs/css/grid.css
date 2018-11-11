@@ -1,0 +1,13 @@
+
+/* --------------
+skout! grid
+-------------- */
+
+.container {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	max-width: 1320px;
+	margin: 0 auto;
+	padding: 0 20;
+}

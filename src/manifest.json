@@ -1,16 +1,21 @@
 {
-    "compatibleVersion": 3,
-    "bundleVersion": 1,
-    "icon": "icon.png",
-    "commands": [{
-        "name": "skout-run",
-        "identifier": "skout-run-identifier",
-        "script": "./skout-run.js"
+	"compatibleVersion": 52,
+	"bundleVersion": 1,
+	"icon": "icon.png",
+	"identifier": "com.circledev.skout",
+	"homepage": "https://actarian.github.io/skout/",
+	"commands": [{
+		"name": "Run...",
+		"identifier": "skout-run-identifier",
+		"script": "./skout-run.js",
+		"shortcut": "ctrl cmd s",
+		"description": "Select an artboard to export."
     }],
-    "menu": {
-        "title": "skout",
-        "items": [
-            "skout-run-identifier"
+	"menu": {
+		"title": "Skout!",
+		"items": [
+			"skout-run-identifier",
+			"-"
         ]
-    }
+	}
 }

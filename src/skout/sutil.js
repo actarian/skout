@@ -9,6 +9,7 @@
  */
 
 import beautify from 'js-beautify';
+import SOptions from './soptions';
 
 const GOOGLE_UA = 'UA-128159763-1';
 const GOOGLE_UUID = 'google.analytics.uuid';
@@ -17,120 +18,6 @@ export default class SUtil {
 
 	static getDocument() {
 		return sketch.fromNative(context.document);
-	}
-
-	/**
-	 * Create Select Box for dialog window
-	 * @param  {Array}      options           Options for the select
-	 * @param  {Int}        selectedItemIndex Default selected item
-	 * @return {NSComboBox}                   Complete select box
-	 */
-	static createSelect(options, selectedItemIndex = 0, rect = {
-		left: 0,
-		top: 0,
-		width: 140,
-		height: 25
-	}) {
-		const select = NSComboBox.alloc().initWithFrame(NSMakeRect(rect.left, rect.top, rect.width, rect.height));
-		select.addItemsWithObjectValues(options.map(x => x.title));
-		select.selectItemAtIndex(selectedItemIndex);
-		return select;
-	}
-
-	static createRadioMatrix(options, cols = 2, rect = {
-		left: 0,
-		top: 0,
-		width: 280,
-		height: 25
-	}) {
-		options = options.slice();
-		const rows = 1 + Math.floor(options.length / cols);
-		const radio = NSButtonCell.alloc().init();
-		radio.setButtonType(NSRadioButton);
-		radio.setBezelStyle(0);
-		const matrix = NSMatrix.alloc().initWithFrame_mode_prototype_numberOfRows_numberOfColumns(
-			NSMakeRect(rect.left, rect.top, rect.width, rect.height * rows),
-			// NSTrackModeMatrix, // objects are asked to track the mouse with trackMouse:inRect:ofView:untilMouseUp: whenever the cursor is inside their bounds. No highlighting is performed.
-			// NSHighlightModeMatrix, // An NSCell is highlighted before it’s asked to track the mouse, then unhighlighted when it’s done tracking.
-			// NSRadioModeMatrix, // Selects no more than one NSCell at a time.
-			NSRadioModeMatrix, // NSCell objects are highlighted, but don’t track the mouse.
-			radio,
-			rows, // rows
-			cols // columns
-		);
-		matrix.setCellSize(CGSizeMake(Math.floor(rect.width / cols), rect.height));
-		const cells = matrix.cells();
-		const totals = cols * rows;
-		while (options.length < totals) {
-			options.push(null);
-		}
-		options.forEach((option, i) => {
-			if (option) {
-				cells.objectAtIndex(i).setTitle(option.title);
-				cells.objectAtIndex(i).setState(option.selected ? NSOnState : NSOffState);
-			} else {
-				const r = Math.floor(i / cols);
-				const c = i - r * cols;
-				matrix.putCell_atRow_column(NSCell.alloc().init(), r, c);
-			}
-		});
-		return matrix;
-	}
-
-	static getRadioMatrixValue(options, matrix) {
-		const cells = matrix.cells();
-		return cells ? cells.reduce((a, b, i) => (i < options.length && a.stringValue() == '1') ? options[i].value : null) : null;
-	}
-
-	static createCheckboxMatrix(options, cols = 3, rect = {
-		left: 0,
-		top: 0,
-		width: 280,
-		height: 25
-	}) {
-		const keys = Object.keys(options);
-		const rows = 1 + Math.floor(keys.length / cols);
-		const checkbox = NSButtonCell.alloc().init();
-		checkbox.setButtonType(NSSwitchButton);
-		checkbox.setBezelStyle(0);
-		const matrix = NSMatrix.alloc().initWithFrame_mode_prototype_numberOfRows_numberOfColumns(
-			NSMakeRect(rect.left, rect.top, rect.width, rect.height * rows),
-			// NSTrackModeMatrix, // objects are asked to track the mouse with trackMouse:inRect:ofView:untilMouseUp: whenever the cursor is inside their bounds. No highlighting is performed.
-			// NSHighlightModeMatrix, // An NSCell is highlighted before it’s asked to track the mouse, then unhighlighted when it’s done tracking.
-			// NSRadioModeMatrix, // Selects no more than one NSCell at a time.
-			NSListModeMatrix, // NSCell objects are highlighted, but don’t track the mouse.
-			checkbox,
-			rows, // rows
-			cols // columns
-		);
-		matrix.setCellSize(CGSizeMake(Math.floor(rect.width / cols), rect.height));
-		const cells = matrix.cells();
-		const totals = cols * rows;
-		while (keys.length < totals) {
-			keys.push(null);
-		}
-		keys.forEach((key, i) => {
-			if (key) {
-				const option = options[key];
-				cells.objectAtIndex(i).setTitle(option.title);
-				cells.objectAtIndex(i).setState(option.value ? NSOnState : NSOffState);
-			} else {
-				const r = Math.floor(i / cols);
-				const c = i - r * cols;
-				matrix.putCell_atRow_column(NSCell.alloc().init(), r, c);
-			}
-		});
-		return matrix;
-	}
-
-	static setCheckboxMatrixValues(options, matrix) {
-		const keys = Object.keys(options);
-		const cells = matrix.cells();
-		keys.forEach((key, i) => {
-			const option = options[key];
-			option.value = cells.objectAtIndex(i).stringValue() == '1';
-		});
-		return options;
 	}
 
 	static toGroupNames(name) {
@@ -191,10 +78,6 @@ export default class SUtil {
 		);
 	}
 
-	static openFolder(path) {
-		NSWorkspace.sharedWorkspace().selectFile_inFileViewerRootedAtPath(path, nil);
-	}
-
 	static exportLayer(object, path, name, format) {
 		format = format || 'svg'; // !!!
 		const doc = context.document;
@@ -247,6 +130,53 @@ export default class SUtil {
 		const url = context.plugin.urlForResourceNamed(resourceName);
 		const resource = NSString.alloc().initWithContentsOfURL(url);
 		return resource;
+	}
+
+	// SUtil.launch(`/bin/bash`, [`-l`, `-c`, `which npm`], true, (success) => {});
+	static launch(path = '/usr/bin/which', commands = [], wait = false, callback = null, error = null) {
+		// const pid = NSProcessInfo.processInfo().processIdentifier();
+		const pipeOutput = NSPipe.pipe();
+		const pipeError = NSPipe.pipe();
+		const fileOutput = pipeOutput.fileHandleForReading();
+		const fileError = pipeError.fileHandleForReading();
+		const task = NSTask.alloc().init();
+		task.setLaunchPath_(path);
+		if (SOptions.folder) {
+			task.setCurrentDirectoryPath_(SOptions.folder);
+		}
+		task.arguments = commands;
+		task.standardOutput = pipeOutput;
+		task.standardError = pipeError;
+		task.launch();
+		if (!wait) {
+			if (typeof callback == 'function') {
+				callback({ task: task, status: -1 });
+			}
+			return;
+		}
+		task.waitUntilExit();
+		const status = task.terminationStatus();
+		const dataOutput = fileOutput.readDataToEndOfFile();
+		const outputCallback = NSString.alloc().initWithData_encoding_(dataOutput, NSUTF8StringEncoding);
+		fileOutput.closeFile();
+		const dataError = fileError.readDataToEndOfFile();
+		const outputError = NSString.alloc().initWithData_encoding_(dataError, NSUTF8StringEncoding);
+		fileError.closeFile();
+		console.log('output', path, commands, status, outputCallback, outputError);
+		const response = {
+			output: outputCallback,
+			error: outputError,
+			status: status,
+			task: task,
+		};
+		if (status == 0) {
+			if (wait && typeof callback == 'function') {
+				callback(response);
+			}
+		} else if (typeof error == 'function') {
+			error(response);
+		}
+		return task;
 	}
 
 	static googleAnalytics(category, action, label, value) {

@@ -1,0 +1,33 @@
+
+/* --------------
+skout! base
+-------------- */
+
+html {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
+img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.stext {
+	display: inline-flex;
+}
+
+.stext>span {
+	width: 100%;
+}

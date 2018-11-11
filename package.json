@@ -1,32 +1,37 @@
 {
-    "name": "skout",
-    "author": "Luca Zampetti <lzampetti@gmail.com>",
-    "license": "MIT",
-    "version": "0.1.0",
-    "scripts": {
-        "build": "skpm-build",
-        "watch": "skpm-build --watch",
-        "start": "skpm-build --watch --run",
-        "postinstall": "npm run build && skpm-link"
-    },
-    "engines": {
-        "sketch": ">=3.0"
-    },
-    "skpm": {
-        "name": "skout",
-        "manifest": "src/manifest.json",
-        "main": "skout.sketchplugin",
-        "assets": [
-            "assets/**/*"
-        ]
-    },
-    "devDependencies": {
-        "@skpm/builder": "^0.5.2"
-    },
-    "dependencies": {
-        "js-beautify": "^1.8.8",
-        "vdom-to-html": "^2.3.1",
-        "virtual-dom": "^2.1.1",
-        "virtual-html": "^2.0.0"
-    }
+	"name": "skout",
+	"description": "Opinionated exporter of an artboard into Web Components and web ready mockup.",
+	"author": "Luca Zampetti <lzampetti@gmail.com>",
+	"identifier": "com.circledev.skout",
+	"license": "MIT",
+	"version": "0.1.0",
+	"repository": {
+		"url": "https://github.com/actarian/skout"
+	},
+	"scripts": {
+		"build": "skpm-build",
+		"watch": "skpm-build --watch",
+		"start": "skpm-build --watch --run",
+		"postinstall": "npm run build && skpm-link"
+	},
+	"engines": {
+		"sketch": ">=3.0"
+	},
+	"skpm": {
+		"name": "Skout!",
+		"manifest": "src/manifest.json",
+		"main": "skout.sketchplugin",
+		"assets": [
+      "assets/**/*"
+    ]
+	},
+	"devDependencies": {
+		"@skpm/builder": "^0.5.2"
+	},
+	"dependencies": {
+		"js-beautify": "^1.8.8",
+		"vdom-to-html": "^2.3.1",
+		"virtual-dom": "^2.1.1",
+		"virtual-html": "^2.0.0"
+	}
 }

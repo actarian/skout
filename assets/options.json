@@ -1,0 +1,33 @@
+{
+	"settings": true,
+	"save": true,
+	"launch": true,
+	"inline": false,
+	"html": {
+		"export": true,
+		"exact": true,
+		"relative": true
+	},
+	"css": {
+		"export": true,
+		"folder": "css"
+	},
+	"image": {
+		"export": true,
+		"folder": "img",
+		"compression": 0.8
+	},
+	"svg": {
+		"export": true,
+		"folder": "svg",
+		"sprite": true
+	},
+	"component": {
+		"export": false,
+		"folder": "components",
+		"inline": true
+	},
+	"log": {
+		"layers": false
+	}
+}
