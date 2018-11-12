@@ -39,24 +39,24 @@ export default class SShape extends SNode {
 		return new VNode('div', this.attributes(), []);
 	}
 
+	/*
 	save(folder, filePath) {
 		var path = folder + '/' + filePath;
 		const objectStyle = this.sketchObject.style();
 		if (objectStyle.hasEnabledFill()) {
 			const fill = objectStyle.fills().firstObject();
 			const image = fill.image();
-			/*
-			const cgRef = image.CGImageForProposedRect_context_hints(null, nil, nil);
-			const newRep = NSBitmapImageRep.alloc().initWithCGImage(cgRef);
-			newRep.setSize(image.size()); // get original size
-			const imageData = newRep.representationUsingType_properties(NSJPEGFileType, {
-			    NSImageCompressionFactor: 0.8
-			});
-			imageData.writeToFile(path);
-			*/
+			// const cgRef = image.CGImageForProposedRect_context_hints(null, nil, nil);
+			// const newRep = NSBitmapImageRep.alloc().initWithCGImage(cgRef);
+			// newRep.setSize(image.size()); // get original size
+			// const imageData = newRep.representationUsingType_properties(NSJPEGFileType, {
+			//     NSImageCompressionFactor: 0.8
+			// });
+			// imageData.writeToFile(path);
 		}
 		return path;
 	}
+	*/
 
 	/*
 	__getShapeStyle() {

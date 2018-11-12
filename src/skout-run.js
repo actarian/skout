@@ -14,7 +14,7 @@ import SOptions from './skout/soptions';
 import SPage from './skout/spage';
 import SUtil from './skout/sutil';
 
-const DEBUG = true;
+const DEBUG = false;
 
 export default function() {
 
