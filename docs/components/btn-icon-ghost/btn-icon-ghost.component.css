@@ -1,0 +1,8 @@
+:host>.pin {
+	display: block;
+	position: relative;
+	width: 24px;
+	height: 24px;
+	z-index: 0;
+	padding: 0px 2px 0px 3px;
+}

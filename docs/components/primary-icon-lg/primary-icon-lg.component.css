@@ -1,0 +1,9 @@
+:host>.label-icon-left {
+	display: block;
+	position: absolute;
+	width: 83px;
+	height: 24px;
+	z-index: 1;
+	top: 13px;
+	left: 34px;
+}

@@ -56,19 +56,20 @@ export default class SOptions {
 
 	static setOptions(settings) {
 		const options = SOptions.storedOptions;
-		options.html.relative = settings.layout.mode == 0;
+		options.html.relative = settings.layout.mode === 0;
 		options.html.export = settings.assets.html.value;
 		options.css.export = settings.assets.css.value;
-		options.inline = settings.css.mode == 1;
+		options.inline = settings.css.mode === 1;
 		options.image.export = settings.assets.image.value;
 		options.svg.export = settings.assets.svg.value;
 		options.component.export = settings.assets.component.value;
-		options.component.extract = settings.component.mode == 1;
+		options.component.extract = settings.component.mode === 1;
 		options.launch = settings.launch.launch.value;
 		if (options.component.export) {
 			options.svg.sprite = false;
 		}
 		SOptions.set(options);
+		console.log(options.component)
 		// console.log('setOptions.debug', options.debug, options.component.extract, settings.layout.mode);
 	}
 
@@ -110,8 +111,8 @@ export default class SOptions {
 			},
 			component: {
 				modes: [
-					{ title: 'Single file', value: 0, selected: !SOptions.component.exctract },
-					{ title: 'Exctracted', value: 1, selected: SOptions.component.exctract },
+					{ title: 'Single file', value: 0, selected: !SOptions.component.extract },
+					{ title: 'Extracted', value: 1, selected: SOptions.component.extract },
 				],
 				mode: 0,
 			},

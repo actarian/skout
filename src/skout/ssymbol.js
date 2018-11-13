@@ -95,7 +95,7 @@ export default class SSymbol extends SNode {
 	static save(folder, object) {
 		const path = `${SOptions.component.folder}/${object.pathName}`;
 		const filePath = `${object.pathName}.component`;
-		const css = object.css;
+		const css = SUtil.beautifyCss(object.css);
 		const html = SUtil.beautifyHtml(object.html);
 		if (SOptions.component.extract) {
 			SUtil.saveTextFile(css, `${folder}/${path}`, `${filePath}.css`);

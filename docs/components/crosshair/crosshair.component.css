@@ -1,0 +1,7 @@
+:host>.crosshair {
+	display: block;
+	position: relative;
+	width: 24px;
+	height: 24px;
+	z-index: 0;
+}

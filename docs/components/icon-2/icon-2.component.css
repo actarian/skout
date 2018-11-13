@@ -1,0 +1,10 @@
+:host>.basket {
+	display: block;
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	z-index: 1;
+	top: 6px;
+	left: 6px;
+	padding: 3px 0px 3px 0px;
+}

@@ -4,20 +4,12 @@ import Component from '../component.js';
 
 class BasketComponent extends Component {
 
-    static get style() {
-        return `
-:host > .basket {
-    display: block;
-    position: relative;
-    width: 24px;
-    height: 18px;
-    z-index: 0; }`;
+    static get styleUrl() {
+        return 'components/basket/basket.component.css';
     }
 
-    static get template() {
-        return `
-<link rel="stylesheet" type="text/css" href="css/grid.css"><img class="basket" src="svg/basket.svg">
-`;
+    static get templateUrl() {
+        return 'components/basket/basket.component.html';
     }
 
     static get observedAttributes() {

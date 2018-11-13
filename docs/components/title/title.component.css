@@ -1,0 +1,38 @@
+.form-title-sup {
+	color: #A3A6A8;
+	font-size: 16px;
+	font-family: 'KatahdinRound-Regular';
+	letter-spacing: 0;
+	text-align: left;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+:host>.sup {
+	display: block;
+	position: relative;
+	width: 304px;
+	height: 16px;
+	z-index: 1;
+	margin: 0px 0px 3px 0px;
+	align-items: flex-start;
+}
+
+.form-title-text {
+	color: #000000;
+	font-size: 26px;
+	font-family: 'KatahdinRound-Regular';
+	letter-spacing: 0;
+	text-align: left;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+:host>.text {
+	display: block;
+	position: relative;
+	width: 304px;
+	height: 26px;
+	z-index: 0;
+	align-items: flex-start;
+}

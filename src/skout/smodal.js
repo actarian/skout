@@ -94,7 +94,7 @@ export default class SModal {
 			const cssMatrix = SModal.createRadioMatrix(options.css.modes);
 			modal.addAccessoryView(cssMatrix);
 			//
-			modal.addTextLabelWithValue(`Select exctracted or single file components.`);
+			modal.addTextLabelWithValue(`Select extracted or single file components.`);
 			const componentMatrix = SModal.createRadioMatrix(options.component.modes);
 			modal.addAccessoryView(componentMatrix);
 			//
@@ -109,6 +109,8 @@ export default class SModal {
 				// options.layout.mode = layoutModeSelect.indexOfSelectedItem();
 				options.layout.mode = SModal.getRadioMatrixValue(options.layout.modes, layoutMatrix);
 				options.assets = SModal.getCheckboxMatrixValues(options.assets, assetsMatrix);
+				options.css.mode = SModal.getRadioMatrixValue(options.css.modes, cssMatrix);
+				options.component.mode = SModal.getRadioMatrixValue(options.component.modes, componentMatrix);
 				options.launch = SModal.getCheckboxMatrixValues(options.launch, launchMatrix);
 				/*
 				const result = {

@@ -1,0 +1,7 @@
+:host>.logo-negativo {
+	display: block;
+	position: relative;
+	width: 260px;
+	height: 64px;
+	z-index: 0;
+}
