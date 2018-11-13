@@ -8,7 +8,6 @@
  * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
  */
 
-import sketch from 'sketch';
 import VNode from 'virtual-dom/vnode/vnode';
 import SOptions from './soptions';
 import SRect from './srect';
@@ -33,16 +32,16 @@ export default class SNode {
 		const object = node.object;
 		const sketchObject = object.sketchObject;
 		const parent = node.parent;
-		const groups = SUtil.toGroupNames(object.name);
-		const name = groups.pop();
+		const names = SUtil.getNames(node.name);
 		this.type = node.type;
 		this.rect = node.rect;
 		this.originalRect = node.originalRect;
 		this.childOfSymbol = node.childOfSymbol;
 		this.collectedStyles = node.collectedStyles;
 		this.id = object.id;
-		this.name = name;
-		this.groups = groups;
+		this.groups = names.groups;
+		this.name = names.name;
+		this.fileName = names.fileName;
 		this.zIndex = 0;
 		this.styleText = object.sketchObject.CSSAttributeString().trim();
 		this.margin = new SRect();
@@ -63,14 +62,20 @@ export default class SNode {
 			value: parent,
 			writable: true
 		});
+		if (parent) {
+			Object.defineProperty(this, 'parentSymbol', {
+				value: parent.type === 'MSSymbolInstance' ? parent : parent.parentSymbol,
+				writable: true
+			});
+		}
 		/*
 		Object.defineProperty(this, 'sketchObject', {
 		    value: sketchObject,
 		    writable: true
 		});
 		*/
-		this.fileName = SStyle.getFileName(this.name);
 		this.classes = [];
+		this.overrides = {};
 	}
 
 	static getConstraint(object) {
@@ -407,6 +412,7 @@ export default class SNode {
 				return i === 0 ? (this.childOfSymbol ? ':host' : '.' + x) : x;
 			}).join(' > .') :
 			'.' + this.pathNames.join(' > .');
+		// console.log('selector', selector);
 		const styleObj = {
 			className: this.className,
 			selector: selector,
@@ -462,6 +468,7 @@ export default class SNode {
 			});
 			const relatives = this.renderableNodes(this.relatives, this.containerRect);
 			const containerPathNames = pathNames.slice();
+			containerPathNames.shift();
 			containerPathNames.push('container');
 			relatives.forEach((a, i) => {
 				a.setPathNames('container', containerPathNames);
@@ -518,10 +525,6 @@ export default class SNode {
 			console.log(this.className, '=>', a.className, ' '.repeat(50 - this.className.length - 4 - a.className.length), (a.absolute ? 'abs' : 'rel'), a.rect.width, 'x', a.rect.height);
 		});
 		console.log(' ', ' ');
-	}
-
-	static getDocument() {
-		return sketch.fromNative(context.document);
 	}
 
 }

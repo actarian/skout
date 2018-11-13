@@ -9,6 +9,7 @@
  */
 
 import beautify from 'js-beautify';
+import sketch from 'sketch';
 import SOptions from './soptions';
 
 const GOOGLE_UA = 'UA-128159763-1';
@@ -20,12 +21,23 @@ export default class SUtil {
 		return sketch.fromNative(context.document);
 	}
 
-	static toGroupNames(name) {
-		return name.toLowerCase().split('/').map(x => x.trim().replace(/ /g, '-'));
+	static toGroupNames(text) {
+		return text.toLowerCase().split('/').map(x => x.trim().replace(/ /g, '-'));
 	}
 
-	static toComponentName(name) {
-		return name.toLowerCase().replace(/(?:^\w|[A-Z]|\b\w|-+)/g, (match, index) => {
+	static getFileName(text) {
+		return text.toLowerCase().replace(/(?!-)(?!_)(\W*)/g, '');
+	}
+
+	static getNames(text) {
+		const groups = SUtil.toGroupNames(text);
+		const name = groups.pop();
+		const fileName = SUtil.getFileName(name);
+		return { groups, name, fileName };
+	}
+
+	static toComponentName(text) {
+		return text.toLowerCase().replace(/(?:^\w|[A-Z]|\b\w|-+)/g, (match, index) => {
 			return match === '-' ? '' : match.toUpperCase();
 		}) + 'Component';
 	}

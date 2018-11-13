@@ -41,13 +41,13 @@ export default class SStyle {
 				};
 			}
 			/*
-			const doc = SNode.getDocument();
+			const doc = SUtil.getDocument();
 			const sharedStyles = doc.getSharedLayerStyles();
 			const style = sharedStyles.find(x => x.id == node.object.sharedStyleId);
 			*/
 			// const styleO = SStyle.findTextStyleByName(style.name);
 			/*
-			const doc = SNode.getDocument();
+			const doc = SUtil.getDocument();
 			const sharedStyles = doc.getSharedLayerStyles();
 			const style = sharedStyles.find(x => x.id == node.object.sharedStyleId);
 			// const style = doc.getSharedLayerStyleWithID(object.sharedStyleId);
@@ -380,19 +380,17 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
 		}
 	}
 
+	/*
 	static getClassNameCount(name, names) {
 		let count = SStyle.collectedNames[name] || 0;
 		count++;
 		SStyle.collectedNames[name] = count;
 		return count > 1 ? '-' + count : '';
 	}
-
-	static getFileName(name) {
-		return name.toLowerCase().replace(/(?!-)(?!_)(\W*)/g, '');
-	}
+	*/
 
 	static getClassName(name) {
-		name = SStyle.getFileName(name);
+		name = SUtil.getFileName(name);
 		return name; // + SStyle.getClassNameCount(name);
 	}
 
@@ -651,7 +649,7 @@ skout! ${s}
 
 }
 
-SStyle.collectedNames = {};
+// SStyle.collectedNames = {};
 SStyle.collectedStyles = [];
 SStyle.collectedComponentStyles = [];
 SStyle.collectedTextStyles = [];

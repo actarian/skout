@@ -68,7 +68,7 @@ export default class SPage extends SNode {
 		}
 		if (SOptions.component.export) {
 			SSymbol.collectedSymbols.forEach(x => headNodes.push(new VNode('script', {
-				src: `${SOptions.component.folder}/${x.className}/${x.className}.component.js`,
+				src: `${SOptions.component.folder}/${x.pathName}/${x.pathName}.component.js`,
 				type: 'module',
 			}, [])));
 		}
@@ -148,6 +148,9 @@ export default class SPage extends SNode {
 		// context.document.documentData().allLayerStyles();
 		// MSDocument.currentDocument().documentData().allTextStyles();
 		// context.document.documentData().allTextStyles();
+		SSymbol.collectedIds = {};
+		SSymbol.collectedNames = {};
+		// SStyle.collectedNames = {};
 		SStyle.collectedStyles = [];
 		SStyle.collectedComponentStyles = [];
 		SStyle.collectedTextStyles = [];
@@ -167,10 +170,12 @@ export default class SPage extends SNode {
 		return page;
 	}
 
-	static getNode(object, parent, overrides, childOfSymbol) {
-		overrides = overrides || {};
+	static getNode(object, parent, parentData, childOfSymbol) {
+		parentData = parentData || {};
+		const name = object.name;
+		const originalName = name;
 		const type = String(object.sketchObject.className());
-		const override = overrides[object.id];
+		const data = parentData[object.id];
 		const rect = SRect.fromObject(object);
 		let parentRect = rect;
 		let originalRect = rect;
@@ -180,6 +185,8 @@ export default class SPage extends SNode {
 			collectedStyles = parent.collectedStyles;
 		}
 		let node = {
+			name,
+			originalName,
 			type,
 			object,
 			parent,
@@ -205,10 +212,14 @@ export default class SPage extends SNode {
 				break;
 			case 'MSSymbolInstance':
 				let symbolId = object.symbolId;
-				if (override && override.symbolID) {
-					symbolId = override.symbolID;
+				const originalSymbolId = symbolId;
+				if (data && data.symbolID) {
+					symbolId = data.symbolID;
 				}
-				const symbol = SNode.getDocument().getSymbolMasterWithID(symbolId);
+				const symbol = SUtil.getDocument().getSymbolMasterWithID(symbolId);
+				node.name = symbol.name;
+				node.symbolId = symbolId;
+				node.originalSymbolId = originalSymbolId;
 				layers = symbol.layers || [];
 				object.layers = layers;
 				//
@@ -218,18 +229,19 @@ export default class SPage extends SNode {
 				//
 				originalRect = SRect.fromObject(symbol);
 				node.originalRect = originalRect;
-				overrides = {};
-				const objectOverrides = object.sketchObject.overrides();
-				if (objectOverrides) {
-					Object.keys(objectOverrides).forEach(x => {
-						overrides[x] = objectOverrides[x];
+				parentData = {};
+				const overrides = object.sketchObject.overrides();
+				if (overrides) {
+					Object.keys(overrides).forEach(x => {
+						parentData[x] = overrides[x];
 					});
 				}
-				if (typeof override == 'object') {
-					Object.keys(override).forEach(x => {
-						overrides[x] = override[x];
+				if (typeof data == 'object') {
+					Object.keys(data).forEach(x => {
+						parentData[x] = data[x];
 					});
 				}
+				node.parentData = parentData;
 				break;
 			case 'MSLayerGroup':
 				if (SSvg.isSvg(object)) {
@@ -250,8 +262,8 @@ export default class SPage extends SNode {
 				break;
 			case 'MSTextLayer':
 				node = new SText(node);
-				if (override) {
-					node.innerText = override;
+				if (data) {
+					node.innerText = data;
 				}
 				break;
 			case 'MSBitmapLayer':
@@ -266,7 +278,7 @@ export default class SPage extends SNode {
 				!x.hidden
 			));
 			layers = layers.map((layer, i) => {
-				const snode = SPage.getNode(layer, node, overrides, childOfSymbol);
+				const snode = SPage.getNode(layer, node, parentData, childOfSymbol);
 				snode.zIndex = i;
 				snode.parentRect = node.rect;
 				snode.originalParentRect = originalRect;

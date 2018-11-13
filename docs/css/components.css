@@ -13,7 +13,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.btn-primary>.label {
+.primary-md>.label {
 	display: block;
 	position: absolute;
 	width: 76px;
@@ -55,7 +55,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.btn-primary>.label {
+.primary-md>.label {
 	display: block;
 	position: absolute;
 	width: 76px;
@@ -66,7 +66,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.desktop>.claim-whatsapp>.container>.group>.rimani-sempre-in-con {
+.claim-whatsapp>.container>.group>.rimani-sempre-in-con {
 	display: block;
 	position: relative;
 	width: 425px;
@@ -83,7 +83,7 @@ skout! components
 	text-transform: uppercase;
 }
 
-.label-icon>.group>.label {
+.label-icon-left>.group>.label {
 	display: block;
 	position: relative;
 	width: 51px;
@@ -94,7 +94,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.form-title>.sup {
+.title>.sup {
 	display: block;
 	position: relative;
 	width: 304px;
@@ -104,7 +104,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.form-title>.text {
+.title>.text {
 	display: block;
 	position: relative;
 	width: 304px;
@@ -113,7 +113,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.form-control-text>.group>.label {
+.control-text>.group>.label {
 	display: block;
 	position: relative;
 	width: 195px;
@@ -123,7 +123,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.form-control-text>.group>.required {
+.control-text>.group>.required {
 	display: block;
 	position: relative;
 	width: 87px;
@@ -132,7 +132,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.form-control-input-text>.value {
+.control-input-text>.value {
 	display: block;
 	position: absolute;
 	width: 276px;
@@ -143,7 +143,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.form-control-text-2>.group>.label {
+.control-text-2>.group>.label {
 	display: block;
 	position: relative;
 	width: 195px;
@@ -153,7 +153,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.form-control-text-2>.group>.required {
+.control-text-2>.group>.required {
 	display: block;
 	position: relative;
 	width: 87px;
@@ -162,7 +162,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.form-control-input-text>.value {
+.control-input-text>.value {
 	display: block;
 	position: absolute;
 	width: 276px;
@@ -173,7 +173,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.btn-primary-lg>.label {
+.primary-lg>.label {
 	display: block;
 	position: absolute;
 	width: 115px;
@@ -197,7 +197,7 @@ skout! components
 	border-radius: 0;
 }
 
-.desktop>.home-hero>.container>.home-hero-body {
+.home-hero>.container>.home-hero-body {
 	display: flex;
 	position: relative;
 	width: 847px;
@@ -230,7 +230,7 @@ skout! components
 	padding: 6px 6px 6px 6px;
 }
 
-.btn-icon-ghost>.basket {
+.btn-icon-ghost>.pin {
 	display: block;
 	position: relative;
 	width: 24px;
@@ -239,7 +239,7 @@ skout! components
 	padding: 0px 2px 0px 3px;
 }
 
-.basket>.pin {
+.pin>.pin {
 	display: block;
 	position: relative;
 	width: 19px;
@@ -258,7 +258,7 @@ skout! components
 	padding: 6px 6px 6px 6px;
 }
 
-.btn-icon-ghost-2>.basket {
+.btn-icon-ghost-2>.crosshair {
 	display: block;
 	position: relative;
 	width: 24px;
@@ -266,7 +266,7 @@ skout! components
 	z-index: 0;
 }
 
-.basket>.crosshair {
+.crosshair>.crosshair {
 	display: block;
 	position: relative;
 	width: 24px;
@@ -274,7 +274,7 @@ skout! components
 	z-index: 0;
 }
 
-.search-bar>.btn-primary {
+.search-bar>.primary-md {
 	display: block;
 	position: absolute;
 	width: 112px;
@@ -316,7 +316,7 @@ skout! components
 	z-index: 0;
 }
 
-.header-desktop>.group>.btn-icon {
+.header-desktop>.group>.icon {
 	display: block;
 	position: relative;
 	width: 36px;
@@ -328,7 +328,7 @@ skout! components
 	border-radius: 50%;
 }
 
-.btn-icon>.basket {
+.icon>.basket {
 	display: block;
 	position: absolute;
 	width: 24px;
@@ -347,7 +347,7 @@ skout! components
 	z-index: 0;
 }
 
-.header-desktop>.group>.btn-primary {
+.header-desktop>.group>.primary-md {
 	display: block;
 	position: relative;
 	width: 112px;
@@ -358,7 +358,7 @@ skout! components
 	border-radius: 18px;
 }
 
-.desktop>.claim-whatsapp>.container>.group {
+.claim-whatsapp>.container>.group {
 	display: flex;
 	position: relative;
 	width: 598px;
@@ -369,7 +369,7 @@ skout! components
 	align-items: center;
 }
 
-.desktop>.claim-whatsapp>.container>.group>.btn-primary-lg {
+.claim-whatsapp>.container>.group>.primary-icon-lg {
 	display: block;
 	position: relative;
 	width: 150px;
@@ -380,7 +380,7 @@ skout! components
 	border-radius: 25px;
 }
 
-.btn-primary-lg>.label-icon {
+.primary-icon-lg>.label-icon-left {
 	display: block;
 	position: absolute;
 	width: 83px;
@@ -390,7 +390,7 @@ skout! components
 	left: 34px;
 }
 
-.label-icon>.group {
+.label-icon-left>.group {
 	display: flex;
 	position: relative;
 	width: 83px;
@@ -402,7 +402,7 @@ skout! components
 	transform: rotateZ(-180deg);
 }
 
-.label-icon>.group>.icon {
+.label-icon-left>.group>.whatsapp {
 	display: block;
 	position: relative;
 	width: 24px;
@@ -411,7 +411,7 @@ skout! components
 	transform: rotateZ(-180deg);
 }
 
-.icon>.whatsapp {
+.whatsapp>.whatsapp {
 	display: block;
 	position: relative;
 	width: 24px;
@@ -419,7 +419,7 @@ skout! components
 	z-index: 0;
 }
 
-.desktop>.signin>.container>.form-login {
+.signin>.container>.form-login {
 	display: flex;
 	position: relative;
 	width: 305px;
@@ -430,7 +430,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.form-login>.form-title {
+.form-login>.title {
 	display: flex;
 	position: relative;
 	width: 305px;
@@ -442,7 +442,7 @@ skout! components
 	margin: 0px 0px 34px 0px;
 }
 
-.form-login>.form-control-text {
+.form-login>.control-text {
 	display: flex;
 	position: relative;
 	width: 305px;
@@ -454,7 +454,7 @@ skout! components
 	margin: 0px 0px 21px 0px;
 }
 
-.form-control-text>.group {
+.control-text>.group {
 	display: flex;
 	position: relative;
 	width: 305px;
@@ -467,7 +467,7 @@ skout! components
 	padding: 0px 1px 0px 1px;
 }
 
-.form-control-text>.form-control-input-text {
+.control-text>.control-input-text {
 	display: block;
 	position: relative;
 	width: 305px;
@@ -479,7 +479,7 @@ skout! components
 	border-radius: 3px;
 }
 
-.form-login>.form-control-text-2 {
+.form-login>.control-text-2 {
 	display: flex;
 	position: relative;
 	width: 305px;
@@ -491,7 +491,7 @@ skout! components
 	margin: 0px 0px 60px 0px;
 }
 
-.form-control-text-2>.group {
+.control-text-2>.group {
 	display: flex;
 	position: relative;
 	width: 305px;
@@ -504,7 +504,7 @@ skout! components
 	padding: 0px 1px 0px 1px;
 }
 
-.form-control-text-2>.form-control-input-text {
+.control-text-2>.control-input-text {
 	display: block;
 	position: relative;
 	width: 305px;
@@ -516,7 +516,7 @@ skout! components
 	border-radius: 3px;
 }
 
-.form-login>.btn-primary-lg {
+.form-login>.primary-lg {
 	display: block;
 	position: relative;
 	width: 150px;

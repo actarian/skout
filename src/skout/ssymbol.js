@@ -17,6 +17,42 @@ import SUtil from './sutil';
 
 export default class SSymbol extends SNode {
 
+	static getNames(text, id) {
+		const groups = SUtil.toGroupNames(text);
+		const name = groups.pop();
+		let fileName = SSymbol.collectedIds[id];
+		if (!fileName) {
+			fileName = SUtil.getFileName(name);
+			fileName += SSymbol.getSymbolNameCount(fileName);
+			SSymbol.collectedIds[id] = fileName;
+		}
+		return { groups, name, fileName };
+	}
+
+	static getSymbolNameCount(text) {
+		let count = SSymbol.collectedNames[text] || 0;
+		count++;
+		SSymbol.collectedNames[text] = count;
+		return count > 1 ? '-' + count : '';
+	}
+
+	constructor(node) {
+		super(node);
+		this.symbolId = node.symbolId;
+		const names = SSymbol.getNames(node.name, node.symbolId);
+		this.tagName = names.fileName;
+		this.originalSymbolId = node.originalSymbolId;
+		const originalNames = SSymbol.getNames(node.originalName, node.originalSymbolId);
+		this.originalName = originalNames.name;
+		this.originalTagName = originalNames.fileName;
+		if (this.parentSymbol) {
+			const overrides = this.parentSymbol.overrides;
+			overrides[this.originalTagName] = this.tagName;
+			// console.log(overrides);
+			// console.log(this.tagName, this.originalTagName);
+		}
+	}
+
 	render() {
 		if (SOptions.component.export) {
 			const nodes = this.renderNodes();
@@ -29,24 +65,36 @@ export default class SSymbol extends SNode {
 				}, []);
 				html = toHTML(styles) + html;
 			}
-			const tagName = `${this.className}-component`;
-			SSymbol.collectedSymbols.push({
-				className: this.className,
-				componentName: SUtil.toComponentName(this.className),
-				tagName: tagName,
-				html: html,
-				css: SStyle.stylesToCss(this.collectedStyles),
-			});
+			const tagName = `${this.tagName}-component`;
+			const collected = SSymbol.collectedSymbols.find(x => x.tagName == tagName);
+			if (!collected) {
+				SSymbol.collectedSymbols.push({
+					pathName: this.tagName,
+					componentName: SUtil.toComponentName(this.tagName),
+					tagName: tagName,
+					overrides: this.overrides,
+					html: html,
+					css: SStyle.stylesToCss(this.collectedStyles),
+				});
+			}
 			const attributes = this.attributes();
-			return new VNode(tagName, attributes, []);
+			Object.assign(attributes, this.overrides);
+			const componentName = `${this.originalTagName}-component`;
+			/*
+			if (this.parentSymbol) {
+				this.parentSymbol.overrides[componentName] = tagName;
+			}
+			console.log(this.name, this.originalName, this.overrides);
+			*/
+			return new VNode(componentName, attributes, []);
 		} else {
 			return SNode.prototype.render.call(this);
 		}
 	}
 
 	static save(folder, object) {
-		const path = `${SOptions.component.folder}/${object.className}`;
-		const filePath = `${object.className}.component`;
+		const path = `${SOptions.component.folder}/${object.pathName}`;
+		const filePath = `${object.pathName}.component`;
 		const css = object.css;
 		const html = SUtil.beautifyHtml(object.html);
 		if (SOptions.component.extract) {
@@ -78,7 +126,7 @@ class ${object.componentName} extends Component {
 ${getters}
 
     static get observedAttributes() {
-        return ['name'];
+        return ${JSON.stringify(Object.keys(object.overrides)).replace(/"/gm, `'`)};
     }
 
 }
@@ -90,5 +138,6 @@ window.customElements.define('${object.tagName}', ${object.componentName});
 
 }
 
+SSymbol.collectedIds = {};
 SSymbol.collectedNames = {};
 SSymbol.collectedSymbols = [];
