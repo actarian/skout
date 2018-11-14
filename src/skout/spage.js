@@ -44,6 +44,12 @@ export default class SPage extends SNode {
         ];
 		if (SOptions.css.export) {
 			Object.keys(css.styles).forEach(s => {
+				headNodes.push(new VNode('link', {
+					rel: 'stylesheet',
+					type: 'text/css',
+					href: `${SOptions.css.folder}/styles.css`
+				}, []));
+				/*
 				if (css.styles[s].trim() !== '') {
 					headNodes.push(new VNode('link', {
 						rel: 'stylesheet',
@@ -51,18 +57,19 @@ export default class SPage extends SNode {
 						href: `${SOptions.css.folder}/${s}.css`
 					}, []));
 				}
+				*/
 			});
 			/*
 			headNodes.push(new VNode('link', {
 			    rel: 'stylesheet',
 			    type: 'text/css',
-			    href: SOptions.css.folder + '/all.css'
+			    href: SOptions.css.folder + '/style.css'
 			}, []));
 			*/
 		} else {
-			if (css.all.trim() !== '') {
+			if (css.style.trim() !== '') {
 				headNodes.push(new VNode('style', null, [
-                new VText(css.all)
+                new VText(css.style)
 			]));
 			}
 		}
@@ -93,20 +100,41 @@ export default class SPage extends SNode {
 		return html;
 	}
 
-	exportToFolder(folder) {
+	save(folder) {
 		SNode.folder = folder;
 		let html = this.getHtml();
 		if (SOptions.css.export) {
 			const cssFolder = `${folder}/${SOptions.css.folder}`;
 			SUtil.addFolder(cssFolder);
-			Object.keys(SPage.css.styles).forEach(s => {
-				if (SPage.css.styles[s].trim() !== '') {
-					SUtil.saveTextFile(SPage.css.styles[s], cssFolder, `${s}.css`);
-				}
-			});
-			if (SPage.css.all.trim() !== '') {
-				SUtil.saveTextFile(SPage.css.all, cssFolder, 'all.css');
+			let shared = [
+				`@import "../${SOptions.css.folder}/base.css";`,
+				`@import "../${SOptions.css.folder}/grid.css";`
+			];
+			let styles = shared.slice();
+			if (SPage.css.styles.typography) {
+				styles.push(`@import "../${SOptions.css.folder}/typography.css";`);
+				shared.push(`@import "../${SOptions.css.folder}/typography.css";`);
 			}
+			if (SPage.css.styles.components && !SOptions.component.export) {
+				styles.push(`@import "../${SOptions.css.folder}/components.css";`);
+			}
+			if (SPage.css.styles.page) {
+				styles.push(`@import "../${SOptions.css.folder}/page.css";`);
+			}
+			Object.keys(SPage.css.styles).forEach(s => {
+				// if (SPage.css.styles[s].trim() !== '') {
+				SUtil.saveTextFile(SPage.css.styles[s], cssFolder, `${s}.css`);
+				// }
+			});
+			SUtil.saveTextFile(styles.join('\n'), cssFolder, 'styles.css');
+			if (SOptions.component.export && SSymbol.collectedSymbols.length) {
+				SUtil.saveTextFile(shared.join('\n'), cssFolder, 'shared.css');
+			}
+			/*
+			if (SPage.css.style.trim() !== '') {
+				SUtil.saveTextFile(SPage.css.style, cssFolder, 'style.css');
+			}
+			*/
 		}
 		if (SOptions.image.export && SImage.collectedImages.length) {
 			SUtil.addFolder(`${folder}/${SOptions.image.folder}`);
@@ -221,7 +249,7 @@ export default class SPage extends SNode {
 				node.symbolId = symbolId;
 				node.originalSymbolId = originalSymbolId;
 				layers = symbol.layers || [];
-				object.layers = layers;
+				// object.layers = layers;
 				//
 				node = new SSymbol(node);
 				node.collectedStyles = [];
@@ -264,6 +292,10 @@ export default class SPage extends SNode {
 				node = new SText(node);
 				if (data) {
 					node.innerText = data;
+					if (node.parentSymbol) {
+						const overrides = node.parentSymbol.overrides;
+						overrides[node.fileName] = data;
+					}
 				}
 				break;
 			case 'MSBitmapLayer':

@@ -431,8 +431,8 @@ ${props} }`;
         }
         `);
 		const typography = SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedTextStyles));
-		const page = SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedStyles));
 		const components = SOptions.component.export ? null : SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedComponentStyles));
+		const page = SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedStyles));
 		const styles = {
 			base,
 			grid,
@@ -440,7 +440,7 @@ ${props} }`;
 		};
 		const css = {
 			styles: {},
-			all: '',
+			style: '',
 		};
 		if (!SOptions.component.export) {
 			styles.components = components;
@@ -455,7 +455,7 @@ skout! ${s}
 
 ` + styles[s];
 			}
-			css.all += styles[s];
+			css.style += styles[s];
 		});
 		return css;
 	}

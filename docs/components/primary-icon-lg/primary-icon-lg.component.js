@@ -4,16 +4,29 @@ import Component from '../component.js';
 
 class PrimaryIconLgComponent extends Component {
 
-    static get styleUrl() {
-        return 'components/primary-icon-lg/primary-icon-lg.component.css';
+    static get style() {
+        return `
+:host>.label-icon-left {
+	display: block;
+	position: absolute;
+	width: 83px;
+	height: 24px;
+	z-index: 1;
+	top: 13px;
+	left: 34px;
+}
+`;
     }
 
-    static get templateUrl() {
-        return 'components/primary-icon-lg/primary-icon-lg.component.html';
+    static get template() {
+        return `
+<link rel="stylesheet" type="text/css" href="css/shared.css">
+<label-icon-left-component class="label-icon-left" data="{&quot;label&quot;:{},&quot;icon&quot;:&quot;whatsapp&quot;}"></label-icon-left-component>
+`;
     }
 
     static get observedAttributes() {
-        return ['label-icon-left'];
+        return ['data']; // ['label-icon-left'];
     }
 
 }

@@ -45,6 +45,7 @@ export default class SSymbol extends SNode {
 		const originalNames = SSymbol.getNames(node.originalName, node.originalSymbolId);
 		this.originalName = originalNames.name;
 		this.originalTagName = originalNames.fileName;
+		this.fileName = originalNames.fileName;
 		if (this.parentSymbol) {
 			const overrides = this.parentSymbol.overrides;
 			overrides[this.originalTagName] = this.tagName;
@@ -61,7 +62,7 @@ export default class SSymbol extends SNode {
 				const styles = new VNode('link', {
 					rel: 'stylesheet',
 					type: 'text/css',
-					href: `${SOptions.css.folder}/grid.css`
+					href: `${SOptions.css.folder}/shared.css`
 				}, []);
 				html = toHTML(styles) + html;
 			}
@@ -77,8 +78,9 @@ export default class SSymbol extends SNode {
 					css: SStyle.stylesToCss(this.collectedStyles),
 				});
 			}
+			// this.classes.push(`outlet-${this.originalTagName}`);
 			const attributes = this.attributes();
-			Object.assign(attributes, this.overrides);
+			attributes.data = JSON.stringify(this.overrides);
 			const componentName = `${this.originalTagName}-component`;
 			/*
 			if (this.parentSymbol) {
@@ -126,7 +128,7 @@ class ${object.componentName} extends Component {
 ${getters}
 
     static get observedAttributes() {
-        return ${JSON.stringify(Object.keys(object.overrides)).replace(/"/gm, `'`)};
+        return ['data']; // ${JSON.stringify(Object.keys(object.overrides)).replace(/"/gm, `'`)};
     }
 
 }

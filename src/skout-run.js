@@ -54,11 +54,11 @@ export default function() {
 		if (SOptions.save) {
 			const modal = SModal.newSelectFolderModal((folder) => {
 				SOptions.folder = folder.path;
-				page.exportToFolder(SOptions.folder);
+				page.save(SOptions.folder);
 				message(`saved to folder ${SOptions.folder} 🌈 `);
 			}, (cancel) => message(`canceled! 🌈`), (error) => message(error));
 		} else if (SOptions.folder) {
-			page.exportToFolder(SOptions.folder);
+			page.save(SOptions.folder);
 			console.log(`saved to folder ${SOptions.folder} 🌈 `, ``);
 		} else {
 			const html = page.getHtml();

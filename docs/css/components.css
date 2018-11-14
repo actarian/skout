@@ -230,7 +230,7 @@ skout! components
 	padding: 6px 6px 6px 6px;
 }
 
-.btn-icon-ghost>.pin {
+.btn-icon-ghost>.icon {
 	display: block;
 	position: relative;
 	width: 24px;
@@ -239,7 +239,7 @@ skout! components
 	padding: 0px 2px 0px 3px;
 }
 
-.pin>.pin {
+.icon>.pin {
 	display: block;
 	position: relative;
 	width: 19px;
@@ -258,7 +258,7 @@ skout! components
 	padding: 6px 6px 6px 6px;
 }
 
-.btn-icon-ghost-2>.crosshair {
+.btn-icon-ghost-2>.icon {
 	display: block;
 	position: relative;
 	width: 24px;
@@ -266,7 +266,7 @@ skout! components
 	z-index: 0;
 }
 
-.crosshair>.crosshair {
+.icon>.crosshair {
 	display: block;
 	position: relative;
 	width: 24px;
@@ -316,7 +316,7 @@ skout! components
 	z-index: 0;
 }
 
-.header-desktop>.group>.icon {
+.header-desktop>.group>.icon-2 {
 	display: block;
 	position: relative;
 	width: 36px;
@@ -328,7 +328,7 @@ skout! components
 	border-radius: 50%;
 }
 
-.icon>.basket {
+.icon-2>.icon {
 	display: block;
 	position: absolute;
 	width: 24px;
@@ -339,7 +339,7 @@ skout! components
 	padding: 3px 0px 3px 0px;
 }
 
-.basket>.basket {
+.icon>.basket {
 	display: block;
 	position: relative;
 	width: 24px;
@@ -402,7 +402,7 @@ skout! components
 	transform: rotateZ(-180deg);
 }
 
-.label-icon-left>.group>.whatsapp {
+.label-icon-left>.group>.icon {
 	display: block;
 	position: relative;
 	width: 24px;
@@ -411,7 +411,7 @@ skout! components
 	transform: rotateZ(-180deg);
 }
 
-.whatsapp>.whatsapp {
+.icon>.whatsapp {
 	display: block;
 	position: relative;
 	width: 24px;
