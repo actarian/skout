@@ -47,20 +47,24 @@ export default function() {
 	}
 
 	function getHtml() {
-		const page = SPage.fromArtboard(artboards[0]);
 		// console.log('pages', JSON.stringify(pages).replace(/(")(\w*)(\":)/g, ' $2: '));
 		// console.log('pages', pages);
 		// message(`${pages.length} pages found 🌈 `);
 		if (SOptions.save) {
 			const modal = SModal.newSelectFolderModal((folder) => {
 				SOptions.folder = folder.path;
+				SUtil.addFolder(SOptions.folder);
+				const page = SPage.fromArtboard(artboards[0]);
 				page.save(SOptions.folder);
 				message(`saved to folder ${SOptions.folder} 🌈 `);
 			}, (cancel) => message(`canceled! 🌈`), (error) => message(error));
 		} else if (SOptions.folder) {
+			SUtil.addFolder(SOptions.folder);
+			const page = SPage.fromArtboard(artboards[0]);
 			page.save(SOptions.folder);
 			console.log(`saved to folder ${SOptions.folder} 🌈 `, ``);
 		} else {
+			const page = SPage.fromArtboard(artboards[0]);
 			const html = page.getHtml();
 		}
 		if (!SOptions.debug) {

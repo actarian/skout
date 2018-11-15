@@ -36,6 +36,51 @@ export default class SSymbol extends SNode {
 		return count > 1 ? '-' + count : '';
 	}
 
+	static save(folder, object) {
+		const path = `${SOptions.component.folder}/${object.pathName}`;
+		const filePath = `${object.pathName}.component`;
+		const css = SUtil.beautifyCss(object.css);
+		const html = SUtil.beautifyHtml(object.html);
+		if (SOptions.component.extract) {
+			SUtil.saveTextFile(css, `${folder}/${path}`, `${filePath}.css`);
+			SUtil.saveTextFile(html, `${folder}/${path}`, `${filePath}.html`);
+		}
+		let getters = SOptions.component.extract ? `static get styleUrl() {
+			return '${path}/${filePath}.css';
+		}
+
+		static get templateUrl() {
+			return '${path}/${filePath}.html';
+		}` : `static get style() {
+        return \`
+${css}\`;
+    }
+
+    static get template() {
+        return \`
+${html}\`;
+    }`;
+		const js = SUtil.beautifyJs(`
+/* jshint esversion: 6 */
+
+import Component from '../component.js';
+
+class ${object.componentName} extends Component {
+
+${getters}
+
+    static get observedAttributes() {
+        return ['data'];
+    }
+
+}
+
+window.customElements.define('${object.tagName}', ${object.componentName});
+`);
+		// ${JSON.stringify(Object.keys(object.overrides)).replace(/"/gm, `'`)};
+		SUtil.saveTextFile(js, `${folder}/${path}`, `${filePath}.js`);
+	}
+
 	constructor(node) {
 		super(node);
 		this.symbolId = node.symbolId;
@@ -79,73 +124,30 @@ export default class SSymbol extends SNode {
 					pathName: this.tagName,
 					componentName: SUtil.toComponentName(this.tagName),
 					tagName: tagName,
-					overrides: this.overrides,
+					// overrides: this.overrides,
 					html: html,
 					css: SStyle.stylesToCss(this.collectedStyles),
 				});
 			}
-			// this.classes.push(`outlet-${this.originalTagName}`);
+			this.overrides.scomponent = this.tagName;
+			this.parentSymbol.overrides[this.className] = this.overrides;
+			// console.log(this.overrides);
 			const attributes = this.attributes();
 			attributes.data = JSON.stringify(this.overrides);
 			const componentName = `${this.originalTagName}-component`;
+			return new VNode(componentName, attributes, []);
+			// this.classes.push(`outlet-${this.originalTagName}`);
 			/*
-			if (this.parentSymbol) {
-				this.parentSymbol.overrides[componentName] = tagName;
-			}
 			console.log(this.name, this.originalName, this.overrides);
 			*/
-			return new VNode(componentName, attributes, []);
 		} else {
 			return SNode.prototype.render.call(this);
 		}
 	}
 
-	static save(folder, object) {
-		const path = `${SOptions.component.folder}/${object.pathName}`;
-		const filePath = `${object.pathName}.component`;
-		const css = SUtil.beautifyCss(object.css);
-		const html = SUtil.beautifyHtml(object.html);
-		if (SOptions.component.extract) {
-			SUtil.saveTextFile(css, `${folder}/${path}`, `${filePath}.css`);
-			SUtil.saveTextFile(html, `${folder}/${path}`, `${filePath}.html`);
-		}
-		let getters = SOptions.component.extract ? `static get styleUrl() {
-			return '${path}/${filePath}.css';
-		}
-
-		static get templateUrl() {
-			return '${path}/${filePath}.html';
-		}` : `static get style() {
-        return \`
-${css}\`;
-    }
-
-    static get template() {
-        return \`
-${html}\`;
-    }`;
-		const js = SUtil.beautifyJs(`
-/* jshint esversion: 6 */
-
-import Component from '../component.js';
-
-class ${object.componentName} extends Component {
-
-${getters}
-
-    static get observedAttributes() {
-        return ['data']; // ${JSON.stringify(Object.keys(object.overrides)).replace(/"/gm, `'`)};
-    }
-
 }
 
-window.customElements.define('${object.tagName}', ${object.componentName});
-`);
-		SUtil.saveTextFile(js, `${folder}/${path}`, `${filePath}.js`);
-	}
-
-}
-
+SSymbol.overrides = {};
 SSymbol.collectedIds = {};
 SSymbol.collectedNames = {};
 SSymbol.collectedSymbols = [];

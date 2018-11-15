@@ -24,7 +24,7 @@ export default class SImage extends SNode {
 		SImage.collectedImages.push({
 			name: `${SOptions.image.folder}/${this.fileName}.jpg`,
 			save: (folder, filePath) => {
-				return this.saveToJpg(this.sketchObject.image(), SOptions.folder, `${SOptions.image.folder}/`, `${this.fileName}.jpg`);
+				return this.saveToJpg(this.sketchObject.image(), SOptions.folder, SOptions.image.folder, `${this.fileName}.jpg`);
 			},
 		});
 		return new VNode('div', this.attributes(), [
@@ -118,7 +118,7 @@ export default class SImage extends SNode {
 			// const imageData = newRep.representationUsingType_properties(NSPNGFileType, nil);
 			// console.log(NSFileManager.defaultManager());
 			SUtil.addFolder(folder + '/' + filepath);
-			imageData.writeToFile(folder + '/' + filepath + filename);
+			imageData.writeToFile(folder + '/' + filepath + '/' + filename);
 			// console.log('saveJpg.writeToFile', folder, filepath, filename);
 			// return NSString.stringWithFormat('data:%@;base64,%@', 'image/jpeg', imageData.base64EncodedStringWithOptions(0));
 		}

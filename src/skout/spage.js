@@ -97,10 +97,12 @@ export default class SPage extends SNode {
 		console.log('collectedComponentStyles', SStyle.collectedComponentStyles.length);
 		console.log('collectedTextStyles', SStyle.collectedTextStyles.length);
 		console.log('collectedSymbols', SSymbol.collectedSymbols.length);
+		console.log('overrides', Object.keys(SSymbol.overrides));
 		return html;
 	}
 
 	save(folder) {
+		console.log('save');
 		SNode.folder = folder;
 		let html = this.getHtml();
 		if (SOptions.css.export) {
@@ -129,6 +131,11 @@ export default class SPage extends SNode {
 			SUtil.saveTextFile(styles.join('\n'), cssFolder, 'styles.css');
 			if (SOptions.component.export && SSymbol.collectedSymbols.length) {
 				SUtil.saveTextFile(shared.join('\n'), cssFolder, 'shared.css');
+				const dataFolder = `${folder}/data`;
+				SUtil.addFolder(dataFolder);
+				SUtil.saveTextFile(SUtil.beautifyJs(
+					JSON.stringify(SSymbol.overrides)
+				), dataFolder, `data.json`);
 			}
 			/*
 			if (SPage.css.style.trim() !== '') {
@@ -170,34 +177,6 @@ export default class SPage extends SNode {
 		}
 	}
 
-	static fromArtboard(object) {
-		const artboard = Artboard.fromNative(object);
-		// MSDocument.currentDocument().documentData().allLayerStyles();
-		// context.document.documentData().allLayerStyles();
-		// MSDocument.currentDocument().documentData().allTextStyles();
-		// context.document.documentData().allTextStyles();
-		SSymbol.collectedIds = {};
-		SSymbol.collectedNames = {};
-		// SStyle.collectedNames = {};
-		SStyle.collectedStyles = [];
-		SStyle.collectedComponentStyles = [];
-		SStyle.collectedTextStyles = [];
-		SImage.collectedImages = [];
-		SSvg.collectedSvgs = [];
-		const layout = SLayout.fromArtboard(object);
-		SOptions.layout = layout;
-		const page = SPage.getNode(artboard);
-		page.zIndex = 0;
-		page.parentRect = layout.rect;
-		page.originalRect = layout.rect;
-		if (SOptions.html.relative) {
-			page.setMarginAndPaddings();
-		}
-		page.setPathNames();
-		page.setStyle();
-		return page;
-	}
-
 	static getNode(object, parent, parentData, childOfSymbol) {
 		parentData = parentData || {};
 		const name = object.name;
@@ -205,7 +184,6 @@ export default class SPage extends SNode {
 		const type = String(object.sketchObject.className());
 		const data = parentData[object.id];
 		const rect = SRect.fromObject(object);
-		let parentRect = rect;
 		let originalRect = rect;
 		let layers = object.layers || [];
 		let collectedStyles = [];
@@ -237,6 +215,7 @@ export default class SPage extends SNode {
 		switch (type) {
 			case 'MSArtboardGroup':
 				node = new SPage(node);
+				node.parentSymbol = { overrides: SSymbol.overrides };
 				break;
 			case 'MSSymbolInstance':
 				let symbolId = object.symbolId;
@@ -294,7 +273,7 @@ export default class SPage extends SNode {
 					node.innerText = data;
 					if (node.parentSymbol) {
 						const overrides = node.parentSymbol.overrides;
-						overrides[node.fileName] = data;
+						overrides[node.fileName] = String(data);
 					}
 				}
 				break;
@@ -333,6 +312,35 @@ export default class SPage extends SNode {
 			}
 		}
 		return node;
+	}
+
+	static fromArtboard(object) {
+		const artboard = Artboard.fromNative(object);
+		// MSDocument.currentDocument().documentData().allLayerStyles();
+		// context.document.documentData().allLayerStyles();
+		// MSDocument.currentDocument().documentData().allTextStyles();
+		// context.document.documentData().allTextStyles();
+		SSymbol.overrides = {};
+		SSymbol.collectedIds = {};
+		SSymbol.collectedNames = {};
+		// SStyle.collectedNames = {};
+		SStyle.collectedStyles = [];
+		SStyle.collectedComponentStyles = [];
+		SStyle.collectedTextStyles = [];
+		SImage.collectedImages = [];
+		SSvg.collectedSvgs = [];
+		const layout = SLayout.fromArtboard(object);
+		SOptions.layout = layout;
+		const page = SPage.getNode(artboard);
+		page.zIndex = 0;
+		page.parentRect = layout.rect;
+		page.originalRect = layout.rect;
+		if (SOptions.html.relative) {
+			page.setMarginAndPaddings();
+		}
+		page.setPathNames();
+		page.setStyle();
+		return page;
 	}
 
 }

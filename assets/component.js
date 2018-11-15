@@ -38,20 +38,21 @@ export default class Component extends HTMLElement {
 						if (stext) {
 							stext.innerHTML = `<span>${data[k]}</span>`;
 						}
-						const tagName = `${v}-component`;
-						const scomponent = root.querySelector(`.scomponent.${k}`);
-						if (scomponent && scomponent.tagName !== tagName) {
-							const newComponent = document.createElement(tagName);
-							if (scomponent.hasAttributes()) {
-								const attributes = Array.prototype.slice.call(scomponent.attributes);
-								attributes.forEach(a => newComponent.setAttribute(a.name, a.value));
-							}
-							scomponent.replaceWith(newComponent);
-						}
 					} else if (v) {
 						const scomponent = root.querySelector(`.scomponent.${k}`);
 						if (scomponent) {
-							scomponent.data = v;
+							scomponent.data = JSON.stringify(v);
+							if (v.scomponent) {
+								const tagName = `${v.scomponent}-component`;
+								if (scomponent.tagName !== tagName) {
+									const newComponent = document.createElement(tagName);
+									if (scomponent.hasAttributes()) {
+										const attributes = Array.prototype.slice.call(scomponent.attributes);
+										attributes.forEach(a => newComponent.setAttribute(a.name, a.value));
+									}
+									scomponent.replaceWith(newComponent);
+								}
+							}
 						}
 					}
 				});
@@ -89,7 +90,6 @@ export default class Component extends HTMLElement {
 				Component.appendStyle.apply(this, [shadowRoot, styleText]);
 			});
 		}
-
 		if (this.constructor.template) {
 			Component.appendTemplate.apply(this, [shadowRoot, this.constructor.template]);
 		} else if (this.constructor.templateUrl) {
@@ -99,7 +99,6 @@ export default class Component extends HTMLElement {
 				Component.appendTemplate.apply(this, [shadowRoot, templateText]);
 			});
 		}
-
 		return shadowRoot;
 	}
 
