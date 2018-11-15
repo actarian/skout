@@ -34,24 +34,25 @@ export default class Component extends HTMLElement {
 				Object.keys(data).forEach(k => {
 					const v = data[k];
 					if (typeof v == 'string') {
-						const span = root.querySelector(`.${k}>span`);
-						if (span) {
-							span.innerHTML = data[k];
-						} else {
-							const component = root.querySelector(`.${k}`);
-							const tagName = `${v}-component`;
-							if (component && component.tagName !== tagName) {
-								const newComponent = document.createElement(tagName);
-								if (component.hasAttributes()) {
-									const attributes = Array.prototype.slice.call(component.attributes);
-									attributes.forEach(a => newComponent.setAttribute(a.name, a.value));
-								}
-								component.replaceWith(newComponent);
+						const stext = root.querySelector(`.stext.${k}`);
+						if (stext) {
+							stext.innerHTML = `<span>${data[k]}</span>`;
+						}
+						const tagName = `${v}-component`;
+						const scomponent = root.querySelector(`.scomponent.${k}`);
+						if (scomponent && scomponent.tagName !== tagName) {
+							const newComponent = document.createElement(tagName);
+							if (scomponent.hasAttributes()) {
+								const attributes = Array.prototype.slice.call(scomponent.attributes);
+								attributes.forEach(a => newComponent.setAttribute(a.name, a.value));
 							}
+							scomponent.replaceWith(newComponent);
 						}
 					} else if (v) {
-						const component = root.querySelector(`.${k}`);
-						component.data = v;
+						const scomponent = root.querySelector(`.scomponent.${k}`);
+						if (scomponent) {
+							scomponent.data = v;
+						}
 					}
 				});
 			} catch (error) {

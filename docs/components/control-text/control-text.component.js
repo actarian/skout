@@ -17,7 +17,6 @@ class ControlTextComponent extends Component {
 }
 
 :host>.group>.label {
-	display: block;
 	position: relative;
 	width: 195px;
 	height: 11px;
@@ -37,7 +36,6 @@ class ControlTextComponent extends Component {
 }
 
 :host>.group>.required {
-	display: block;
 	position: relative;
 	width: 87px;
 	height: 10px;
@@ -46,11 +44,11 @@ class ControlTextComponent extends Component {
 }
 
 :host>.group {
-	display: flex;
 	position: relative;
 	width: 305px;
 	height: 11px;
 	z-index: 0;
+	display: flex;
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
@@ -59,7 +57,6 @@ class ControlTextComponent extends Component {
 }
 
 :host>.control-input-text {
-	display: block;
 	position: relative;
 	width: 305px;
 	height: 50px;
@@ -79,7 +76,7 @@ class ControlTextComponent extends Component {
 	<div class="label stext form-control-input-label"><span>Email</span></div>
 	<div class="required stext form-control-required"><span>required</span></div>
 </div>
-<control-input-text-component class="control-input-text" data="{&quot;value&quot;:{}}"></control-input-text-component>
+<control-input-text-component class="control-input-text scomponent" data="{&quot;value&quot;:{}}"></control-input-text-component>
 `;
     }
 

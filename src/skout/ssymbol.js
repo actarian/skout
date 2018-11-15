@@ -54,6 +54,12 @@ export default class SSymbol extends SNode {
 		}
 	}
 
+	getStyle(...rest) {
+		this.classes.push('scomponent');
+		const style = SNode.prototype.getStyle.apply(this, rest);
+		return style;
+	}
+
 	render() {
 		if (SOptions.component.export) {
 			const nodes = this.renderNodes();

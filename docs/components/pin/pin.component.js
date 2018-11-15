@@ -7,7 +7,6 @@ class PinComponent extends Component {
     static get style() {
         return `
 :host>.pin {
-	display: block;
 	position: relative;
 	width: 19px;
 	height: 24px;

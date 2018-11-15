@@ -16,7 +16,6 @@ class SearchBarComponent extends Component {
 }
 
 :host>.search-input {
-	display: block;
 	position: absolute;
 	width: 603px;
 	height: 19px;
@@ -27,7 +26,6 @@ class SearchBarComponent extends Component {
 }
 
 :host>.btn-icon-ghost {
-	display: block;
 	position: absolute;
 	width: 36px;
 	height: 36px;
@@ -38,7 +36,6 @@ class SearchBarComponent extends Component {
 }
 
 :host>.btn-icon-ghost-2 {
-	display: block;
 	position: absolute;
 	width: 36px;
 	height: 36px;
@@ -49,7 +46,6 @@ class SearchBarComponent extends Component {
 }
 
 :host>.primary-md {
-	display: block;
 	position: absolute;
 	width: 112px;
 	height: 36px;
@@ -66,9 +62,9 @@ class SearchBarComponent extends Component {
     static get template() {
         return `
 <link rel="stylesheet" type="text/css" href="css/shared.css">
-<btn-icon-ghost-component class="btn-icon-ghost" data="{&quot;icon&quot;:&quot;pin&quot;}"></btn-icon-ghost-component>
-<btn-icon-ghost-component class="btn-icon-ghost-2" data="{&quot;icon&quot;:&quot;crosshair&quot;}"></btn-icon-ghost-component>
-<primary-md-component class="primary-md" data="{&quot;label&quot;:{}}"></primary-md-component>
+<btn-icon-ghost-component class="btn-icon-ghost scomponent" data="{&quot;icon&quot;:&quot;pin&quot;}"></btn-icon-ghost-component>
+<btn-icon-ghost-component class="btn-icon-ghost-2 scomponent" data="{&quot;icon&quot;:&quot;crosshair&quot;}"></btn-icon-ghost-component>
+<primary-md-component class="primary-md scomponent" data="{&quot;label&quot;:{}}"></primary-md-component>
 <div class="search-input stext search-input-placeholder"><span>Inserisci l’indirizzo</span></div>
 `;
     }

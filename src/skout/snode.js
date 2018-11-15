@@ -299,7 +299,7 @@ export default class SNode {
 			*/
 			// this.rect.width = layout.cols[col - 1] || this.rect.width;
 			style = {
-				display: 'block',
+				// display: 'block',
 				position: this.absolute ? 'absolute' : 'relative',
 				width: (rect.width === layout.maxWidth) ? '100%' : rect.width + 'px',
 				height: rect.height + 'px',

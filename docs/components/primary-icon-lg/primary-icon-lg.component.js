@@ -7,7 +7,6 @@ class PrimaryIconLgComponent extends Component {
     static get style() {
         return `
 :host>.label-icon-left {
-	display: block;
 	position: absolute;
 	width: 83px;
 	height: 24px;
@@ -21,7 +20,7 @@ class PrimaryIconLgComponent extends Component {
     static get template() {
         return `
 <link rel="stylesheet" type="text/css" href="css/shared.css">
-<label-icon-left-component class="label-icon-left" data="{&quot;label&quot;:{},&quot;icon&quot;:&quot;whatsapp&quot;}"></label-icon-left-component>
+<label-icon-left-component class="label-icon-left scomponent" data="{&quot;label&quot;:{},&quot;icon&quot;:&quot;whatsapp&quot;}"></label-icon-left-component>
 `;
     }
 

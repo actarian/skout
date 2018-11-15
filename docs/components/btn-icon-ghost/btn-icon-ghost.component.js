@@ -7,7 +7,6 @@ class BtnIconGhostComponent extends Component {
     static get style() {
         return `
 :host>.icon {
-	display: block;
 	position: relative;
 	width: 24px;
 	height: 24px;
@@ -20,7 +19,7 @@ class BtnIconGhostComponent extends Component {
     static get template() {
         return `
 <link rel="stylesheet" type="text/css" href="css/shared.css">
-<icon-component class="icon" data="{}"></icon-component>
+<icon-component class="icon scomponent" data="{}"></icon-component>
 `;
     }
 

@@ -27,10 +27,10 @@ export default class SText extends SNode {
 	}
 
 	getStyle(...rest) {
+		this.classes.push('stext');
 		const style = SNode.prototype.getStyle.apply(this, rest);
 		const alignItems = (typeof this.sketchObject.verticalAlignment == 'function') ? ['flex-start', 'center', 'flex-end'][this.sketchObject.verticalAlignment()] : 'flex-start';
 		style.alignItems = alignItems;
-		this.classes.push('stext');
 		const sharedStyle = SStyle.getSharedStyle(this.object);
 		const localStyle = SStyle.parseTextStyle(this.sketchObject);
 		if (SOptions.inline) {

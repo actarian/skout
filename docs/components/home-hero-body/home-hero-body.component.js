@@ -16,7 +16,6 @@ class HomeHeroBodyComponent extends Component {
 }
 
 :host>.hero-title {
-	display: block;
 	position: relative;
 	width: 847px;
 	height: 32px;
@@ -26,7 +25,6 @@ class HomeHeroBodyComponent extends Component {
 }
 
 :host>.search-bar {
-	display: block;
 	position: relative;
 	width: 847px;
 	height: 72px;
@@ -42,7 +40,7 @@ class HomeHeroBodyComponent extends Component {
         return `
 <link rel="stylesheet" type="text/css" href="css/shared.css">
 <div class="hero-title stext search-title"><span>Ordina il tuo cibo preferito</span></div>
-<search-bar-component class="search-bar" data="{&quot;btn-icon-ghost&quot;:&quot;btn-icon-ghost&quot;,&quot;search-input&quot;:&quot;Inserisci l’indirizzo&quot;,&quot;primary-md&quot;:&quot;primary-md&quot;}"></search-bar-component>
+<search-bar-component class="search-bar scomponent" data="{&quot;btn-icon-ghost&quot;:&quot;btn-icon-ghost&quot;,&quot;search-input&quot;:&quot;Inserisci l’indirizzo&quot;,&quot;primary-md&quot;:&quot;primary-md&quot;}"></search-bar-component>
 `;
     }
 

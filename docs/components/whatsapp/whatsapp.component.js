@@ -7,7 +7,6 @@ class WhatsappComponent extends Component {
     static get style() {
         return `
 :host>.whatsapp {
-	display: block;
 	position: relative;
 	width: 24px;
 	height: 24px;

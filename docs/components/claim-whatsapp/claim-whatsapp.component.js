@@ -7,7 +7,6 @@ class ClaimWhatsappComponent extends Component {
     static get style() {
         return `
 :host>.container>.group>.rimani-sempre-in-con {
-	display: block;
 	position: relative;
 	width: 425px;
 	height: 17px;
@@ -24,18 +23,17 @@ class ClaimWhatsappComponent extends Component {
 }
 
 :host>.container>.group {
-	display: flex;
 	position: relative;
 	width: 598px;
 	height: 50px;
 	z-index: 1;
+	display: flex;
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
 }
 
 :host>.container>.group>.primary-icon-lg {
-	display: block;
 	position: relative;
 	width: 150px;
 	height: 50px;
@@ -53,7 +51,7 @@ class ClaimWhatsappComponent extends Component {
 <div class="container">
 	<div class="group">
 		<div class="rimani-sempre-in-con stext"><span>rimani sempre in contatto con whatsapp</span></div>
-		<primary-icon-lg-component class="primary-icon-lg" data="{&quot;label-icon-left&quot;:&quot;label-icon-left&quot;}"></primary-icon-lg-component>
+		<primary-icon-lg-component class="primary-icon-lg scomponent" data="{&quot;label-icon-left&quot;:&quot;label-icon-left&quot;}"></primary-icon-lg-component>
 	</div>
 </div>
 `;

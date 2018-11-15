@@ -17,7 +17,6 @@ class PrimaryMdComponent extends Component {
 }
 
 :host>.label {
-	display: block;
 	position: absolute;
 	width: 76px;
 	height: 13px;

@@ -17,7 +17,6 @@ class LabelIconLeftComponent extends Component {
 }
 
 :host>.group>.label {
-	display: block;
 	position: relative;
 	width: 51px;
 	height: 13px;
@@ -28,11 +27,11 @@ class LabelIconLeftComponent extends Component {
 }
 
 :host>.group {
-	display: flex;
 	position: relative;
 	width: 83px;
 	height: 24px;
 	z-index: 0;
+	display: flex;
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
@@ -40,7 +39,6 @@ class LabelIconLeftComponent extends Component {
 }
 
 :host>.group>.icon {
-	display: block;
 	position: relative;
 	width: 24px;
 	height: 24px;
@@ -55,7 +53,7 @@ class LabelIconLeftComponent extends Component {
 <link rel="stylesheet" type="text/css" href="css/shared.css">
 <div class="group">
 	<div class="label stext btn-primary-label"><span>Scrivici</span></div>
-	<icon-component class="icon" data="{}"></icon-component>
+	<icon-component class="icon scomponent" data="{}"></icon-component>
 </div>
 `;
     }

@@ -17,7 +17,6 @@ class TitleComponent extends Component {
 }
 
 :host>.sup {
-	display: block;
 	position: relative;
 	width: 304px;
 	height: 16px;
@@ -37,7 +36,6 @@ class TitleComponent extends Component {
 }
 
 :host>.text {
-	display: block;
 	position: relative;
 	width: 304px;
 	height: 26px;

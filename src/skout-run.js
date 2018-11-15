@@ -23,7 +23,7 @@ export default function() {
 	if (DEBUG) {
 		SOptions.getOptions({
 			debug: true,
-			settings: true,
+			settings: false,
 			save: false,
 			launch: false,
 			folder: folder,

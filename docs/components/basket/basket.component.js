@@ -7,7 +7,6 @@ class BasketComponent extends Component {
     static get style() {
         return `
 :host>.basket {
-	display: block;
 	position: relative;
 	width: 24px;
 	height: 18px;

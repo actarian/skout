@@ -17,7 +17,6 @@ class PrimaryLgComponent extends Component {
 }
 
 :host>.label {
-	display: block;
 	position: absolute;
 	width: 115px;
 	height: 13px;

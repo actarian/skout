@@ -7,7 +7,6 @@ class Icon2Component extends Component {
     static get style() {
         return `
 :host>.icon {
-	display: block;
 	position: absolute;
 	width: 24px;
 	height: 24px;
@@ -22,7 +21,7 @@ class Icon2Component extends Component {
     static get template() {
         return `
 <link rel="stylesheet" type="text/css" href="css/shared.css">
-<icon-component class="icon" data="{}"></icon-component>
+<icon-component class="icon scomponent" data="{}"></icon-component>
 `;
     }
 

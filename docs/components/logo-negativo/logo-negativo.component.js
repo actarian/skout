@@ -7,7 +7,6 @@ class LogoNegativoComponent extends Component {
     static get style() {
         return `
 :host>.logo-negativo {
-	display: block;
 	position: relative;
 	width: 260px;
 	height: 64px;

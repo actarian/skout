@@ -1,28 +1,32 @@
 html {
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 *,
 *::before,
 *::after {
-    box-sizing: inherit;
+	box-sizing: inherit;
 }
 
 img {
-    display: block;
-    width: 100%;
-    height: auto;
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.scomponent {
+	display: block;
 }
 
 .stext {
-    display: inline-flex;
+	display: inline-flex;
 }
 
 .stext>span {
-    width: 100%;
+	width: 100%;
 }

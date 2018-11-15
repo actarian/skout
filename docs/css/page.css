@@ -4,7 +4,6 @@ skout! page
 -------------- */
 
 .desktop {
-	display: block;
 	position: absolute;
 	width: 100%;
 	height: 1440px;
@@ -15,7 +14,6 @@ skout! page
 }
 
 .desktop>.home-hero {
-	display: block;
 	position: relative;
 	width: 100%;
 	height: 608px;
@@ -27,7 +25,6 @@ skout! page
 }
 
 .desktop>.header-desktop {
-	display: block;
 	position: absolute;
 	width: 100%;
 	height: 110px;
@@ -38,7 +35,6 @@ skout! page
 }
 
 .desktop>.claim-whatsapp {
-	display: block;
 	position: relative;
 	width: 100%;
 	height: 110px;
@@ -50,7 +46,6 @@ skout! page
 }
 
 .desktop>.signin {
-	display: block;
 	position: relative;
 	width: 100%;
 	height: 720px;

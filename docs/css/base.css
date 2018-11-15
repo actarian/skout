@@ -24,6 +24,10 @@ img {
 	height: auto;
 }
 
+.scomponent {
+	display: block;
+}
+
 .stext {
 	display: inline-flex;
 }

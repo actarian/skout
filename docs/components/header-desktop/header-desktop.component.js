@@ -16,7 +16,6 @@ class HeaderDesktopComponent extends Component {
 }
 
 :host>.group>.lavora-con-noi {
-	display: block;
 	position: relative;
 	width: 118px;
 	height: 18px;
@@ -35,7 +34,6 @@ class HeaderDesktopComponent extends Component {
 }
 
 :host>.group>.faq {
-	display: block;
 	position: relative;
 	width: 31px;
 	height: 18px;
@@ -45,18 +43,17 @@ class HeaderDesktopComponent extends Component {
 }
 
 :host>.group {
-	display: flex;
 	position: relative;
 	width: 1280px;
 	height: 63px;
 	z-index: 0;
+	display: flex;
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
 }
 
 :host>.group>.logo-negativo {
-	display: block;
 	position: relative;
 	width: 260px;
 	height: 63px;
@@ -66,7 +63,6 @@ class HeaderDesktopComponent extends Component {
 }
 
 :host>.group>.icon-2 {
-	display: block;
 	position: relative;
 	width: 36px;
 	height: 36px;
@@ -78,7 +74,6 @@ class HeaderDesktopComponent extends Component {
 }
 
 :host>.group>.primary-md {
-	display: block;
 	position: relative;
 	width: 112px;
 	height: 36px;
@@ -96,9 +91,9 @@ class HeaderDesktopComponent extends Component {
 <div class="group">
 	<div class="lavora-con-noi stext header-menu"><span>Lavora con noi</span></div>
 	<div class="faq stext header-menu"><span>Faq</span></div>
-	<logo-negativo-component class="logo-negativo" data="{}"></logo-negativo-component>
-	<icon-2-component class="icon-2" data="{&quot;icon&quot;:&quot;basket&quot;}"></icon-2-component>
-	<primary-md-component class="primary-md" data="{&quot;label&quot;:&quot;accedi&quot;}"></primary-md-component>
+	<logo-negativo-component class="logo-negativo scomponent" data="{}"></logo-negativo-component>
+	<icon-2-component class="icon-2 scomponent" data="{&quot;icon&quot;:&quot;basket&quot;}"></icon-2-component>
+	<primary-md-component class="primary-md scomponent" data="{&quot;label&quot;:&quot;accedi&quot;}"></primary-md-component>
 </div>
 `;
     }

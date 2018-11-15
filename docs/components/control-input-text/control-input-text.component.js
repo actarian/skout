@@ -16,7 +16,6 @@ class ControlInputTextComponent extends Component {
 }
 
 :host>.value {
-	display: block;
 	position: absolute;
 	width: 276px;
 	height: 16px;
