@@ -3,69 +3,59 @@
 skout! components
 -------------- */
 
-.home-hero-body>.hero-title {
+.content--hero>.hreo__title {
 	position: relative;
-	width: 847px;
-	height: 32px;
-	z-index: 0;
+	width: 100%;
+	z-index: 1;
 	margin: 0px 0px 25px 0px;
 	align-items: flex-start;
 }
 
-.primary-md>.label {
-	position: absolute;
-	width: 76px;
-	height: 13px;
-	z-index: 1;
-	top: 11px;
-	left: 18px;
-	align-items: flex-start;
-}
-
-.search-bar>.search-input {
-	position: absolute;
-	width: 603px;
-	height: 19px;
-	z-index: 3;
-	top: 25px;
-	left: 60px;
-	align-items: flex-start;
-}
-
-.header-desktop>.group>.lavora-con-noi {
+.control--search>.input__placeholder {
 	position: relative;
-	width: 118px;
-	height: 18px;
+	width: 100%;
+	z-index: 1;
+	max-width: 603px;
+	align-items: flex-start;
+}
+
+.btn--md>.btn__label {
+	position: relative;
+	width: 100%;
+	z-index: 1;
+	max-width: 76px;
+	align-items: flex-start;
+}
+
+.header>.group>.nva--item {
+	position: relative;
+	width: 100%;
 	z-index: 0;
-	margin: 0px 39px 0px 0px;
+	max-width: 118px;
 	align-items: flex-start;
 }
 
-.header-desktop>.group>.faq {
+.header>.group>.nva--item-2 {
 	position: relative;
-	width: 31px;
-	height: 18px;
+	width: 100%;
 	z-index: 1;
-	margin: 0px 325px 0px 0px;
+	max-width: 31px;
 	align-items: flex-start;
 }
 
-.primary-md>.label {
-	position: absolute;
-	width: 76px;
-	height: 13px;
-	z-index: 1;
-	top: 11px;
-	left: 18px;
-	align-items: flex-start;
-}
-
-.claim-whatsapp>.container>.group>.rimani-sempre-in-con {
+.btn--md>.btn__label {
 	position: relative;
-	width: 425px;
-	height: 17px;
+	width: 100%;
 	z-index: 1;
-	margin: 0px 23px 0px 0px;
+	max-width: 76px;
+	align-items: flex-start;
+}
+
+.section--whatsapp>.container>.group>.title {
+	position: relative;
+	width: 100%;
+	z-index: 1;
+	max-width: 425px;
 	align-items: flex-start;
 	color: #FFFFFF;
 	font-size: 17px;
@@ -76,414 +66,538 @@ skout! components
 	text-transform: uppercase;
 }
 
-.label-icon-left>.group>.label {
+.label-icon>.group>.btn__label {
 	position: relative;
-	width: 51px;
-	height: 13px;
+	width: 100%;
 	z-index: 0;
-	margin: 0px 8px 0px 0px;
+	max-width: 51px;
 	transform: rotateZ(-180deg);
 	align-items: flex-start;
 }
 
-.title>.sup {
+.form__head>.head__sup {
 	position: relative;
-	width: 304px;
-	height: 16px;
+	width: 100%;
 	z-index: 1;
+	max-width: 304px;
 	margin: 0px 0px 3px 0px;
 	align-items: flex-start;
 }
 
-.title>.text {
+.form__head>.head__title {
 	position: relative;
-	width: 304px;
-	height: 26px;
+	width: 100%;
 	z-index: 0;
+	max-width: 304px;
 	align-items: flex-start;
 }
 
-.control-text>.group>.label {
+.form__control>.group>.control__label {
 	position: relative;
-	width: 195px;
-	height: 11px;
+	width: 100%;
+	z-index: 1;
+	max-width: 195px;
+	align-items: flex-start;
+}
+
+.form__control>.group>.control__required {
+	position: relative;
+	width: 100%;
 	z-index: 0;
-	margin: 0px 21px 0px 0px;
+	max-width: 87px;
 	align-items: flex-start;
 }
 
-.control-text>.group>.required {
+.input--text>.input__placeholder {
 	position: relative;
-	width: 87px;
-	height: 10px;
+	width: 100%;
 	z-index: 1;
+	max-width: 276px;
 	align-items: flex-start;
 }
 
-.control-input-text>.value {
-	position: absolute;
-	width: 276px;
-	height: 16px;
-	z-index: 1;
-	top: 16px;
-	left: 15px;
-	align-items: flex-start;
-}
-
-.control-text-2>.group>.label {
+.form__control-2>.group>.control__label {
 	position: relative;
-	width: 195px;
-	height: 11px;
+	width: 100%;
+	z-index: 1;
+	max-width: 195px;
+	align-items: flex-start;
+}
+
+.form__control-2>.group>.control__required {
+	position: relative;
+	width: 100%;
 	z-index: 0;
-	margin: 0px 21px 0px 0px;
+	max-width: 87px;
 	align-items: flex-start;
 }
 
-.control-text-2>.group>.required {
+.input--text>.input__placeholder {
 	position: relative;
-	width: 87px;
-	height: 10px;
+	width: 100%;
 	z-index: 1;
+	max-width: 276px;
 	align-items: flex-start;
 }
 
-.control-input-text>.value {
-	position: absolute;
-	width: 276px;
-	height: 16px;
+.btn--lg>.btn__label {
+	position: relative;
+	width: 100%;
 	z-index: 1;
-	top: 16px;
-	left: 15px;
+	max-width: 115px;
 	align-items: flex-start;
 }
 
-.primary-lg>.label {
-	position: absolute;
-	width: 115px;
-	height: 13px;
-	z-index: 1;
-	top: 19px;
-	left: 18px;
-	align-items: flex-start;
-}
-
-.home-hero>.rectangle {
+.section--hero>.overlay {
 	position: absolute;
 	width: 100%;
-	height: 332px;
 	z-index: 1;
 	top: 0;
 	left: 0;
+	height: 332px;
+	max-width: 1440px;
 	background: linear-gradient(-180deg, #000000 0%, rgba(0, 0, 0, 0.00) 100%);
 	background-size: cover;
 	border-radius: 0;
 	display: inline-block;
 }
 
-.home-hero>.container>.home-hero-body {
+.section--hero>.container>.content--hero {
 	position: relative;
-	width: 847px;
-	height: 129px;
+	width: 100%;
 	z-index: 2;
+	min-height: 129px;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: flex-start;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
-.home-hero-body>.search-bar {
+.content--hero>.control--search {
 	position: relative;
-	width: 847px;
+	width: 100%;
+	z-index: 0;
 	height: 72px;
-	z-index: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 18px;
+	padding-bottom: 18px;
+	padding-left: 10px;
+	padding-right: 20px;
 	background: #ffffff;
 	background-size: cover;
 	border-radius: 3px;
 }
 
-.search-bar>.btn-icon-ghost {
-	position: absolute;
-	width: 36px;
+.control--search>.btn--ghost {
+	position: relative;
+	width: 100%;
+	z-index: 2;
+	max-width: 36px;
 	height: 36px;
-	z-index: 1;
-	top: 18px;
-	left: 10px;
-	padding: 6px 6px 6px 6px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	padding-left: 6px;
+	padding-right: 6px;
 }
 
-.btn-icon-ghost>.icon {
+.btn--ghost>.icon {
 	position: relative;
-	width: 24px;
-	height: 24px;
+	width: 100%;
 	z-index: 0;
-	padding: 0px 2px 0px 3px;
+	max-width: 24px;
+	height: 24px;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 3px;
+	padding-right: 2px;
 }
 
 .icon>.pin {
 	position: relative;
-	width: 19px;
-	height: 24px;
+	width: 100%;
 	z-index: 0;
+	max-width: 19px;
+	height: 24px;
 }
 
-.search-bar>.btn-icon-ghost-2 {
-	position: absolute;
-	width: 36px;
-	height: 36px;
-	z-index: 2;
-	top: 18px;
-	left: 679px;
-	padding: 6px 6px 6px 6px;
-}
-
-.btn-icon-ghost-2>.icon {
+.control--search>.btn--ghost-2 {
 	position: relative;
-	width: 24px;
-	height: 24px;
+	width: 100%;
+	z-index: 3;
+	max-width: 36px;
+	height: 36px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	padding-left: 6px;
+	padding-right: 6px;
+}
+
+.btn--ghost-2>.icon {
+	position: relative;
+	width: 100%;
 	z-index: 0;
+	max-width: 24px;
+	height: 24px;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 .icon>.crosshair {
 	position: relative;
-	width: 24px;
-	height: 24px;
+	width: 100%;
 	z-index: 0;
+	height: 24px;
 }
 
-.search-bar>.primary-md {
-	position: absolute;
-	width: 112px;
-	height: 36px;
+.control--search>.btn--md {
+	position: relative;
+	width: 100%;
 	z-index: 4;
-	top: 18px;
-	left: 715px;
+	max-width: 112px;
+	height: 36px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 11px;
+	padding-bottom: 12px;
+	padding-left: 18px;
+	padding-right: 18px;
 	background: #e2007a;
 	background-size: cover;
 	border-radius: 18px;
 }
 
-.header-desktop>.group {
+.header>.group {
 	position: relative;
-	width: 1280px;
-	height: 63px;
+	width: 100%;
 	z-index: 0;
+	min-height: 63px;
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
-.header-desktop>.group>.logo-negativo {
+.header>.group>.icon-2 {
 	position: relative;
-	width: 260px;
-	height: 63px;
+	width: 100%;
 	z-index: 2;
-	margin: 0px 350px 0px 0px;
-	padding: -1px 0px 0px 0px;
+	max-width: 260px;
+	min-height: 63px;
+	padding-top: -1px;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
-.logo-negativo>.logo-negativo {
+.icon-2>.group {
 	position: relative;
-	width: 260px;
-	height: 64px;
+	width: 100%;
 	z-index: 0;
+	height: 64px;
 }
 
-.header-desktop>.group>.icon-2 {
+.header>.group>.btn--icon {
 	position: relative;
-	width: 36px;
-	height: 36px;
+	width: 100%;
 	z-index: 3;
-	margin: 0px 9px 0px 0px;
+	max-width: 36px;
+	min-height: 36px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	padding-left: 6px;
+	padding-right: 6px;
 	background: #e2007a;
 	background-size: cover;
 	border-radius: 50%;
 }
 
-.icon-2>.icon {
-	position: absolute;
-	width: 24px;
-	height: 24px;
+.btn--icon>.icon {
+	position: relative;
+	width: 100%;
 	z-index: 1;
-	top: 6px;
-	left: 6px;
-	padding: 3px 0px 3px 0px;
+	max-width: 24px;
+	height: 24px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 .icon>.basket {
 	position: relative;
-	width: 24px;
-	height: 18px;
+	width: 100%;
 	z-index: 0;
+	height: 18px;
 }
 
-.header-desktop>.group>.primary-md {
+.header>.group>.btn--md {
 	position: relative;
-	width: 112px;
-	height: 36px;
+	width: 100%;
 	z-index: 4;
+	max-width: 112px;
+	min-height: 36px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 11px;
+	padding-bottom: 12px;
+	padding-left: 18px;
+	padding-right: 18px;
 	background: #e2007a;
 	background-size: cover;
 	border-radius: 18px;
 }
 
-.claim-whatsapp>.container>.group {
+.section--whatsapp>.container>.group {
 	position: relative;
-	width: 598px;
-	height: 50px;
+	width: 100%;
 	z-index: 1;
+	max-width: 598px;
+	min-height: 50px;
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
-.claim-whatsapp>.container>.group>.primary-icon-lg {
+.section--whatsapp>.container>.group>.btn--icon-label {
 	position: relative;
-	width: 150px;
-	height: 50px;
+	width: 100%;
 	z-index: 0;
+	max-width: 150px;
+	height: 50px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 13px;
+	padding-bottom: 13px;
+	padding-left: 34px;
+	padding-right: 33px;
 	background: #e2007a;
 	background-size: cover;
 	border-radius: 25px;
 }
 
-.primary-icon-lg>.label-icon-left {
-	position: absolute;
-	width: 83px;
-	height: 24px;
+.btn--icon-label>.label-icon {
+	position: relative;
+	width: 100%;
 	z-index: 1;
-	top: 13px;
-	left: 34px;
+	max-width: 83px;
+	height: 24px;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
-.label-icon-left>.group {
+.label-icon>.group {
 	position: relative;
-	width: 83px;
-	height: 24px;
+	width: 100%;
 	z-index: 0;
+	height: 24px;
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 	transform: rotateZ(-180deg);
 }
 
-.label-icon-left>.group>.icon {
+.label-icon>.group>.icon {
 	position: relative;
-	width: 24px;
-	height: 24px;
+	width: 100%;
 	z-index: 1;
+	max-width: 24px;
+	height: 24px;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 	transform: rotateZ(-180deg);
 }
 
 .icon>.whatsapp {
 	position: relative;
-	width: 24px;
-	height: 24px;
+	width: 100%;
 	z-index: 0;
+	height: 24px;
 }
 
-.signin>.container>.form-login {
+.section--signin>.container>.form--signin {
 	position: relative;
-	width: 305px;
-	height: 348px;
+	width: 100%;
 	z-index: 1;
+	min-height: 348px;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: flex-start;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
-.form-login>.title {
+.form--signin>.form__head {
 	position: relative;
-	width: 305px;
-	height: 45px;
+	width: 100%;
 	z-index: 3;
+	height: 45px;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: flex-start;
 	margin: 0px 0px 34px 0px;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
-.form-login>.control-text {
+.form--signin>.form__control {
 	position: relative;
-	width: 305px;
+	width: 100%;
+	z-index: 2;
 	height: 69px;
-	z-index: 1;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: flex-start;
 	margin: 0px 0px 21px 0px;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
-.control-text>.group {
+.form__control>.group {
 	position: relative;
-	width: 305px;
+	width: 100%;
+	z-index: 1;
 	height: 11px;
-	z-index: 0;
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
 	margin: 0px 0px 8px 0px;
-	padding: 0px 1px 0px 1px;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 1px;
+	padding-right: 1px;
 }
 
-.control-text>.control-input-text {
+.form__control>.input--text {
 	position: relative;
-	width: 305px;
+	width: 100%;
+	z-index: 0;
 	height: 50px;
-	z-index: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 16px;
+	padding-bottom: 18px;
+	padding-left: 15px;
+	padding-right: 14px;
 	background: #ffffff;
 	background-size: cover;
 	border: 2px solid #dcdcdc;
 	border-radius: 3px;
 }
 
-.form-login>.control-text-2 {
+.form--signin>.form__control-2 {
 	position: relative;
-	width: 305px;
+	width: 100%;
+	z-index: 1;
 	height: 69px;
-	z-index: 2;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: flex-start;
 	margin: 0px 0px 60px 0px;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 
-.control-text-2>.group {
+.form__control-2>.group {
 	position: relative;
-	width: 305px;
+	width: 100%;
+	z-index: 1;
 	height: 11px;
-	z-index: 0;
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
 	margin: 0px 0px 8px 0px;
-	padding: 0px 1px 0px 1px;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-left: 1px;
+	padding-right: 1px;
 }
 
-.control-text-2>.control-input-text {
+.form__control-2>.input--text {
 	position: relative;
-	width: 305px;
+	width: 100%;
+	z-index: 0;
 	height: 50px;
-	z-index: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 16px;
+	padding-bottom: 18px;
+	padding-left: 15px;
+	padding-right: 14px;
 	background: #ffffff;
 	background-size: cover;
 	border: 2px solid #dcdcdc;
 	border-radius: 3px;
 }
 
-.form-login>.primary-lg {
+.form--signin>.btn--lg {
 	position: relative;
-	width: 150px;
-	height: 50px;
+	width: 100%;
 	z-index: 0;
+	max-width: 150px;
+	height: 50px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 19px;
+	padding-bottom: 18px;
+	padding-left: 18px;
+	padding-right: 17px;
 	background: #e2007a;
 	background-size: cover;
 	border-radius: 25px;

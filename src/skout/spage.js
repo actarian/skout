@@ -43,13 +43,13 @@ export default class SPage extends SNode {
 			}, []),
         ];
 		if (SOptions.css.export) {
+			headNodes.push(new VNode('link', {
+				rel: 'stylesheet',
+				type: 'text/css',
+				href: `${SOptions.css.folder}/styles.css`
+			}, []));
+			/*
 			Object.keys(css.styles).forEach(s => {
-				headNodes.push(new VNode('link', {
-					rel: 'stylesheet',
-					type: 'text/css',
-					href: `${SOptions.css.folder}/styles.css`
-				}, []));
-				/*
 				if (css.styles[s].trim() !== '') {
 					headNodes.push(new VNode('link', {
 						rel: 'stylesheet',
@@ -57,8 +57,8 @@ export default class SPage extends SNode {
 						href: `${SOptions.css.folder}/${s}.css`
 					}, []));
 				}
-				*/
 			});
+			*/
 			/*
 			headNodes.push(new VNode('link', {
 			    rel: 'stylesheet',
@@ -102,7 +102,6 @@ export default class SPage extends SNode {
 	}
 
 	save(folder) {
-		console.log('save');
 		SNode.folder = folder;
 		let html = this.getHtml();
 		if (SOptions.css.export) {
@@ -186,10 +185,7 @@ export default class SPage extends SNode {
 		const rect = SRect.fromObject(object);
 		let originalRect = rect;
 		let layers = object.layers || [];
-		let collectedStyles = [];
-		if (parent) {
-			collectedStyles = parent.collectedStyles;
-		}
+		let collectedStyles = parent.collectedStyles;
 		let node = {
 			name,
 			originalName,
@@ -320,10 +316,9 @@ export default class SPage extends SNode {
 		// context.document.documentData().allLayerStyles();
 		// MSDocument.currentDocument().documentData().allTextStyles();
 		// context.document.documentData().allTextStyles();
+		SUtil.collectedSymbolIds = {};
+		SUtil.collectedSymbolNames = {};
 		SSymbol.overrides = {};
-		SSymbol.collectedIds = {};
-		SSymbol.collectedNames = {};
-		// SStyle.collectedNames = {};
 		SStyle.collectedStyles = [];
 		SStyle.collectedComponentStyles = [];
 		SStyle.collectedTextStyles = [];
@@ -331,7 +326,11 @@ export default class SPage extends SNode {
 		SSvg.collectedSvgs = [];
 		const layout = SLayout.fromArtboard(object);
 		SOptions.layout = layout;
-		const page = SPage.getNode(artboard);
+		const page = SPage.getNode(artboard, {
+			rect: layout.rect,
+			originalRect: layout.rect,
+			collectedStyles: []
+		});
 		page.zIndex = 0;
 		page.parentRect = layout.rect;
 		page.originalRect = layout.rect;

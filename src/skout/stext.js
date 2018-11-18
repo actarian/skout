@@ -31,7 +31,13 @@ export default class SText extends SNode {
 		const style = SNode.prototype.getStyle.apply(this, rest);
 		const alignItems = (typeof this.sketchObject.verticalAlignment == 'function') ? ['flex-start', 'center', 'flex-end'][this.sketchObject.verticalAlignment()] : 'flex-start';
 		style.alignItems = alignItems;
-		const sharedStyle = SStyle.getSharedStyle(this.object);
+		const sharedStyle = SStyle.getSharedStyle(this.object, this.isInputPlaceholder());
+		if (sharedStyle) {
+			if (this.isInputPlaceholder()) {
+				sharedStyle.className = 'input::placeholder';
+				sharedStyle.selector = 'input::placeholder';
+			}
+		}
 		const localStyle = SStyle.parseTextStyle(this.sketchObject);
 		if (SOptions.inline) {
 			if (sharedStyle) {
@@ -61,7 +67,7 @@ export default class SText extends SNode {
 	}
 
 	render() {
-		return new VNode('div', this.attributes(), [
+		return new VNode('div', this.attributes(), this.isInputPlaceholder() ? [] : [
             new VNode('span', null, [
                 new VText(this.innerText)
             ])

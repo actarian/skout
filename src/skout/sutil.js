@@ -17,8 +17,15 @@ const GOOGLE_UUID = 'google.analytics.uuid';
 
 export default class SUtil {
 
-	static getDocument() {
-		return sketch.fromNative(context.document);
+	static getNames(text, symbolId) {
+		const groups = SUtil.toGroupNames(text);
+		const name = groups.pop();
+		const fileName = symbolId ? SUtil.getSymbolFileName(name, symbolId) : SUtil.getFileName(name);
+		const className = fileName;
+		const tagName = SUtil.getTagName(className);
+		const componentClassName = SUtil.toComponentName(className);
+		const componentTagName = `${className}-component`;
+		return { groups, name, fileName, className, tagName, componentClassName, componentTagName };
 	}
 
 	static toGroupNames(text) {
@@ -29,17 +36,67 @@ export default class SUtil {
 		return text.toLowerCase().replace(/(?!-)(?!_)(\W*)/g, '');
 	}
 
-	static getNames(text) {
-		const groups = SUtil.toGroupNames(text);
-		const name = groups.pop();
-		const fileName = SUtil.getFileName(name);
-		return { groups, name, fileName };
+	static getTagName(text) {
+		let name = text.split('--')[0];
+		name = name.indexOf('__') !== -1 ? name.split('__')[1] : name;
+		switch (name) {
+			case 'a':
+			case 'article':
+			case 'aside':
+			case 'b':
+			case 'button':
+			case 'footer':
+			case 'form':
+			case 'header':
+				// case 'input':
+			case 'label':
+			case 'legend':
+			case 'li':
+			case 'nav':
+			case 'ol':
+			case 'placeholder':
+			case 'section':
+			case 'select':
+			case 'span':
+			case 'strong':
+			case 'sup':
+			case 'textarea':
+			case 'ul':
+				break;
+			case 'btn':
+				name = 'button';
+				break;
+			default:
+				name = 'div';
+		}
+		return name;
+	}
+
+	static getSymbolFileName(text, symbolId) {
+		let name = SUtil.collectedSymbolIds[symbolId];
+		if (!name) {
+			name = SUtil.getFileName(text);
+			name += SUtil.getSymbolNameCount(name);
+			SUtil.collectedSymbolIds[symbolId] = name;
+		}
+		return name;
+	}
+
+	static getSymbolNameCount(text) {
+		let count = SUtil.collectedSymbolNames[text] || 0;
+		count++;
+		SUtil.collectedSymbolNames[text] = count;
+		return count > 1 ? '-' + count : '';
 	}
 
 	static toComponentName(text) {
-		return text.toLowerCase().replace(/(?:^\w|[A-Z]|\b\w|-+)/g, (match, index) => {
+		return text.toLowerCase().replace(/--|__/g, '-').replace(/(?:^\w|[A-Z]|\b\w|-+)/g, (match, index) => {
 			return match === '-' ? '' : match.toUpperCase();
 		}) + 'Component';
+	}
+
+	static getDocument() {
+		return sketch.fromNative(context.document);
 	}
 
 	static toHash(text) {
@@ -230,3 +287,6 @@ export default class SUtil {
 	}
 
 }
+
+SUtil.collectedSymbolIds = {};
+SUtil.collectedSymbolNames = {};

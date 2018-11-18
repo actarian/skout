@@ -21,10 +21,18 @@ export default class SImage extends SNode {
 	}
 
 	render() {
+		const image = this.sketchObject.image();
+		const hasAlpha = SImage.hasAlpha(image);
+		const extension = hasAlpha ? `png` : `jpg`;
 		SImage.collectedImages.push({
-			name: `${SOptions.image.folder}/${this.fileName}.jpg`,
+			name: `${SOptions.image.folder}/${this.fileName}.${extension}`,
 			save: (folder, filePath) => {
-				return this.saveToJpg(this.sketchObject.image(), SOptions.folder, SOptions.image.folder, `${this.fileName}.jpg`);
+				const image = this.sketchObject.image();
+				if (hasAlpha) {
+					return SImage.saveToPng(image, SOptions.folder, SOptions.image.folder, `${this.fileName}.${extension}`);
+				} else {
+					return SImage.saveToJpg(image, SOptions.folder, SOptions.image.folder, `${this.fileName}.${extension}`);
+				}
 			},
 		});
 		return new VNode('div', this.attributes(), [
@@ -121,6 +129,29 @@ export default class SImage extends SNode {
 			imageData.writeToFile(folder + '/' + filepath + '/' + filename);
 			// console.log('saveJpg.writeToFile', folder, filepath, filename);
 			// return NSString.stringWithFormat('data:%@;base64,%@', 'image/jpeg', imageData.base64EncodedStringWithOptions(0));
+		}
+	}
+
+	static saveToPng(image, folder, filepath, filename) {
+		if (image instanceof MSImageData) {
+			const nsImage = image.image();
+			const cgRef = nsImage.CGImageForProposedRect_context_hints(null, nil, nil);
+			const newRep = NSBitmapImageRep.alloc().initWithCGImage(cgRef);
+			newRep.setSize(nsImage.size()); // get original size
+			const imageData = newRep.representationUsingType_properties(NSPNGFileType, nil);
+			SUtil.addFolder(folder + '/' + filepath);
+			imageData.writeToFile(folder + '/' + filepath + '/' + filename);
+		}
+	}
+
+	static hasAlpha(image) {
+		if (image instanceof MSImageData) {
+			const nsImage = image.image();
+			const alpha = CGImageGetAlphaInfo(nsImage.CGImage());
+			return (alpha == kCGImageAlphaFirst ||
+				alpha == kCGImageAlphaLast ||
+				alpha == kCGImageAlphaPremultipliedFirst ||
+				alpha == kCGImageAlphaPremultipliedLast);
 		}
 	}
 

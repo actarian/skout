@@ -25,7 +25,7 @@ img {
 }
 
 .scomponent {
-	display: block;
+	display: flex;
 }
 
 .stext {
@@ -34,4 +34,35 @@ img {
 
 .stext>span {
 	width: 100%;
+}
+
+button {
+	margin: 0;
+	padding: 0;
+	overflow: visible;
+	outline: none;
+	border: none;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	line-height: normal;
+	text-align: inherit;
+	-webkit-font-smoothing: inherit;
+	-moz-osx-font-smoothing: inherit;
+	-webkit-appearance: none;
+	cursor: pointer;
+	transition: filter ease-in-out 300ms;
+}
+
+button:hover {
+	filter: brightness(90%);
+}
+
+button:active {
+	filter: brightness(200%);
+}
+
+button::-moz-focus-inner {
+	padding: 0;
+	border: 0;
 }

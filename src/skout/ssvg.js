@@ -9,6 +9,7 @@
  */
 
 import sketch from 'sketch';
+import svg from 'virtual-dom/virtual-hyperscript/svg';
 import VNode from 'virtual-dom/vnode/vnode';
 import SNode from './snode';
 import SOptions from './soptions';
@@ -45,12 +46,14 @@ export default class SSvg extends SNode {
 			}
 			*/
 			const attributes = this.attributes();
+			attributes.width = `100%`;
+			attributes.viewBox = `0 0 ${this.rect.width} ${this.rect.height}`;
 			if (SOptions.svg.sprite) {
-				return new VNode('svg', attributes, [
-                    new VNode('use', {
-						'href': `#${this.fileName}`
-					}, [])
-                ]);
+				return svg('svg', attributes,
+					svg('use', {
+						'xmlns:xlink': 'http://www.w3.org/1999/xlink',
+						'xlink:href': `#${this.fileName}`
+					}));
 			} else {
 				attributes.src = SSvg.filePath(this.fileName);
 				return new VNode('img', attributes, []);
@@ -101,8 +104,8 @@ export default class SSvg extends SNode {
 		const allowedClasses = ['MSLayerGroup', 'MSShapeGroup', 'MSShapePathLayer', 'MSRectangleShape', 'MSOvalShape'];
 		let flag = true;
 		object.layers.forEach(x => {
-			const className = String(x.sketchObject.className());
-			if (allowedClasses.indexOf(className) === -1) {
+			const type = String(x.sketchObject.className());
+			if (allowedClasses.indexOf(type) === -1) {
 				flag = false;
 			}
 		});
@@ -203,7 +206,7 @@ export default class SSvg extends SNode {
 	static pathRebound(path) {
 		const commands = SSvg.pathToCommands(path);
 		const bounds = SSvg.commandsToBounds(commands);
-		console.log('pathRebound', bounds);
+		// console.log('pathRebound', bounds);
 		return path;
 	}
 

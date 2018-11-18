@@ -3,7 +3,7 @@
 skout! typography
 -------------- */
 
-.search-title {
+.hero__title {
 	color: #FFFFFF;
 	font-size: 32px;
 	font-family: 'KatahdinRound-Regular';
@@ -12,7 +12,16 @@ skout! typography
 	line-height: 1;
 }
 
-.btn-primary-label {
+.search__placeholder {
+	color: #A3A6A8;
+	font-size: 19px;
+	font-family: 'GothamHTF-Book';
+	letter-spacing: 0;
+	text-align: left;
+	line-height: 1;
+}
+
+.btn__label {
 	color: #FFFFFF;
 	font-size: 13px;
 	font-family: 'GothamHTF-Medium';
@@ -22,16 +31,7 @@ skout! typography
 	text-transform: uppercase;
 }
 
-.search-input-placeholder {
-	color: #A3A6A8;
-	font-size: 19px;
-	font-family: 'GothamHTF-Book';
-	letter-spacing: 0;
-	text-align: left;
-	line-height: 1;
-}
-
-.header-menu {
+.nav--item {
 	color: #FFFFFF;
 	font-size: 16px;
 	font-family: 'GothamHTF-Book';
@@ -40,7 +40,7 @@ skout! typography
 	line-height: 1;
 }
 
-.form-title-sup {
+.head__sup {
 	color: #A3A6A8;
 	font-size: 16px;
 	font-family: 'KatahdinRound-Regular';
@@ -50,7 +50,7 @@ skout! typography
 	text-transform: uppercase;
 }
 
-.form-title-text {
+.head__title {
 	color: #000000;
 	font-size: 26px;
 	font-family: 'KatahdinRound-Regular';
@@ -60,7 +60,7 @@ skout! typography
 	text-transform: uppercase;
 }
 
-.form-control-input-label {
+.control__label {
 	color: #000000;
 	font-size: 11px;
 	font-family: 'KatahdinRound-Regular';
@@ -70,7 +70,7 @@ skout! typography
 	text-transform: uppercase;
 }
 
-.form-control-required {
+.control__required {
 	color: #E2007A;
 	font-size: 10px;
 	font-family: 'KatahdinRound-Regular';
@@ -80,7 +80,7 @@ skout! typography
 	text-transform: uppercase;
 }
 
-.form-control-input-placeholder {
+.input__placeholder {
 	color: #7F7F7F;
 	font-size: 16px;
 	font-family: 'GothamHTF-Book';

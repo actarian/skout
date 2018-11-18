@@ -36,7 +36,7 @@ export default class SStyle {
 				// console.log(this.className, sharedStyle.name());
 				result = {
 					className: className,
-					selector: '.' + className,
+					selector: ('.' + className),
 					style: SStyle.parseTextStyle(sharedStyle),
 				};
 			}
@@ -265,8 +265,15 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
 			const fillImage = fill.image();
 			const fillGradient = SStyle.serializeStyle(node.styleText)['background-image']; // fill.gradient();
 			if (fillImage) {
-				background = `url('../${SOptions.image.folder}/${node.fileName}.jpg') no-repeat center`;
-				SImage.saveToJpg(fillImage, SOptions.folder, SOptions.image.folder, `${node.fileName}.jpg`);
+				const hasAlpha = SImage.hasAlpha(fillImage);
+				// console.log('hasAlpha', hasAlpha);
+				const extension = hasAlpha ? `png` : `jpg`;
+				background = `url('../${SOptions.image.folder}/${node.fileName}.${extension}') no-repeat center`;
+				if (hasAlpha) {
+					SImage.saveToPng(fillImage, SOptions.folder, SOptions.image.folder, `${node.fileName}.${extension}`);
+				} else {
+					SImage.saveToJpg(fillImage, SOptions.folder, SOptions.image.folder, `${node.fileName}.${extension}`);
+				}
 				/* else {
 				    backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
 				}*/
@@ -418,16 +425,7 @@ ${props} }`;
 	static getCss() {
 		const layout = SOptions.layout;
 		const base = SUtil.beautifyCss(SUtil.readResource('base.css'));
-		const grid = SUtil.beautifyCss(`
-        .container {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            max-width: ${layout.totalWidth + layout.gutterWidth * 2}px;
-            margin: 0 auto;
-            padding: 0 ${layout.gutterWidth};
-        }
-        `);
+		const grid = SStyle.getGrid();
 		const typography = SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedTextStyles));
 		const components = SOptions.component.export ? null : SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedComponentStyles));
 		const page = SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedStyles));
@@ -456,6 +454,66 @@ skout! ${s}
 			css.style += styles[s];
 		});
 		return css;
+	}
+
+	static getCols() {
+		let grid = ``;
+		const layout = SOptions.layout;
+		if (layout.numberOfColumns > 1) {
+			const row = `
+		.row {
+			display: flex;
+			flex-wrap: wrap;
+			margin-right: ${(layout.gutterWidth / -2).toFixed(2)}px;
+			margin-left: ${(layout.gutterWidth / -2).toFixed(2)}px;
+		}
+		`;
+			const cols = new Array(layout.numberOfColumns).fill(0).map((x, i) => {
+				return `.col-${i + 1} {
+				position: relative;
+				width: 100%;
+				padding-right: ${(layout.gutterWidth / 2).toFixed(2)}px;
+				padding-left: ${(layout.gutterWidth / 2).toFixed(2)}px;
+				flex: 0 0 ${(100 / layout.numberOfColumns * (i + 1)).toFixed(3)}%;
+				max-width: ${(100 / layout.numberOfColumns * (i + 1)).toFixed(3)}%;
+			}
+
+			.offset-${i + 1} {
+				margin-left: ${(100 / layout.numberOfColumns * (i + 1)).toFixed(3)}%;
+			}
+
+			@media (max-width: ${Math.floor(layout.totalWidth * 0.5)}px) {
+				.col-${i + 1} {
+					flex: 0 0 100%;
+					max-width: 100%;
+				}
+
+				.offset-${i + 1} {
+					margin-left: 0;
+				}
+			}`;
+			}).join('\n');
+			grid += row + cols;
+		}
+		return grid;
+	}
+
+	static getGrid() {
+		const layout = SOptions.layout;
+		const grid = SUtil.beautifyCss(`
+        .container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-width: ${layout.totalWidth + layout.gutterWidth}px;
+            margin-right: auto;
+            margin-left: auto;
+			padding-right: ${(layout.gutterWidth / 2).toFixed(2)}px;
+            padding-left: ${(layout.gutterWidth / 2).toFixed(2)}px;
+		}
+		${SStyle.getCols()}
+		`);
+		return grid;
 	}
 
 	// UNUSED !!!

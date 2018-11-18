@@ -7,7 +7,304 @@ skout! grid
 	display: flex;
 	justify-content: center;
 	width: 100%;
-	max-width: 1320px;
-	margin: 0 auto;
-	padding: 0 20;
+	max-width: 1300px;
+	margin-right: auto;
+	margin-left: auto;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+}
+
+.row {
+	display: flex;
+	flex-wrap: wrap;
+	margin-right: -10.00px;
+	margin-left: -10.00px;
+}
+
+.col-1 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 8.333%;
+	max-width: 8.333%;
+}
+
+.offset-1 {
+	margin-left: 8.333%;
+}
+
+@media (max-width: 640px) {
+	.col-1 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-1 {
+		margin-left: 0;
+	}
+}
+
+.col-2 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 16.667%;
+	max-width: 16.667%;
+}
+
+.offset-2 {
+	margin-left: 16.667%;
+}
+
+@media (max-width: 640px) {
+	.col-2 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-2 {
+		margin-left: 0;
+	}
+}
+
+.col-3 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 25.000%;
+	max-width: 25.000%;
+}
+
+.offset-3 {
+	margin-left: 25.000%;
+}
+
+@media (max-width: 640px) {
+	.col-3 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-3 {
+		margin-left: 0;
+	}
+}
+
+.col-4 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 33.333%;
+	max-width: 33.333%;
+}
+
+.offset-4 {
+	margin-left: 33.333%;
+}
+
+@media (max-width: 640px) {
+	.col-4 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-4 {
+		margin-left: 0;
+	}
+}
+
+.col-5 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 41.667%;
+	max-width: 41.667%;
+}
+
+.offset-5 {
+	margin-left: 41.667%;
+}
+
+@media (max-width: 640px) {
+	.col-5 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-5 {
+		margin-left: 0;
+	}
+}
+
+.col-6 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 50.000%;
+	max-width: 50.000%;
+}
+
+.offset-6 {
+	margin-left: 50.000%;
+}
+
+@media (max-width: 640px) {
+	.col-6 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-6 {
+		margin-left: 0;
+	}
+}
+
+.col-7 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 58.333%;
+	max-width: 58.333%;
+}
+
+.offset-7 {
+	margin-left: 58.333%;
+}
+
+@media (max-width: 640px) {
+	.col-7 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-7 {
+		margin-left: 0;
+	}
+}
+
+.col-8 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 66.667%;
+	max-width: 66.667%;
+}
+
+.offset-8 {
+	margin-left: 66.667%;
+}
+
+@media (max-width: 640px) {
+	.col-8 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-8 {
+		margin-left: 0;
+	}
+}
+
+.col-9 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 75.000%;
+	max-width: 75.000%;
+}
+
+.offset-9 {
+	margin-left: 75.000%;
+}
+
+@media (max-width: 640px) {
+	.col-9 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-9 {
+		margin-left: 0;
+	}
+}
+
+.col-10 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 83.333%;
+	max-width: 83.333%;
+}
+
+.offset-10 {
+	margin-left: 83.333%;
+}
+
+@media (max-width: 640px) {
+	.col-10 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-10 {
+		margin-left: 0;
+	}
+}
+
+.col-11 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 91.667%;
+	max-width: 91.667%;
+}
+
+.offset-11 {
+	margin-left: 91.667%;
+}
+
+@media (max-width: 640px) {
+	.col-11 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-11 {
+		margin-left: 0;
+	}
+}
+
+.col-12 {
+	position: relative;
+	width: 100%;
+	padding-right: 10.00px;
+	padding-left: 10.00px;
+	flex: 0 0 100.000%;
+	max-width: 100.000%;
+}
+
+.offset-12 {
+	margin-left: 100.000%;
+}
+
+@media (max-width: 640px) {
+	.col-12 {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
+
+	.offset-12 {
+		margin-left: 0;
+	}
 }

@@ -17,6 +17,7 @@ import SUtil from './sutil';
 
 export default class SSymbol extends SNode {
 
+	/*
 	static getNames(text, id) {
 		const groups = SUtil.toGroupNames(text);
 		const name = groups.pop();
@@ -35,6 +36,7 @@ export default class SSymbol extends SNode {
 		SSymbol.collectedNames[text] = count;
 		return count > 1 ? '-' + count : '';
 	}
+	*/
 
 	static save(folder, object) {
 		const path = `${SOptions.component.folder}/${object.pathName}`;
@@ -65,7 +67,7 @@ ${html}\`;
 
 import Component from '../component.js';
 
-class ${object.componentName} extends Component {
+class ${object.componentClassName} extends Component {
 
 ${getters}
 
@@ -75,7 +77,7 @@ ${getters}
 
 }
 
-window.customElements.define('${object.tagName}', ${object.componentName});
+window.customElements.define('${object.componentTagName}', ${object.componentClassName});
 `);
 		// ${JSON.stringify(Object.keys(object.overrides)).replace(/"/gm, `'`)};
 		SUtil.saveTextFile(js, `${folder}/${path}`, `${filePath}.js`);
@@ -83,19 +85,28 @@ window.customElements.define('${object.tagName}', ${object.componentName});
 
 	constructor(node) {
 		super(node);
+		/*
 		this.symbolId = node.symbolId;
 		const names = SSymbol.getNames(node.name, node.symbolId);
+		this.name = names.name;
+		this.fileName = names.fileName;
+		this.className = names.className;
 		this.tagName = names.fileName;
+		this.componentClassName = names.componentClassName;
+		this.componentTagName = names.componentTagName;
+		*/
 		this.originalSymbolId = node.originalSymbolId;
-		const originalNames = SSymbol.getNames(node.originalName, node.originalSymbolId);
-		this.originalName = originalNames.name;
-		this.originalTagName = originalNames.fileName;
-		this.fileName = originalNames.fileName;
+		const names = SUtil.getNames(node.originalName, node.originalSymbolId);
+		this.originalName = names.name;
+		this.originalFileName = names.fileName;
+		this.originalClassName = names.className;
+		this.originalTagName = names.fileName;
+		this.originalComponentClassName = names.componentClassName;
+		this.originalComponentTagName = names.componentTagName;
+		this.fileName = names.fileName; // ???
 		if (this.parentSymbol) {
 			const overrides = this.parentSymbol.overrides;
-			overrides[this.originalTagName] = this.tagName;
-			// console.log(overrides);
-			// console.log(this.tagName, this.originalTagName);
+			overrides[this.originalClassName] = this.className;
 		}
 	}
 
@@ -117,25 +128,23 @@ window.customElements.define('${object.tagName}', ${object.componentName});
 				}, []);
 				html = toHTML(styles) + html;
 			}
-			const tagName = `${this.tagName}-component`;
-			const collected = SSymbol.collectedSymbols.find(x => x.tagName == tagName);
+			const collected = SSymbol.collectedSymbols.find(x => x.componentTagName == this.componentTagName);
 			if (!collected) {
 				SSymbol.collectedSymbols.push({
-					pathName: this.tagName,
-					componentName: SUtil.toComponentName(this.tagName),
-					tagName: tagName,
+					pathName: this.className,
+					componentClassName: this.componentClassName, // SUtil.toComponentName(this.className),
+					componentTagName: this.componentTagName,
 					// overrides: this.overrides,
 					html: html,
 					css: SStyle.stylesToCss(this.collectedStyles),
 				});
 			}
-			this.overrides.scomponent = this.tagName;
-			this.parentSymbol.overrides[this.className] = this.overrides;
+			this.overrides.scomponent = this.className;
+			this.parentSymbol.overrides[this.uniqueClassName] = this.overrides;
 			// console.log(this.overrides);
 			const attributes = this.attributes();
 			attributes.data = JSON.stringify(this.overrides);
-			const componentName = `${this.originalTagName}-component`;
-			return new VNode(componentName, attributes, []);
+			return new VNode(this.originalComponentTagName, attributes, []);
 			// this.classes.push(`outlet-${this.originalTagName}`);
 			/*
 			console.log(this.name, this.originalName, this.overrides);
@@ -148,6 +157,4 @@ window.customElements.define('${object.tagName}', ${object.componentName});
 }
 
 SSymbol.overrides = {};
-SSymbol.collectedIds = {};
-SSymbol.collectedNames = {};
 SSymbol.collectedSymbols = [];
