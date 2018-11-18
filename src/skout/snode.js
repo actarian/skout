@@ -279,22 +279,23 @@ export default class SNode {
 		padding.bottom = rect.height - innerRect.bottom;
 		padding.left = innerRect.left;
 		// nodes = this.nodes;
+		const renderableRect = this.containerRect || this.rect;
 		if (this.isHorizontal) {
-			nodes.sort((a, b) => a.rect.left - b.rect.left).filter(x => x.isRenderable()).forEach((b, i) => {
+			nodes.sort((a, b) => a.rect.left - b.rect.left).filter(x => x.isRenderable(renderableRect)).forEach((b, i) => {
 				if (i > 0) {
 					const a = nodes[i - 1];
 					a.margin.right = b.rect.left - a.rect.right;
 				}
 			});
-			this.classes.push('h');
+			// this.classes.push('h');
 		} else if (this.isVertical) {
-			nodes.sort((a, b) => a.rect.top - b.rect.top).filter(x => x.isRenderable()).forEach((b, i) => {
+			nodes.sort((a, b) => a.rect.top - b.rect.top).filter(x => x.isRenderable(renderableRect)).forEach((b, i) => {
 				if (i > 0) {
 					const a = nodes[i - 1];
 					a.margin.bottom = b.rect.top - a.rect.bottom;
 				}
 			});
-			this.classes.push('v');
+			// this.classes.push('v');
 		} else {
 			nodes.sort((a, b) => (a.rect.top * 10000 + a.rect.left) - (b.rect.top * 10000 + b.rect.left));
 		}
@@ -395,10 +396,10 @@ export default class SNode {
 
 			if (this.isVertical) {
 				style.display = 'block';
+				style.flexDirection = 'column';
 				/*
 				// !!!
 				style.display = 'flex';
-				style.flexDirection = 'column';
 				style.justifyContent = 'flex-start';
 				style.alignItems = 'flex-start';
 				*/

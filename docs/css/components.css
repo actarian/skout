@@ -202,6 +202,7 @@ skout! components
 	z-index: 2;
 	min-height: 129px;
 	display: block;
+	flex-direction: column;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 0;
@@ -229,24 +230,9 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 10px;
 	padding-right: 20px;
-}
-
-.control--search>.input {
-	position: absolute;
-	width: 100%;
-	z-index: 0;
-	top: 0;
-	left: 0;
-	height: 72px;
-	max-width: 847px;
-	padding-top: 25px;
-	padding-right: 184px;
-	padding-bottom: 28px;
-	padding-left: 60px;
 	background: #ffffff;
 	background-size: cover;
 	border-radius: 3px;
-	display: inline-block;
 }
 
 .control--search>.btn--ghost {
@@ -543,6 +529,7 @@ skout! components
 	z-index: 1;
 	min-height: 348px;
 	display: block;
+	flex-direction: column;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 0;
@@ -559,6 +546,7 @@ skout! components
 	z-index: 3;
 	height: 45px;
 	display: block;
+	flex-direction: column;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 34px;
@@ -575,6 +563,7 @@ skout! components
 	z-index: 2;
 	height: 69px;
 	display: block;
+	flex-direction: column;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 21px;
@@ -617,29 +606,10 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 15px;
 	padding-right: 14px;
-}
-
-.control--text>.input {
-	position: absolute;
-	width: 100%;
-	z-index: 0;
-	top: 0;
-	left: 0;
-	height: 50px;
-	max-width: 413px;
-	margin-top: 0;
-	margin-right: 0;
-	margin-bottom: 0;
-	margin-left: 0;
-	padding-top: 16px;
-	padding-right: 14px;
-	padding-bottom: 18px;
-	padding-left: 15px;
 	background: #ffffff;
 	background-size: cover;
 	border: 2px solid #dcdcdc;
 	border-radius: 3px;
-	display: inline-block;
 }
 
 .form--signin>.form__control-2 {
@@ -648,6 +618,7 @@ skout! components
 	z-index: 1;
 	height: 69px;
 	display: block;
+	flex-direction: column;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 60px;
@@ -690,29 +661,10 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 15px;
 	padding-right: 14px;
-}
-
-.control--text>.input {
-	position: absolute;
-	width: 100%;
-	z-index: 0;
-	top: 0;
-	left: 0;
-	height: 50px;
-	max-width: 413px;
-	margin-top: 0;
-	margin-right: 0;
-	margin-bottom: 0;
-	margin-left: 0;
-	padding-top: 16px;
-	padding-right: 14px;
-	padding-bottom: 18px;
-	padding-left: 15px;
 	background: #ffffff;
 	background-size: cover;
 	border: 2px solid #dcdcdc;
 	border-radius: 3px;
-	display: inline-block;
 }
 
 .form--signin>.btn--lg {

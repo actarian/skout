@@ -12,7 +12,7 @@ skout! typography
 	line-height: 1;
 }
 
-.input {
+.search__placeholder {
 	color: #A3A6A8;
 	font-size: 19px;
 	font-family: 'GothamHTF-Book';
@@ -78,4 +78,13 @@ skout! typography
 	text-align: right;
 	line-height: 1;
 	text-transform: uppercase;
+}
+
+.input__placeholder {
+	color: #7F7F7F;
+	font-size: 16px;
+	font-family: 'GothamHTF-Book';
+	letter-spacing: 0;
+	text-align: left;
+	line-height: 1;
 }
