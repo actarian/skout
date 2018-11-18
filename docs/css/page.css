@@ -9,6 +9,10 @@ skout! page
 	z-index: 0;
 	max-width: 1440px;
 	min-height: 1440px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 2px;
 	padding-left: 0;
@@ -25,6 +29,10 @@ skout! page
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-left: 0;
 	padding-right: 0;
 	background: url('../img/background.jpg') no-repeat center;
@@ -40,6 +48,10 @@ skout! page
 	left: 0;
 	height: 110px;
 	max-width: 1440px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 33px;
 	padding-bottom: 14px;
 	padding-left: 79px;
@@ -56,6 +68,10 @@ skout! page
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 29px;
 	padding-bottom: 31px;
 	padding-left: 0;
@@ -75,6 +91,10 @@ skout! page
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 98px;
 	padding-bottom: 274px;
 	padding-left: 0;

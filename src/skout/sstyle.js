@@ -10,7 +10,7 @@
 
 import SImage from './simage';
 import SOptions from './soptions';
-import SUtil from './sutil';
+import { SUtil, toPxx } from './sutil';
 
 export default class SStyle {
 
@@ -69,9 +69,9 @@ export default class SStyle {
 		if (objectStyle.hasTextStyle()) {
 			const attributes = objectStyle.primitiveTextStyle().attributes();
 			const color = attributes.MSAttributedStringColorAttribute.hexValue();
-			const fontSize = attributes.NSFont.fontDescriptor().objectForKey(NSFontSizeAttribute) + 'px';
+			const fontSize = toPxx(attributes.NSFont.fontDescriptor().objectForKey(NSFontSizeAttribute));
 			const fontFamily = attributes.NSFont.fontDescriptor().objectForKey(NSFontNameAttribute);
-			const letterSpacing = attributes.NSKern + 'px';
+			const letterSpacing = toPxx(attributes.NSKern);
 			const textTransform = attributes.MSAttributedStringTextTransformAttribute ? ['none', 'uppercase', 'lowercase'][attributes.MSAttributedStringTextTransformAttribute] : 'none';
 			const underline = attributes.NSUnderline === 1 ? 'underline' : null;
 			const lineThrough = attributes.NSStrikethrough === 1 ? 'line-through' : null;
@@ -293,7 +293,7 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
 		}
 		let borderRadius = 'none';
 		if (node.type === 'MSRectangleShape') {
-			borderRadius = sketchObject.cornerRadiusFloat() + 'px';
+			borderRadius = toPxx(sketchObject.cornerRadiusFloat());
 		} else if (node.type === 'MSOvalShape') {
 			borderRadius = '50%';
 		}

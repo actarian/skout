@@ -15,7 +15,7 @@ import SOptions from './soptions';
 const GOOGLE_UA = 'UA-128159763-1';
 const GOOGLE_UUID = 'google.analytics.uuid';
 
-export default class SUtil {
+export class SUtil {
 
 	static getNames(text, symbolId) {
 		const groups = SUtil.toGroupNames(text);
@@ -238,7 +238,7 @@ export default class SUtil {
 			status: status,
 			task: task,
 		};
-		if (status == 0) {
+		if (status === 0) {
 			if (wait && typeof callback == 'function') {
 				callback(response);
 			}
@@ -287,6 +287,16 @@ export default class SUtil {
 	}
 
 }
+
+export function toPx(value) {
+	return value !== 0 ? Math.round(value) + 'px' : '0';
+}
+
+export function toPxx(value) {
+	return value > 0 ? Math.round(value) + 'px' : '0';
+}
+
+export default SUtil;
 
 SUtil.collectedSymbolIds = {};
 SUtil.collectedSymbolNames = {};

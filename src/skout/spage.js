@@ -183,7 +183,7 @@ export default class SPage extends SNode {
 		const type = String(object.sketchObject.className());
 		const data = parentData[object.id];
 		const rect = SRect.fromObject(object);
-		let originalRect = rect;
+		let originalRect = new SRect(rect);
 		let layers = object.layers || [];
 		let collectedStyles = parent.collectedStyles;
 		let node = {

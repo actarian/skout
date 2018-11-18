@@ -12,7 +12,7 @@ import VNode from 'virtual-dom/vnode/vnode';
 import SOptions from './soptions';
 import SRect from './srect';
 import SStyle from './sstyle';
-import SUtil from './sutil';
+import { SUtil, toPx, toPxx } from './sutil';
 
 const ResizingConstraint = Object.freeze({
 	None: 63,
@@ -404,6 +404,7 @@ export default class SNode {
 			style = {
 				// display: 'block',
 				position: this.absolute ? 'absolute' : 'relative',
+				// minWidth: this.rect.width + 'px',
 				width: '100%',
 				// width: this.constraint.width ? rect.width + 'px' : (rect.width / parentRect.width * 100) + '%',
 				// height: this.constraint.height ? rect.height + 'px' : (rect.height / parentRect.height * 100) + '%',
@@ -420,10 +421,10 @@ export default class SNode {
 			*/
 
 			if (this.absolute) {
-				style.top = rect.top + 'px';
-				style.left = rect.left + 'px';
-				style.height = rect.height + 'px';
-				style.maxWidth = rect.width + 'px';
+				style.top = toPx(rect.top);
+				style.left = toPx(rect.left);
+				style.height = toPxx(rect.height);
+				style.maxWidth = toPxx(rect.width);
 
 			} else if (parentRect && parentRect.width >= layout.totalWidth) {
 				const col = layout.cols.reduce((x, col, i) => {
@@ -431,19 +432,19 @@ export default class SNode {
 				}, 0);
 				if (col > 0 && col < layout.numberOfColumns + 1) {
 					this.classes.push(`col-${col}`);
-					style.minHeight = `${rect.height}px`;
+					style.minHeight = toPxx(rect.height);
 				} else {
-					style.maxWidth = rect.width + 'px';
+					style.maxWidth = toPxx(rect.width);
 					if (this.type !== 'MSTextLayer') {
-						style.minHeight = `${rect.height}px`;
+						style.minHeight = toPxx(rect.height);
 					}
 				}
 			} else {
 				if (rect.width < parentRect.width) {
-					style.maxWidth = rect.width + 'px';
+					style.maxWidth = toPxx(rect.width);
 				}
 				if (this.type !== 'MSTextLayer') {
-					style.height = `${rect.height}px`;
+					style.height = toPxx(rect.height);
 				}
 			}
 
@@ -462,19 +463,22 @@ export default class SNode {
 			}
 
 			if (!this.parent.isHorizontal) {
-				style.margin = `${margin.top}px ${margin.right}px ${margin.bottom}px ${margin.left}px`;
+				style.marginTop = toPx(margin.top);
+				style.marginRight = toPx(margin.right);
+				style.marginBottom = toPx(margin.bottom);
+				style.marginLeft = toPx(margin.left);
 			}
 
 			if (this.nodes.length) {
 				if (padding.top < 120 || Math.abs(padding.bottom - padding.top) > 1) {
-					style.paddingTop = `${padding.top}px`;
-					style.paddingBottom = `${padding.bottom}px`;
+					style.paddingTop = toPxx(padding.top);
+					style.paddingBottom = toPxx(padding.bottom);
 				} else {
 					style.alignItems = 'center';
 				}
 				if (padding.left < 120 || Math.abs(padding.right - padding.left) > 1) {
-					style.paddingLeft = `${padding.left}px`;
-					style.paddingRight = `${padding.right}px`;
+					style.paddingLeft = toPxx(padding.left);
+					style.paddingRight = toPxx(padding.right);
 				} else {
 					style.justifyContent = 'center';
 				}
@@ -489,10 +493,10 @@ export default class SNode {
 		} else if (SOptions.html.exact) {
 			style = {
 				position: 'absolute',
-				top: rect.top + 'px',
-				left: rect.left + 'px',
-				width: rect.width + 'px',
-				height: rect.height + 'px',
+				top: toPx(rect.top),
+				left: toPx(rect.left),
+				width: toPxx(rect.width),
+				height: toPxx(rect.height),
 				zIndex: this.zIndex,
 			};
 			// style.width = (rect.width / parentRect.width * 100) + '%';
@@ -507,15 +511,15 @@ export default class SNode {
 			// absolute positioning
 			style = {
 				position: 'absolute',
-				top: this.constraint.top ? rect.top + 'px' : (rect.top / parentRect.height * 100).toFixed(2) + '%',
-				left: this.constraint.left ? rect.left + 'px' : (rect.left / parentRect.width * 100).toFixed(2) + '%',
+				top: this.constraint.top ? toPx(rect.top) : (rect.top / parentRect.height * 100).toFixed(2) + '%',
+				left: this.constraint.left ? toPx(rect.left) : (rect.left / parentRect.width * 100).toFixed(2) + '%',
 				zIndex: this.zIndex,
 			};
 			if (this.constraint.right) {
-				style.right = (parentRect.width - rect.right) + 'px';
+				style.right = toPx(parentRect.width - rect.right);
 			}
 			if (this.constraint.bottom) {
-				style.bottom = (parentRect.height - rect.bottom) + 'px';
+				style.bottom = toPx(parentRect.height - rect.bottom);
 			}
 			/*
 			if (!this.constraint.left && !this.constraint.right) {
@@ -526,7 +530,7 @@ export default class SNode {
 			if (this.constraint.left && this.constraint.right) {
 				style.width = 'auto';
 			} else {
-				style.width = this.constraint.width ? rect.width + 'px' : (rect.width / parentRect.width * 100).toFixed(2) + '%';
+				style.width = this.constraint.width ? toPxx(rect.width) : (rect.width / parentRect.width * 100).toFixed(2) + '%';
 			}
 			/*
 			if (!this.constraint.top && !this.constraint.bottom) {
@@ -537,7 +541,7 @@ export default class SNode {
 			if (this.constraint.top && this.constraint.bottom) {
 				style.width = 'auto';
 			} else {
-				style.height = this.constraint.height ? rect.height + 'px' : (rect.height / parentRect.height * 100).toFixed(2) + '%';
+				style.height = this.constraint.height ? toPxx(rect.height) : (rect.height / parentRect.height * 100).toFixed(2) + '%';
 			}
 		}
 		if (this.sketchObject.rotation()) {

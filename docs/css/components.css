@@ -7,7 +7,10 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	margin: 0px 0px 25px 0px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 25px;
+	margin-left: 0;
 	align-items: flex-start;
 }
 
@@ -79,8 +82,11 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 304px;
-	margin: 0px 0px 3px 0px;
+	max-width: 412px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 3px;
+	margin-left: 0;
 	align-items: flex-start;
 }
 
@@ -88,7 +94,11 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	max-width: 304px;
+	max-width: 412px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	align-items: flex-start;
 }
 
@@ -96,7 +106,7 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 195px;
+	max-width: 265px;
 	align-items: flex-start;
 }
 
@@ -112,7 +122,7 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 276px;
+	max-width: 384px;
 	align-items: flex-start;
 }
 
@@ -120,7 +130,7 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 195px;
+	max-width: 265px;
 	align-items: flex-start;
 }
 
@@ -136,7 +146,7 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 276px;
+	max-width: 384px;
 	align-items: flex-start;
 }
 
@@ -186,6 +196,10 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 18px;
 	padding-bottom: 18px;
 	padding-left: 10px;
@@ -213,6 +227,10 @@ skout! components
 	z-index: 0;
 	max-width: 24px;
 	height: 24px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 3px;
@@ -225,6 +243,10 @@ skout! components
 	z-index: 0;
 	max-width: 19px;
 	height: 24px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 }
 
 .control--search>.btn--ghost-2 {
@@ -245,6 +267,10 @@ skout! components
 	z-index: 0;
 	max-width: 24px;
 	height: 24px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -256,6 +282,10 @@ skout! components
 	width: 100%;
 	z-index: 0;
 	height: 24px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 }
 
 .control--search>.btn--md {
@@ -286,6 +316,10 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -298,7 +332,7 @@ skout! components
 	z-index: 2;
 	max-width: 260px;
 	min-height: 63px;
-	padding-top: -1px;
+	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
 	padding-right: 0;
@@ -309,6 +343,10 @@ skout! components
 	width: 100%;
 	z-index: 0;
 	height: 64px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 }
 
 .header>.group>.btn--icon {
@@ -347,6 +385,10 @@ skout! components
 	width: 100%;
 	z-index: 0;
 	height: 18px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 }
 
 .header>.group>.btn--md {
@@ -424,6 +466,10 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -449,6 +495,10 @@ skout! components
 	width: 100%;
 	z-index: 0;
 	height: 24px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 }
 
 .section--signin>.container>.form--signin {
@@ -475,7 +525,10 @@ skout! components
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: flex-start;
-	margin: 0px 0px 34px 0px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 34px;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -491,7 +544,10 @@ skout! components
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: flex-start;
-	margin: 0px 0px 21px 0px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 21px;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -507,11 +563,14 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	margin: 0px 0px 8px 0px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 8px;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 1px;
-	padding-right: 1px;
+	padding-right: 0;
 }
 
 .form__control>.input--text {
@@ -523,6 +582,10 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 16px;
 	padding-bottom: 18px;
 	padding-left: 15px;
@@ -542,7 +605,10 @@ skout! components
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: flex-start;
-	margin: 0px 0px 60px 0px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 60px;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -558,11 +624,14 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	margin: 0px 0px 8px 0px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 8px;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 1px;
-	padding-right: 1px;
+	padding-right: 0;
 }
 
 .form__control-2>.input--text {
@@ -574,6 +643,10 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 16px;
 	padding-bottom: 18px;
 	padding-left: 15px;
@@ -594,6 +667,10 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 19px;
 	padding-bottom: 18px;
 	padding-left: 18px;
