@@ -31,11 +31,12 @@ export default class SText extends SNode {
 		const style = SNode.prototype.getStyle.apply(this, rest);
 		const alignItems = (typeof this.sketchObject.verticalAlignment == 'function') ? ['flex-start', 'center', 'flex-end'][this.sketchObject.verticalAlignment()] : 'flex-start';
 		style.alignItems = alignItems;
-		const sharedStyle = SStyle.getSharedStyle(this.object, this.isInputPlaceholder());
+		const sharedStyle = SStyle.getSharedStyle(this.object);
 		if (sharedStyle) {
-			if (this.isInputPlaceholder()) {
-				sharedStyle.className = 'input::placeholder';
-				sharedStyle.selector = 'input::placeholder';
+			const input = this.getInput();
+			if (input) {
+				sharedStyle.className = ''; // 'input::placeholder';
+				sharedStyle.selector = '.' + input.uniqueClassName; // 'input::placeholder';
 			}
 		}
 		const localStyle = SStyle.parseTextStyle(this.sketchObject);

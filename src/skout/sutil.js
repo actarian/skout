@@ -48,7 +48,7 @@ export class SUtil {
 			case 'footer':
 			case 'form':
 			case 'header':
-				// case 'input':
+			case 'input':
 			case 'label':
 			case 'legend':
 			case 'li':

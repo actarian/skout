@@ -61,3 +61,12 @@ button::-moz-focus-inner {
 	padding: 0;
 	border: 0;
 }
+
+input {
+	border: 0;
+	outline: none;
+	-webkit-appearance: none;
+	font-size: inherit;
+	line-height: inherit;
+	color: inherit;
+}

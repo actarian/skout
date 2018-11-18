@@ -25,14 +25,11 @@ skout! page
 	z-index: 0;
 	max-width: 1440px;
 	min-height: 608px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 0;
 	margin-left: 0;
+	align-items: center;
 	padding-left: 0;
 	padding-right: 0;
 	background: url('../img/background.jpg') no-repeat center;
@@ -64,10 +61,6 @@ skout! page
 	z-index: 1;
 	max-width: 1440px;
 	min-height: 110px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 0;
@@ -87,10 +80,6 @@ skout! page
 	z-index: 2;
 	max-width: 1440px;
 	min-height: 720px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 0;

@@ -27,6 +27,10 @@ skout! components
 	width: 100%;
 	z-index: 1;
 	max-width: 76px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	align-items: flex-start;
 }
 
@@ -51,6 +55,10 @@ skout! components
 	width: 100%;
 	z-index: 1;
 	max-width: 76px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	align-items: flex-start;
 }
 
@@ -118,11 +126,15 @@ skout! components
 	align-items: flex-start;
 }
 
-.input--text>.input__placeholder {
+.control--text>.input__placeholder {
 	position: relative;
 	width: 100%;
 	z-index: 1;
 	max-width: 384px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	align-items: flex-start;
 }
 
@@ -142,11 +154,15 @@ skout! components
 	align-items: flex-start;
 }
 
-.input--text>.input__placeholder {
+.control--text>.input__placeholder {
 	position: relative;
 	width: 100%;
 	z-index: 1;
 	max-width: 384px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	align-items: flex-start;
 }
 
@@ -155,6 +171,10 @@ skout! components
 	width: 100%;
 	z-index: 1;
 	max-width: 115px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	align-items: flex-start;
 }
 
@@ -166,6 +186,10 @@ skout! components
 	left: 0;
 	height: 332px;
 	max-width: 1440px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	background: linear-gradient(-180deg, #000000 0%, rgba(0, 0, 0, 0.00) 100%);
 	background-size: cover;
 	border-radius: 0;
@@ -177,10 +201,11 @@ skout! components
 	width: 100%;
 	z-index: 2;
 	min-height: 129px;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: flex-start;
+	display: block;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -204,9 +229,24 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 10px;
 	padding-right: 20px;
+}
+
+.control--search>.input {
+	position: absolute;
+	width: 100%;
+	z-index: 0;
+	top: 0;
+	left: 0;
+	height: 72px;
+	max-width: 847px;
+	padding-top: 25px;
+	padding-right: 184px;
+	padding-bottom: 28px;
+	padding-left: 60px;
 	background: #ffffff;
 	background-size: cover;
 	border-radius: 3px;
+	display: inline-block;
 }
 
 .control--search>.btn--ghost {
@@ -294,10 +334,6 @@ skout! components
 	z-index: 4;
 	max-width: 112px;
 	height: 36px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
 	padding-top: 11px;
 	padding-bottom: 12px;
 	padding-left: 18px;
@@ -355,10 +391,6 @@ skout! components
 	z-index: 3;
 	max-width: 36px;
 	min-height: 36px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
 	padding-top: 6px;
 	padding-bottom: 6px;
 	padding-left: 6px;
@@ -374,6 +406,10 @@ skout! components
 	z-index: 1;
 	max-width: 24px;
 	height: 24px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 3px;
 	padding-bottom: 3px;
 	padding-left: 0;
@@ -397,10 +433,6 @@ skout! components
 	z-index: 4;
 	max-width: 112px;
 	min-height: 36px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
 	padding-top: 11px;
 	padding-bottom: 12px;
 	padding-left: 18px;
@@ -420,6 +452,10 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -432,10 +468,6 @@ skout! components
 	z-index: 0;
 	max-width: 150px;
 	height: 50px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
 	padding-top: 13px;
 	padding-bottom: 13px;
 	padding-left: 34px;
@@ -451,6 +483,10 @@ skout! components
 	z-index: 1;
 	max-width: 83px;
 	height: 24px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -506,10 +542,11 @@ skout! components
 	width: 100%;
 	z-index: 1;
 	min-height: 348px;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: flex-start;
+	display: block;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -521,10 +558,7 @@ skout! components
 	width: 100%;
 	z-index: 3;
 	height: 45px;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: flex-start;
+	display: block;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 34px;
@@ -540,10 +574,7 @@ skout! components
 	width: 100%;
 	z-index: 2;
 	height: 69px;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: flex-start;
+	display: block;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 21px;
@@ -573,15 +604,11 @@ skout! components
 	padding-right: 0;
 }
 
-.form__control>.input--text {
+.form__control>.control--text {
 	position: relative;
 	width: 100%;
 	z-index: 0;
 	height: 50px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 0;
@@ -590,10 +617,29 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 15px;
 	padding-right: 14px;
+}
+
+.control--text>.input {
+	position: absolute;
+	width: 100%;
+	z-index: 0;
+	top: 0;
+	left: 0;
+	height: 50px;
+	max-width: 413px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+	padding-top: 16px;
+	padding-right: 14px;
+	padding-bottom: 18px;
+	padding-left: 15px;
 	background: #ffffff;
 	background-size: cover;
 	border: 2px solid #dcdcdc;
 	border-radius: 3px;
+	display: inline-block;
 }
 
 .form--signin>.form__control-2 {
@@ -601,10 +647,7 @@ skout! components
 	width: 100%;
 	z-index: 1;
 	height: 69px;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: flex-start;
+	display: block;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 60px;
@@ -634,15 +677,11 @@ skout! components
 	padding-right: 0;
 }
 
-.form__control-2>.input--text {
+.form__control-2>.control--text {
 	position: relative;
 	width: 100%;
 	z-index: 0;
 	height: 50px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 0;
@@ -651,10 +690,29 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 15px;
 	padding-right: 14px;
+}
+
+.control--text>.input {
+	position: absolute;
+	width: 100%;
+	z-index: 0;
+	top: 0;
+	left: 0;
+	height: 50px;
+	max-width: 413px;
+	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+	padding-top: 16px;
+	padding-right: 14px;
+	padding-bottom: 18px;
+	padding-left: 15px;
 	background: #ffffff;
 	background-size: cover;
 	border: 2px solid #dcdcdc;
 	border-radius: 3px;
+	display: inline-block;
 }
 
 .form--signin>.btn--lg {
@@ -663,10 +721,6 @@ skout! components
 	z-index: 0;
 	max-width: 150px;
 	height: 50px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
 	margin-top: 0;
 	margin-right: 0;
 	margin-bottom: 0;

@@ -190,71 +190,6 @@ export default class SNode {
 		this.constraint = constraint;
 	}
 
-	_setPosition() {
-		const layout = SOptions.layout;
-		// const nodes = this.nodes.slice();
-		const nodes = this.renderableNodes(this.nodes, this.rect).slice();
-		/*
-		if (this.name === 'control--search') {
-			nodes.forEach(x => console.log(x.name));
-		}
-		*/
-		nodes.forEach((a, i) => {
-			a.hasSibilings = nodes.length > 1;
-			if (a.hasSibilings) {
-				nodes.filter(b => b !== a).forEach(b => {
-					a.hasOverlaps = a.hasOverlaps || SRect.overlaps(a.rect, b.rect);
-					a.hasSmallOverlaps = a.hasSmallOverlaps || (SRect.overlaps(a.rect, b.rect) && a.rect.width >= layout.totalWidth && b.rect.width < layout.totalWidth);
-					a.hasLargeOverlaps = a.hasLargeOverlaps || (SRect.overlaps(a.rect, b.rect) && a.rect.width < layout.totalWidth && b.rect.width >= layout.totalWidth);
-				});
-			}
-		});
-		const overlaps = nodes.filter(a => a.hasOverlaps);
-		if (overlaps.length) {
-			const largest = overlaps.reduce((a, b) => a.rect.width >= b.rect.width && a.rect.height > b.rect.height ? a : b);
-			largest.isLargest = true;
-		}
-		nodes.forEach((a, i) => {
-			if (a.hasSmallOverlaps) {
-				a.absolute = true;
-			} else if (a.hasLargeOverlaps) {
-				a.absolute = false;
-			} else {
-				a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
-			}
-			/*
-			if (a.rect.width >= layout.totalWidth) {
-				if (a.hasSmallOverlaps) {
-					a.absolute = true;
-				} else if (a.hasLargeOverlaps) {
-					a.absolute = false;
-				} else {
-					a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
-				}
-			} else {
-				a.absolute = (a.hasOverlaps && a.isLargest) ? true : false;
-			}
-			*/
-			a.relative = !a.absolute;
-		});
-		const relatives = nodes; // nodes.filter(x => x.relative);
-		if (relatives.length > 1) {
-			const horizontals = relatives.sort((a, b) => a.rect.left - b.rect.left);
-			const isHorizontal = horizontals.reduce((a, b) => (a && b && a.rect.right <= b.rect.left) ? b : null);
-			this.isHorizontal = isHorizontal;
-			const verticals = relatives.sort((a, b) => a.rect.top - b.rect.top);
-			const isVertical = verticals.reduce((a, b) => (a && b && a.rect.bottom <= b.rect.top) ? b : null);
-			this.isVertical = isVertical;
-		}
-		if (this.name == 'homepage') { // 'control--search') {
-			console.log(nodes.map(x =>
-				x.isLargest ? 'isLargest' : '' +
-				x.absolute ? 'absolute' : '' +
-				x.hasLargeOverlaps ? 'hasLargeOverlaps' : '' +
-				x.hasSmallOverlaps ? 'hasSmallOverlaps' : ''));
-		}
-	}
-
 	setPosition() {
 		const layout = SOptions.layout;
 		const nodes = this.nodes.slice();
@@ -287,10 +222,13 @@ export default class SNode {
 			}
 			a.relative = !a.absolute;
 		});
-		if (nodes.length > 1) {
-			const horizontals = nodes.filter(x => x.relative).sort((a, b) => a.rect.left - b.rect.left);
+		const relatives = nodes.filter(x => x.relative);
+		if (relatives.length > 1) {
+			const horizontals = relatives.sort((a, b) => a.rect.left - b.rect.left);
 			const isHorizontal = horizontals.reduce((a, b) => (a && b && a.rect.right <= b.rect.left) ? b : null);
 			this.isHorizontal = isHorizontal;
+		}
+		if (nodes.length > 1) {
 			const verticals = nodes.sort((a, b) => a.rect.top - b.rect.top);
 			const isVertical = verticals.reduce((a, b) => (a && b && a.rect.bottom <= b.rect.top) ? b : null);
 			this.isVertical = isVertical;
@@ -332,7 +270,7 @@ export default class SNode {
 
 	setMarginAndPaddings() {
 		const rect = this.rect;
-		const innerRect = this.innerRect;
+		let innerRect = this.innerRect;
 		const padding = this.padding;
 		const nodes = this.containerRect ? this.relatives : this.nodes;
 		this.isLargest = this.isLargest || false;
@@ -342,21 +280,21 @@ export default class SNode {
 		padding.left = innerRect.left;
 		// nodes = this.nodes;
 		if (this.isHorizontal) {
-			nodes.sort((a, b) => a.rect.left - b.rect.left).forEach((b, i) => {
+			nodes.sort((a, b) => a.rect.left - b.rect.left).filter(x => x.isRenderable()).forEach((b, i) => {
 				if (i > 0) {
 					const a = nodes[i - 1];
 					a.margin.right = b.rect.left - a.rect.right;
 				}
 			});
-			this.classes.push('horizontal');
+			this.classes.push('h');
 		} else if (this.isVertical) {
-			nodes.sort((a, b) => a.rect.top - b.rect.top).forEach((b, i) => {
+			nodes.sort((a, b) => a.rect.top - b.rect.top).filter(x => x.isRenderable()).forEach((b, i) => {
 				if (i > 0) {
 					const a = nodes[i - 1];
 					a.margin.bottom = b.rect.top - a.rect.bottom;
 				}
 			});
-			this.classes.push('vertical');
+			this.classes.push('v');
 		} else {
 			nodes.sort((a, b) => (a.rect.top * 10000 + a.rect.left) - (b.rect.top * 10000 + b.rect.left));
 		}
@@ -456,10 +394,14 @@ export default class SNode {
 			}
 
 			if (this.isVertical) {
+				style.display = 'block';
+				/*
+				// !!!
 				style.display = 'flex';
 				style.flexDirection = 'column';
 				style.justifyContent = 'flex-start';
 				style.alignItems = 'flex-start';
+				*/
 			}
 
 			if (!this.parent.isHorizontal) {
@@ -487,7 +429,11 @@ export default class SNode {
 
 			const placeholder = this.getInputPlaceholder();
 			if (placeholder) {
-				console.log('placeholder', placeholder.rect);
+				const innerRect = placeholder.rect;
+				style.paddingTop = toPxx(innerRect.top);
+				style.paddingRight = toPxx(rect.width - innerRect.right);
+				style.paddingBottom = toPxx(rect.height - innerRect.bottom);
+				style.paddingLeft = toPxx(innerRect.left);
 			}
 
 		} else if (SOptions.html.exact) {
@@ -578,7 +524,18 @@ export default class SNode {
 		}
 	}
 
+	getInput() {
+		if (this.tagName === 'placeholder' || this.tagName === 'value') {
+			return this.parent.nodes.find(x => x.tagName === 'input');
+		}
+	}
+
 	isInputPlaceholder() {
+		/*
+		if (this.tagName == 'placeholder') {
+			console.log(this.parent.name, this.parent.nodes.map(x => x.tagName));
+		}
+		*/
 		return this.tagName === 'placeholder' && this.parent.nodes.find(x => x.tagName === 'input') !== undefined;
 	}
 
@@ -587,7 +544,11 @@ export default class SNode {
 	}
 
 	renderableNodes(nodes, rect) {
-		return nodes.filter(x => !x.isShapeForRect(rect) && !x.isInputPlaceholder());
+		return nodes.filter(x => x.isRenderable(rect));
+	}
+
+	isRenderable(rect) {
+		return !this.isShapeForRect(rect); // !(this.isShapeForRect(rect) || this.isInputPlaceholder());
 	}
 
 	merge(object) {
@@ -664,6 +625,7 @@ export default class SNode {
 				const placeholder = this.getInputPlaceholder();
 				if (placeholder) {
 					attributes.placeholder = placeholder.innerText;
+					// attributes.value = placeholder.innerText;
 				}
 				break;
 		}

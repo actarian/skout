@@ -27,6 +27,19 @@ export default class SShape extends SNode {
 		const attributes = {
 			className: this.classes.join(' '),
 		};
+		switch (this.tagName) {
+			case 'button':
+				attributes.type = 'button';
+				break;
+			case 'input':
+				attributes.type = 'text';
+				const placeholder = this.getInputPlaceholder();
+				if (placeholder) {
+					attributes.placeholder = placeholder.innerText;
+					// attributes.value = placeholder.innerText;
+				}
+				break;
+		}
 		if (SOptions.inline) {
 			attributes.style = style;
 		} else {
@@ -36,7 +49,7 @@ export default class SShape extends SNode {
 	}
 
 	render() {
-		return new VNode('div', this.attributes(), []);
+		return new VNode(this.tagName, this.attributes(), []);
 	}
 
 	/*

@@ -51,11 +51,11 @@ button {
 	-moz-osx-font-smoothing: inherit;
 	-webkit-appearance: none;
 	cursor: pointer;
-	transition: filter ease-in-out 300ms;
+	transition: filter ease-in-out 200ms;
 }
 
 button:hover {
-	filter: brightness(90%);
+	filter: brightness(80%);
 }
 
 button:active {
@@ -65,4 +65,10 @@ button:active {
 button::-moz-focus-inner {
 	padding: 0;
 	border: 0;
+}
+
+input {
+	border: 0;
+	outline: none;
+	-webkit-appearance: none;
 }
