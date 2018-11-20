@@ -4,27 +4,27 @@ skout! typography
 -------------- */
 
 .hero__title {
-	color: #FFFFFF;
+	color: var(--color-1);
 	font-size: 32px;
-	font-family: 'KatahdinRound-Regular';
+	font-family: var(--font-1);
 	letter-spacing: 0;
 	text-align: center;
 	line-height: 1;
 }
 
 .search__placeholder {
-	color: #A3A6A8;
+	color: var(--color-2);
 	font-size: 19px;
-	font-family: 'GothamHTF-Book';
+	font-family: var(--font-2);
 	letter-spacing: 0;
 	text-align: left;
 	line-height: 1;
 }
 
 .btn__label {
-	color: #FFFFFF;
+	color: var(--color-1);
 	font-size: 13px;
-	font-family: 'GothamHTF-Medium';
+	font-family: var(--font-3);
 	letter-spacing: 1px;
 	text-align: center;
 	line-height: 1;
@@ -32,18 +32,18 @@ skout! typography
 }
 
 .nav--item {
-	color: #FFFFFF;
+	color: var(--color-1);
 	font-size: 16px;
-	font-family: 'GothamHTF-Book';
+	font-family: var(--font-2);
 	letter-spacing: 0;
 	text-align: left;
 	line-height: 1;
 }
 
 .head__sup {
-	color: #A3A6A8;
+	color: var(--color-2);
 	font-size: 16px;
-	font-family: 'KatahdinRound-Regular';
+	font-family: var(--font-1);
 	letter-spacing: 0;
 	text-align: left;
 	line-height: 1;
@@ -51,9 +51,9 @@ skout! typography
 }
 
 .head__title {
-	color: #000000;
+	color: var(--color-4);
 	font-size: 26px;
-	font-family: 'KatahdinRound-Regular';
+	font-family: var(--font-1);
 	letter-spacing: 0;
 	text-align: left;
 	line-height: 1;
@@ -61,9 +61,9 @@ skout! typography
 }
 
 .control__label {
-	color: #000000;
+	color: var(--color-4);
 	font-size: 11px;
-	font-family: 'KatahdinRound-Regular';
+	font-family: var(--font-1);
 	letter-spacing: 0;
 	text-align: left;
 	line-height: 1;
@@ -71,9 +71,9 @@ skout! typography
 }
 
 .control__required {
-	color: #E2007A;
+	color: var(--color-3);
 	font-size: 10px;
-	font-family: 'KatahdinRound-Regular';
+	font-family: var(--font-1);
 	letter-spacing: 0;
 	text-align: right;
 	line-height: 1;
@@ -81,9 +81,9 @@ skout! typography
 }
 
 .input__placeholder {
-	color: #7F7F7F;
+	color: var(--color-6);
 	font-size: 16px;
-	font-family: 'GothamHTF-Book';
+	font-family: var(--font-2);
 	letter-spacing: 0;
 	text-align: left;
 	line-height: 1;

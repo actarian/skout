@@ -108,6 +108,7 @@ export default class SPage extends SNode {
 			const cssFolder = `${folder}/${SOptions.css.folder}`;
 			SUtil.addFolder(cssFolder);
 			let shared = [
+				`@import "../${SOptions.css.folder}/vars.css";`,
 				`@import "../${SOptions.css.folder}/base.css";`,
 				`@import "../${SOptions.css.folder}/grid.css";`
 			];
@@ -319,6 +320,8 @@ export default class SPage extends SNode {
 		SUtil.collectedSymbolIds = {};
 		SUtil.collectedSymbolNames = {};
 		SSymbol.overrides = {};
+		SStyle.collectedColors = {};
+		SStyle.collectedFonts = {};
 		SStyle.collectedStyles = [];
 		SStyle.collectedComponentStyles = [];
 		SStyle.collectedTextStyles = [];

@@ -86,9 +86,9 @@ export default class SStyle {
 			const opacity = objectStyle.contextSettings().opacity();
 			//
 			// console.log('lineHeight', lineHeight, (paragraphStyle.maximumLineHeight || attributes.NSFont.fontDescriptor().objectForKey(NSFontSizeAttribute)));
-			style.color = color;
+			style.color = SStyle.getColor(color);
 			style.fontSize = fontSize;
-			style.fontFamily = fontFamily;
+			style.fontFamily = SStyle.getFont(fontFamily);
 			style.letterSpacing = letterSpacing;
 			style.textAlign = textAlign;
 			style.lineHeight = lineHeight;
@@ -281,7 +281,7 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
 				background = fillGradient;
 			} else {
 				const fillColor = SStyle.cssColor(fill.color());
-				background = `${fillColor}`;
+				background = `${SStyle.getColor(fillColor)}`;
 			}
 		}
 		let border = 'none';
@@ -289,7 +289,7 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
 			const _border = objectStyle.borders().firstObject();
 			const borderWidth = _border.thickness();
 			const borderColor = SStyle.cssColor(_border.color());
-			border = `${borderWidth}px solid ${borderColor}`;
+			border = `${borderWidth}px solid ${SStyle.getColor(borderColor)}`;
 		}
 		let borderRadius = 'none';
 		if (node.type === 'MSRectangleShape') {
@@ -310,7 +310,7 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
 			const shadowBlur = shadow.blurRadius();
 			const shadowSpread = shadow.spread();
 			const shadowColor = SStyle.cssColor(shadow.color());
-			boxShadow = `${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowSpread}px ${shadowColor}`;
+			boxShadow = `${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowSpread}px ${SStyle.getColor(shadowColor)}`;
 		}
 		if (background !== 'none') {
 			style.background = background;
@@ -404,6 +404,8 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
 			const props = Object.keys(x.style).filter(k => x.style[k] !== '0px 0px 0px 0px').map(k => {
 				const key = k.replace(/([A-Z])/g, '-$1').toLowerCase();
 				const value = x.style[k];
+				const rule = `    ${key}: ${value == '0px' ? 0 : value};`;
+				/*
 				let rule;
 				switch (key) {
 					case 'color':
@@ -415,6 +417,7 @@ layer.addAttribute_value(NSParagraphStyleAttributeName, paragraphStyle);
 					default:
 						rule = `    ${key}: ${value == '0px' ? 0 : value};`;
 				}
+				*/
 				return rule;
 			}).join('\r');
 			return `${x.selector} {
@@ -424,12 +427,19 @@ ${props} }`;
 
 	static getCss() {
 		const layout = SOptions.layout;
+		const colors = Object.keys(SStyle.collectedColors).map(x => `${SStyle.collectedColors[x]}: ${x};`).join('\n');
+		const fonts = Object.keys(SStyle.collectedFonts).map(x => `${SStyle.collectedFonts[x]}: ${x};`).join('\n');
+		const vars = SUtil.beautifyCss(`:root {
+				${colors}
+				${fonts}
+			}`);
 		const base = SUtil.beautifyCss(SUtil.readResource('base.css'));
 		const grid = SStyle.getGrid();
 		const typography = SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedTextStyles));
 		const components = SOptions.component.export ? null : SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedComponentStyles));
 		const page = SUtil.beautifyCss(SStyle.stylesToCss(SStyle.collectedStyles));
 		const styles = {
+			vars,
 			base,
 			grid,
 			typography,
@@ -460,14 +470,12 @@ skout! ${s}
 		let grid = ``;
 		const layout = SOptions.layout;
 		if (layout.numberOfColumns > 1) {
-			const row = `
-		.row {
-			display: flex;
-			flex-wrap: wrap;
-			margin-right: ${(layout.gutterWidth / -2).toFixed(2)}px;
-			margin-left: ${(layout.gutterWidth / -2).toFixed(2)}px;
-		}
-		`;
+			const row = `.row {
+				display: flex;
+				flex-wrap: wrap;
+				margin-right: ${(layout.gutterWidth / -2).toFixed(2)}px;
+				margin-left: ${(layout.gutterWidth / -2).toFixed(2)}px;
+			}`;
 			const cols = new Array(layout.numberOfColumns).fill(0).map((x, i) => {
 				return `.col-${i + 1} {
 				position: relative;
@@ -476,24 +484,29 @@ skout! ${s}
 				padding-left: ${(layout.gutterWidth / 2).toFixed(2)}px;
 				flex: 0 0 ${(100 / layout.numberOfColumns * (i + 1)).toFixed(3)}%;
 				max-width: ${(100 / layout.numberOfColumns * (i + 1)).toFixed(3)}%;
-			}
-
-			.offset-${i + 1} {
-				margin-left: ${(100 / layout.numberOfColumns * (i + 1)).toFixed(3)}%;
-			}
-
-			@media (max-width: ${Math.floor(layout.totalWidth * 0.5)}px) {
-				.col-${i + 1} {
-					flex: 0 0 100%;
-					max-width: 100%;
-				}
-
-				.offset-${i + 1} {
-					margin-left: 0;
-				}
 			}`;
 			}).join('\n');
-			grid += row + cols;
+			const offsets = new Array(layout.numberOfColumns).fill(0).map((x, i) => {
+				return `.offset-${i + 1} {
+				margin-left: ${(100 / layout.numberOfColumns * (i + 1)).toFixed(3)}%;
+			}`;
+			}).join('\n');
+			const queryCols = new Array(layout.numberOfColumns).fill(0).map((x, i) => {
+				return `.col-${i + 1}`;
+			}).join(',\n') + ` {
+				flex: 0 0 100%;
+				max-width: 100%;
+			}`;
+			const queryOffsets = new Array(layout.numberOfColumns).fill(0).map((x, i) => {
+				return `.offset-${i + 1}`;
+			}).join(',\n') + ` {
+				margin-left: 0;
+			}`;
+			const query = `@media (max-width: ${Math.floor(layout.totalWidth * 0.5)}px) {
+				${queryCols}
+				${queryOffsets}
+			}`;
+			grid += row + cols + offsets + query;
 		}
 		return grid;
 	}
@@ -703,9 +716,40 @@ skout! ${s}
 }
 */
 
+	/*
+	:root {
+		--color-1: #ffffff;
+	}
+	var(--color-1)
+	*/
+	static getColor(color) {
+		color = String(color).length === 6 ? `#${color}` : color;
+		color = color.toLowerCase();
+		let value = SStyle.collectedColors[color];
+		if (!value) {
+			const i = Object.keys(SStyle.collectedColors).length;
+			value = `--color-${i + 1}`;
+			SStyle.collectedColors[color] = value;
+		}
+		return `var(${value})`;
+	}
+
+	static getFont(font) {
+		font = `'${font}'`;
+		let value = SStyle.collectedFonts[font];
+		if (!value) {
+			const i = Object.keys(SStyle.collectedFonts).length;
+			value = `--font-${i + 1}`;
+			SStyle.collectedFonts[font] = value;
+		}
+		return `var(${value})`;
+	}
+
 }
 
 // SStyle.collectedNames = {};
+SStyle.collectedColors = {};
+SStyle.collectedFonts = {};
 SStyle.collectedStyles = [];
 SStyle.collectedComponentStyles = [];
 SStyle.collectedTextStyles = [];

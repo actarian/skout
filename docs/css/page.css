@@ -69,7 +69,7 @@ skout! page
 	padding-bottom: 31px;
 	padding-left: 0;
 	padding-right: 0;
-	background: #000000;
+	background: var(--color-4);
 	background-size: cover;
 	border-radius: 0;
 }

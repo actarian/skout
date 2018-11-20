@@ -68,9 +68,9 @@ skout! components
 	z-index: 1;
 	max-width: 425px;
 	align-items: flex-start;
-	color: #FFFFFF;
+	color: var(--color-1);
 	font-size: 17px;
-	font-family: 'GothamHTF-Book';
+	font-family: var(--font-2);
 	letter-spacing: 0;
 	text-align: center;
 	line-height: 1;
@@ -230,7 +230,7 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 10px;
 	padding-right: 20px;
-	background: #ffffff;
+	background: var(--color-1);
 	background-size: cover;
 	border-radius: 3px;
 }
@@ -324,7 +324,7 @@ skout! components
 	padding-bottom: 12px;
 	padding-left: 18px;
 	padding-right: 18px;
-	background: #e2007a;
+	background: var(--color-3);
 	background-size: cover;
 	border-radius: 18px;
 }
@@ -381,7 +381,7 @@ skout! components
 	padding-bottom: 6px;
 	padding-left: 6px;
 	padding-right: 6px;
-	background: #e2007a;
+	background: var(--color-3);
 	background-size: cover;
 	border-radius: 50%;
 }
@@ -423,7 +423,7 @@ skout! components
 	padding-bottom: 12px;
 	padding-left: 18px;
 	padding-right: 18px;
-	background: #e2007a;
+	background: var(--color-3);
 	background-size: cover;
 	border-radius: 18px;
 }
@@ -458,7 +458,7 @@ skout! components
 	padding-bottom: 13px;
 	padding-left: 34px;
 	padding-right: 33px;
-	background: #e2007a;
+	background: var(--color-3);
 	background-size: cover;
 	border-radius: 25px;
 }
@@ -606,9 +606,9 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 15px;
 	padding-right: 14px;
-	background: #ffffff;
+	background: var(--color-1);
 	background-size: cover;
-	border: 2px solid #dcdcdc;
+	border: 2px solid var(--color-5);
 	border-radius: 3px;
 }
 
@@ -661,9 +661,9 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 15px;
 	padding-right: 14px;
-	background: #ffffff;
+	background: var(--color-1);
 	background-size: cover;
-	border: 2px solid #dcdcdc;
+	border: 2px solid var(--color-5);
 	border-radius: 3px;
 }
 
@@ -681,7 +681,7 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 18px;
 	padding-right: 17px;
-	background: #e2007a;
+	background: var(--color-3);
 	background-size: cover;
 	border-radius: 25px;
 }
