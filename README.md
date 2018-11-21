@@ -1,36 +1,112 @@
-# Skout!
+# 💎 Skout! — Sketch Plugin
 
-_Skout is currently a work in progress._
+[![Download from Sketchpacks.com](https://badges.sketchpacks.com/plugins/com.circledev.skout/version.svg)](https://api.sketchpacks.com/v1/plugins/com.circledev.skout/download) 
+[![Compatible Sketch Version](https://badges.sketchpacks.com/plugins/com.circledev.skout/compatibility.svg)](https://sketchpacks.com/circledev/skout)
+
+*Skout! is a Sketch plugin to export selected artboard to a web ready mockup.*
+
+*Skout is currently in active development.*
+
+<!--
+<a href="https://www.sketchapp.com"><img width="160" height="41" src="images/sketch-badge.png"></a>
+<a href="http://bit.ly/SketchRunnerWebsite"><img width="160" height="41" src="http://sketchrunner.com/img/badge_blue.png"></a>
+-->
+
+* Export to html, image and svg.
+* Export stylesheets with css vars.
+* Export to web components
+* Launch page preview through [http-server](https://www.npmjs.com/package/http-server) ([npm](https://nodejs.org) required)
+
+___
+
+## Features
+
+| 💎 | Description |
+| --- | --- |
+| **Responsive / Exact** | Select between a responsive or exact layout |
+| **Html / Css / Images / Svg / Components** | Select the assets you want to export |
+| **Exported / Inline** | Select imported or inline stylesheets |
+| **Single file / Extracted** | Select single file or extracted component |
+| **Launch** | Launch in browser [npm](https://nodejs.org) required |
+
+___
+
+## Purpose
+
+Skout plugin does _not_ generate production ready web pages. 
+
+Skout plugin generates a structured mockup from your design to help you start developing faster.
+
+___
+
+## Installation
+
+1. [Download the plugin](https://api.sketchpacks.com/v1/plugins/com.circledev.skout/download)
+2. Double-click to install `skout.sketchplugin`
+3. Select an artboard
+4. Press ctrl + cmd ⌘ + S
+
+___
+
+## Contributing
+
+*Pull requests are welcome and please submit bugs 🐞*
+
+*Thank you for taking the time to provide feedback and review. This feedback is appreciated and very helpful 🌈*
+
+[Github Project Page](https://github.com/actarian/skout)  
+[Sketchpacks.com](https://api.sketchpacks.com/v1/plugins/com.circledev.skout/download)
+
+*If you find this plugin helpful, consider shouting me coffee via [PayPal](https://www.paypal.me/dtw/5) ☕*
+
+<!--
+<a href="https://www.paypal.me/circledev/5">
+	<img width="160" height="41" src="images/paypal-badge.png" >
+</a>
+-->
+___
+
+## Contact
+
+* Luca Zampetti <lzampetti@gmail.com>
+* Follow [@actarian](https://twitter.com/actarian) on Twitter
+
+[![Twitter Follow](https://img.shields.io/twitter/follow/actarian.svg?style=social&label=Follow)]()
+
+---
+## Requirements
+
+* Sketch.app v 52.0.
+___
+
+## Todo
+
+* BEM naming conversion to web elements.
+___
+
+## Release Notes
+Changelog [here](https://github.com/actarian/skout/blob/master/CHANGELOG.md).
+
+### 0.1.1
+
+* Initial release of skout plugin for sketch.
+
+___
+
 
 _This plugin was created using `skpm`. For a detailed explanation on how things work, checkout the [skpm Readme](https://github.com/skpm/skpm/blob/master/README.md)._
-
-[sketch](/ios/filofood/sketch.52.2.zip)
-
-## Node
+___
+### Node
 
 `sudo npm install -g skpm --unsafe-perm`
-
-`skpm create my-plugin`
 
 To start a development live-reload build
   `npm run start`
 
 To build the plugin
   `npm run build`
-
-To publish the plugin
-  `skpm publish`
-
-## In Sketch
-
-To open the editor
-  `ctrl + shift + K`
-  
-## Help
-
-[developer.sketchapp.com/guides/preferences](https://developer.sketchapp.com/guides/preferences/)
-
-## Usage
+___
+### Usage
 
 Install the dependencies
 
@@ -55,67 +131,7 @@ Additionally, if you wish to run the plugin every time it is built:
 ```bash
 npm run start
 ```
+___
+### Help
 
-## Custom Configuration
-
-### Babel
-
-To customize Babel, you have two options:
-
-* You may create a [`.babelrc`](https://babeljs.io/docs/usage/babelrc) file in your project's root directory. Any settings you define here will overwrite matching config-keys within skpm preset. For example, if you pass a "presets" object, it will replace & reset all Babel presets that skpm defaults to.
-
-* If you'd like to modify or add to the existing Babel config, you must use a `webpack.skpm.config.js` file. Visit the [Webpack](#webpack) section for more info.
-
-### Webpack
-
-To customize webpack create `webpack.skpm.config.js` file which exports function that will change webpack's config.
-
-```js
-/**
- * Function that mutates original webpack config.
- * Supports asynchronous changes when promise is returned.
- *
- * @param {object} config - original webpack config.
- * @param {boolean} isPluginCommand - whether the config is for a plugin command or a resource
- **/
-module.exports = function(config, isPluginCommand) {
-  /** you can change config here **/
-}
-```
-
-## Debugging
-
-To view the output of your `console.log`, you have a few different options:
-
-* Use the [`sketch-dev-tools`](https://github.com/skpm/sketch-dev-tools)
-* Open `Console.app` and look for the sketch logs
-* Look at the `~/Library/Logs/com.bohemiancoding.sketch3/Plugin Output.log` file
-
-Skpm provides a convenient way to do the latter:
-
-```bash
-skpm log
-```
-
-The `-f` option causes `skpm log` to not stop when the end of logs is reached, but rather to wait for additional data to be appended to the input
-
-## Publishing your plugin
-
-```bash
-skpm publish <bump>
-```
-
-(where `bump` can be `patch`, `minor` or `major`)
-
-`skpm publish` will create a new release on your GitHub repository and create an appcast file in order for Sketch users to be notified of the update.
-
-You will need to specify a `repository` in the `package.json`:
-
-```diff
-...
-+ "repository" : {
-+   "type": "git",
-+   "url": "git+https://github.com/ORG/NAME.git"
-+  }
-...
-```
+[developer.sketchapp.com/guides/preferences](https://developer.sketchapp.com/guides/preferences/)
