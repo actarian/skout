@@ -1,4 +1,4 @@
-# 💎 Skout! — Sketch Plugin
+# ![Skout! Settings](assets/favicon.ico) Skout! — Sketch Plugin
 
 [![Download from Sketchpacks.com](https://badges.sketchpacks.com/plugins/com.circledev.skout/version.svg)](https://api.sketchpacks.com/v1/plugins/com.circledev.skout/download) 
 [![Compatible Sketch Version](https://badges.sketchpacks.com/plugins/com.circledev.skout/compatibility.svg)](https://sketchpacks.com/circledev/skout)
@@ -7,28 +7,37 @@
 
 *Skout is currently in active development.*
 
+*With Skout you can:*
+
 <!--
 <a href="https://www.sketchapp.com"><img width="160" height="41" src="images/sketch-badge.png"></a>
 <a href="http://bit.ly/SketchRunnerWebsite"><img width="160" height="41" src="http://sketchrunner.com/img/badge_blue.png"></a>
 -->
 
-* Export to html, image and svg.
-* Export stylesheets with css vars.
-* Export to web components
+* Export to html, css, images and svg.
+* Export stylesheets with custom grids and css vars.
+* Export to web components.
 * Launch page preview through [http-server](https://www.npmjs.com/package/http-server) ([npm](https://nodejs.org) required)
+
+![Skout! Settings](example/settings.png)
 
 ___
 
 ## Features
 
-| 💎 | Description |
+| ![Skout! Settings](assets/favicon.ico) | Description |
 | --- | --- |
 | **Responsive / Exact** | Select between a responsive or exact layout |
 | **Html / Css / Images / Svg / Components** | Select the assets you want to export |
 | **Exported / Inline** | Select imported or inline stylesheets |
 | **Single file / Extracted** | Select single file or extracted component |
 | **Launch** | Launch in browser [npm](https://nodejs.org) required |
+___
 
+## Demo
+
+* View output example [here](https://actarian.github.io/skout/)
+* Download sketch file of example [here](example/mockup.sketch)
 ___
 
 ## Purpose
@@ -57,12 +66,10 @@ ___
 [Github Project Page](https://github.com/actarian/skout)  
 [Sketchpacks.com](https://api.sketchpacks.com/v1/plugins/com.circledev.skout/download)
 
-*If you find this plugin helpful, consider shouting me coffee via [PayPal](https://www.paypal.me/circledev/5) ☕*
-<!--
-<a href="https://www.paypal.me/circledev/5">
-	<img width="160" height="41" src="images/paypal-badge.png" >
-</a>
--->
+*If you find this plugin helpful,   
+feel free to contribute in keeping this plugin up to date via [PayPal](https://www.paypal.me/circledev/5)*
+
+[![PayPal](https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_100x26.png)](https://www.paypal.me/circledev/5)
 ___
 
 ## Contact
