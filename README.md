@@ -63,8 +63,10 @@ ___
 
 *Thank you for taking the time to provide feedback and review. This feedback is appreciated and very helpful 🌈*
 
-[Github Project Page](https://github.com/actarian/skout)  
-[Sketchpacks.com](https://api.sketchpacks.com/v1/plugins/com.circledev.skout/download)
+[![GitHub forks](https://img.shields.io/github/forks/actarian/skout.svg?style=social&label=Fork&maxAge=2592000)](https://gitHub.com/actarian/skout/network/)  [![GitHub stars](https://img.shields.io/github/stars/actarian/skout.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/actarian/skout/stargazers/)  [![GitHub followers](https://img.shields.io/github/followers/actarian.svg?style=social&label=Follow&maxAge=2592000)](https://github.com/actarian?tab=followers)
+
+* [Github Project Page](https://github.com/actarian/skout) 
+* [Sketchpacks.com](https://api.sketchpacks.com/v1/plugins/com.circledev.skout/download)
 
 *If you find this plugin helpful,   
 feel free to contribute in keeping this plugin up to date via [PayPal](https://www.paypal.me/circledev/5)*
@@ -77,7 +79,7 @@ ___
 * Luca Zampetti <lzampetti@gmail.com>
 * Follow [@actarian](https://twitter.com/actarian) on Twitter
 
-[![Twitter Follow](https://img.shields.io/twitter/follow/actarian.svg?style=social&label=Follow)]()
+[![Twitter Follow](https://img.shields.io/twitter/follow/actarian.svg?style=social&label=Follow%20@actarian)](https://twitter.com/actarian)
 
 ---
 ## Requirements
