@@ -58,11 +58,11 @@ ___
 [Sketchpacks.com](https://api.sketchpacks.com/v1/plugins/com.circledev.skout/download)
 
 *If you find this plugin helpful, consider shouting me coffee via [PayPal](https://www.paypal.me/circledev/5) ☕*
-
+<!--
 <a href="https://www.paypal.me/circledev/5">
 	<img width="160" height="41" src="images/paypal-badge.png" >
 </a>
-
+-->
 ___
 
 ## Contact
