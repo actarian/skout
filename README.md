@@ -2,8 +2,9 @@
 
 [![Download from Sketchpacks.com](https://badges.sketchpacks.com/plugins/com.circledev.skout/version.svg)](https://api.sketchpacks.com/v1/plugins/com.circledev.skout/download) 
 [![Compatible Sketch Version](https://badges.sketchpacks.com/plugins/com.circledev.skout/compatibility.svg)](https://sketchpacks.com/circledev/skout)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-*Skout! is a Sketch plugin to export selected artboard to a web ready mockup.*
+*Skout is a Sketch plugin to export selected artboard to a web ready mockup.*
 
 *Skout is currently in active development.*
 
