@@ -36,8 +36,8 @@ ___
 
 ## Demo
 
-* View output example [here](https://actarian.github.io/skout/)
-* Download sketch file of example [here](example/mockup.sketch)
+* View an example output page [here](https://actarian.github.io/skout/)
+* Download the example's sketch file [here](example/mockup.sketch)
 ___
 
 ## Purpose
