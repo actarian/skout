@@ -10,6 +10,7 @@
 
 import VNode from 'virtual-dom/vnode/vnode';
 import SNode from './snode';
+import SOptions from './soptions';
 import SUtil from './sutil';
 
 export default class SImage extends SNode {
@@ -38,7 +39,7 @@ export default class SImage extends SNode {
 		return new VNode('div', this.attributes(), [
             new VNode('img', {
 				// src: SImage.getImage(this.sketchObject.image())
-				src: `${SOptions.image.folder}/${this.fileName}.jpg`,
+				src: `${SOptions.image.folder}/${this.fileName}.${extension}`,
 			})
         ]);
 	}

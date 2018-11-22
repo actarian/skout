@@ -88,7 +88,7 @@ export default class SSvg extends SNode {
 				if (fill) {
 					svg = svg.replace(/path d/gm, `path fill="#${fill[1]}" d`);
 				}
-				svg = svg.replace(/(<!--.*)|(<\?xml.*)|(<svg.*)|(<\/svg.*)|(<title.*)|(<desc.*)|(<g.*)|(<\/g.*)|(<mask.*)|(<\/mask.*)|(<defs.*)|(<\/defs.*)|(<use.*)|(\s?id="[^\"]*")/gm, '');
+				svg = svg.replace(/(<!--.*)|(<\?xml.*)|(<svg.*)|(<\/svg.*)|(<title.*)|(<desc.*)|(<g.*)|(<\/g.*)|(<mask.*)|(<\/mask.*)|(<defs.*)|(<\/defs.*)|(<use.*)|(\s?mask="[^\"]*")|(\s?id="[^\"]*")/gm, '');
 				svg = SSvg.svgRebound(svg);
 				// const parser = new DOMParser();
 				// const svg = parser.parseFromString(svg, 'text/html');
@@ -101,10 +101,13 @@ export default class SSvg extends SNode {
 	}
 
 	static isSvg(object) {
-		const allowedClasses = ['MSLayerGroup', 'MSShapeGroup', 'MSShapePathLayer', 'MSRectangleShape', 'MSOvalShape'];
+		// 'MSLayerGroup',
+		const allowedClasses = ['MSShapeGroup', 'MSShapePathLayer', 'MSRectangleShape', 'MSOvalShape'];
 		let flag = true;
+		// console.log(object.sketchObject.className());
 		object.layers.forEach(x => {
 			const type = String(x.sketchObject.className());
+			// console.log(x.name, type);
 			if (allowedClasses.indexOf(type) === -1) {
 				flag = false;
 			}
@@ -161,6 +164,16 @@ export default class SSvg extends SNode {
 		return bounds;
 	}
 
+	static findValue(string, regexp) {
+		const matches = string.match(regexp);
+		return matches && matches.length > 1 ? parseFloat(matches[1]) : 0;
+	}
+
+	static findPoints(string, regexp) {
+		const matches = string.match(regexp);
+		return matches && matches.length > 1 ? matches[1].split(' ').map(x => parseFloat(x)) : [];
+	}
+
 	static svgRebound(svg) {
 		const paths = [];
 		svg = svg.replace(/<path[\s\S]*?d="([\s\S]*?)"/gm, (match, group1, offset, string) => {
@@ -173,7 +186,86 @@ export default class SSvg extends SNode {
 			});
 			return match;
 		});
-		const svgBounds = paths.reduce((prev, current) => {
+		const circles = [];
+		const regCircles = /<circle[\s\S]*?<\/circle>/gm;
+		let circle;
+		while (circle = regCircles.exec(String(svg))) {
+			const c = circle[0];
+			const cx = SSvg.findValue(c, /<circle[\s\S]*?cx="([\s\S]*?)"/);
+			const cy = SSvg.findValue(c, /<circle[\s\S]*?cy="([\s\S]*?)"/);
+			const r = SSvg.findValue(c, /<circle[\s\S]*?r="([\s\S]*?)"/);
+			// console.log(cx, cy, r);
+			circles.push({
+				props: {
+					r,
+					cx,
+					cy,
+				},
+				bounds: {
+					left: cx - r,
+					top: cy - r,
+					right: cx + r,
+					bottom: cy + r,
+				},
+			});
+		}
+		const rects = [];
+		const regRects = /<rect[\s\S]*?<\/rect>/gm;
+		let rect;
+		while (rect = regRects.exec(String(svg))) {
+			const r = rect[0];
+			const width = SSvg.findValue(r, /<rect[\s\S]*?width="([\s\S]*?)"/);
+			const height = SSvg.findValue(r, /<rect[\s\S]*?height="([\s\S]*?)"/);
+			const x = SSvg.findValue(r, /<rect[\s\S]*?x="([\s\S]*?)"/);
+			const y = SSvg.findValue(r, /<rect[\s\S]*?y="([\s\S]*?)"/);
+			const rx = SSvg.findValue(r, /<rect[\s\S]*?rx="([\s\S]*?)"/);
+			// console.log(width, height, x, y, rx);
+			rects.push({
+				props: {
+					width,
+					height,
+					x,
+					y,
+					rx,
+				},
+				bounds: {
+					left: x,
+					top: y,
+					right: x + width,
+					bottom: y + height,
+				},
+			});
+		}
+		const polygons = [];
+		const regPolygons = /<polygon[\s\S]*?<\/polygon>/gm;
+		let polygon;
+		while (polygon = regPolygons.exec(String(svg))) {
+			const p = polygon[0];
+			const points = SSvg.findPoints(p, /<polygon[\s\S]*?points="([\s\S]*?)"/);
+			if (points.length) {
+				const bounds = points.reduce((prev, point) => {
+					return {
+						left: Math.min(point, prev.left),
+						top: Math.min(point, prev.top),
+						right: Math.max(point, prev.right),
+						bottom: Math.max(point, prev.bottom),
+					};
+				}, {
+					left: Number.POSITIVE_INFINITY,
+					top: Number.POSITIVE_INFINITY,
+					right: Number.NEGATIVE_INFINITY,
+					bottom: Number.NEGATIVE_INFINITY
+				});
+				polygons.push({
+					props: {
+						points,
+					},
+					bounds,
+				});
+			}
+		}
+		// <polygon points="2.52808989 2.125 150 2.125 150 5.125 2.52808989 5.125"></polygon>
+		const svgBounds = paths.concat(circles, rects, polygons).reduce((prev, current) => {
 			const bounds = current.bounds;
 			return {
 				left: Math.min(bounds.left, prev.left),
@@ -187,7 +279,6 @@ export default class SSvg extends SNode {
 			right: Number.NEGATIVE_INFINITY,
 			bottom: Number.NEGATIVE_INFINITY
 		});
-		// console.log(svgBounds);
 		svg = svg.replace(/<path[\s\S]*?d="([\s\S]*?)"/gm, (match, group1, offset, string) => {
 			const path = paths.shift();
 			const commands = path.commands;
@@ -198,6 +289,39 @@ export default class SSvg extends SNode {
 				});
 			});
 			return match.substr(0, match.length - group1.length - 1) + SSvg.commandsToPath(commands) + '"';
+		});
+		svg = svg.replace(/<circle[\s\S]*?<\/circle>/gm, (match, group1, offset, string) => {
+			match = match.replace(/<circle[\s\S]*?cx="([\s\S]*?)"/, (match, group1, offset, string) => {
+				const v = (parseFloat(group1) - svgBounds.left).toFixed(6);
+				return match.substr(0, match.length - group1.length - 1) + v + '"';
+			});
+			match = match.replace(/<circle[\s\S]*?cy="([\s\S]*?)"/, (match, group1, offset, string) => {
+				const v = (parseFloat(group1) - svgBounds.top).toFixed(6);
+				return match.substr(0, match.length - group1.length - 1) + v + '"';
+			});
+			return match;
+		});
+		svg = svg.replace(/<rect[\s\S]*?<\/rect>/gm, (match, group1, offset, string) => {
+			match = match.replace(/<rect[\s\S]*?x="([\s\S]*?)"/, (match, group1, offset, string) => {
+				const v = (parseFloat(group1) - svgBounds.left).toFixed(6);
+				return match.substr(0, match.length - group1.length - 1) + v + '"';
+			});
+			match = match.replace(/<circle[\s\S]*?y="([\s\S]*?)"/, (match, group1, offset, string) => {
+				const v = (parseFloat(group1) - svgBounds.top).toFixed(6);
+				return match.substr(0, match.length - group1.length - 1) + v + '"';
+			});
+			return match;
+		});
+		svg = svg.replace(/<polygon[\s\S]*?<\/polygon>/gm, (match, group1, offset, string) => {
+			match = match.replace(/<polygon[\s\S]*?points="([\s\S]*?)"/, (match, group1, offset, string) => {
+				const points = group1.split(' ').map(x => parseFloat(x));
+				points.map((v, i) => {
+					const n = (i % 2) ? v - svgBounds.top : v - svgBounds.left;
+					return parseFloat(n.toFixed(6));
+				});
+				return match.substr(0, match.length - group1.length - 1) + points.join(' ') + '"';
+			});
+			return match;
 		});
 		// console.log(svg);
 		return svg;

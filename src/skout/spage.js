@@ -217,7 +217,7 @@ export default class SPage extends SNode {
 			case 'MSSymbolInstance':
 				let symbolId = object.symbolId;
 				const originalSymbolId = symbolId;
-				if (data && data.symbolID) {
+				if (data && data.symbolID && data.symbolID.trim() !== '') {
 					symbolId = data.symbolID;
 				}
 				const symbol = SUtil.getDocument().getSymbolMasterWithID(symbolId);

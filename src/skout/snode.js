@@ -243,7 +243,9 @@ export default class SNode {
 		const innerRect = SRect.fromNodes(relatives);
 		const layout = SOptions.layout;
 		this.innerRect = innerRect;
-		if (nodes.length && rect.width > layout.totalWidth && innerRect.width < layout.totalWidth) {
+
+		if (this.type !== 'MSArtboardGroup' &&
+			nodes.length && rect.width > layout.totalWidth && innerRect.width < layout.totalWidth) {
 			const containerRect = new SRect({
 				top: innerRect.top,
 				left: (rect.width - layout.totalWidth) / 2,
