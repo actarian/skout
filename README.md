@@ -61,23 +61,22 @@ ___
 
 ## For optimal results
 
-* `Name your layers usign Blocks, Elements and Modifiers
- notation`.  
+* **Name your layers usign Blocks, Elements and Modifiers notation**.  
  Use [BEM](http://getbem.com/introduction/) notation to name your layers. 
 
-* `Set up the artboard layout settings`.  
+* **Set up the artboard layout settings**.  
 Layout settings helps create your css grid system and apply proper column size to your grid aligned divs. Column classes will be applied to properly aligned elements with a tolerance of 1px.
 
-* `Draw your creativity using full width horizontal sections`.  
+* **Draw your creativity using full width horizontal sections**.  
 Every main row of your artboard should be grouped logically into full width sections. eg header, section--hero, section--claim, section--products.. etc.
 
-* `Use symbols whenever possible`.  
+* **Use symbols whenever possible**.  
 Symbols help optimize html and stylesheets avoiding duplicated elements and styles. Symbols do also get exported to [Web Components](https://www.webcomponents.org/introduction).
 
-* `Group sibiling items`.  
+* **Group sibiling items**.  
 Group all items placed horizontally or vertically. Every group represents an outputted html element. Create subgroups for items with different alignments.  
 
-* `Use constraints`.  
+* **Use constraints**.  
 Using Sketch constraints helps understand responsive behaviours like alignments and resizes.  
   
   
