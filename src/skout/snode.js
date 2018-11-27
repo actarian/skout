@@ -9,6 +9,7 @@
  */
 
 import VNode from 'virtual-dom/vnode/vnode';
+import SContainer from './scontainer';
 import SOptions from './soptions';
 import SRect from './srect';
 import SStyle from './sstyle';
@@ -27,21 +28,6 @@ const ResizingConstraint = Object.freeze({
 const StyleShapes = ['MSRectangleShape', 'MSOvalShape'];
 
 export default class SNode {
-
-	static getConstraint(object) {
-		// const resizesContent = (typeof object.sketchObject.resizesContent == 'function') ? object.sketchObject.resizesContent() : 0;
-		const resizingConstraint = (typeof object.sketchObject.resizingConstraint == 'function') ? object.sketchObject.resizingConstraint() : 0;
-		const constraint = {
-			none: resizingConstraint === ResizingConstraint.None,
-			top: (resizingConstraint & ResizingConstraint.Top) === resizingConstraint,
-			right: (resizingConstraint & ResizingConstraint.Right) === resizingConstraint,
-			bottom: (resizingConstraint & ResizingConstraint.Bottom) === resizingConstraint,
-			left: (resizingConstraint & ResizingConstraint.Left) === resizingConstraint,
-			width: (resizingConstraint & ResizingConstraint.Width) === resizingConstraint,
-			height: (resizingConstraint & ResizingConstraint.Height) === resizingConstraint,
-		};
-		return constraint;
-	}
 
 	constructor(node) {
 		const object = node.object;
@@ -99,6 +85,21 @@ export default class SNode {
 		*/
 		this.classes = [];
 		this.overrides = {};
+	}
+
+	static getConstraint(object) {
+		// const resizesContent = (typeof object.sketchObject.resizesContent == 'function') ? object.sketchObject.resizesContent() : 0;
+		const resizingConstraint = (typeof object.sketchObject.resizingConstraint == 'function') ? object.sketchObject.resizingConstraint() : 0;
+		const constraint = {
+			none: resizingConstraint === ResizingConstraint.None,
+			top: (resizingConstraint & ResizingConstraint.Top) === resizingConstraint,
+			right: (resizingConstraint & ResizingConstraint.Right) === resizingConstraint,
+			bottom: (resizingConstraint & ResizingConstraint.Bottom) === resizingConstraint,
+			left: (resizingConstraint & ResizingConstraint.Left) === resizingConstraint,
+			width: (resizingConstraint & ResizingConstraint.Width) === resizingConstraint,
+			height: (resizingConstraint & ResizingConstraint.Height) === resizingConstraint,
+		};
+		return constraint;
 	}
 
 	setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
@@ -235,6 +236,12 @@ export default class SNode {
 		}
 	}
 
+	_setContainer() {
+		const container = new SContainer(this.nodes, this.rect);
+		this.container = container;
+		this.nodes.forEach(n => n.setContainer());
+	}
+
 	setContainer() {
 		const nodes = this.nodes;
 		const relatives = nodes.filter(x => x.relative);
@@ -243,7 +250,6 @@ export default class SNode {
 		const innerRect = SRect.fromNodes(relatives);
 		const layout = SOptions.layout;
 		this.innerRect = innerRect;
-
 		if (this.type !== 'MSArtboardGroup' &&
 			nodes.length && rect.width > layout.totalWidth && innerRect.width < layout.totalWidth) {
 			const containerRect = new SRect({
@@ -307,6 +313,37 @@ export default class SNode {
 		if (SOptions.log.layers) {
 			this.logLayers();
 		}
+	}
+
+	__renderNodes() {
+		if (this.container && this.container.rows.length) {
+			const container = new VNode('div', {
+				className: 'container'
+			}, this.container.render());
+			const absolute = this.renderableNodes(this.absolutes, this.rect).map(x => x.render());
+			absolute.push(container);
+			return absolute;
+		} else {
+			return this.renderableNodes(this.nodes, this.rect).map(x => x.render());
+		}
+	}
+
+	renderNodes() {
+		if (this.containerRect) {
+			const absolute = this.renderableNodes(this.absolutes, this.rect).map(x => x.render());
+			const relatives = this.renderableNodes(this.relatives, this.containerRect).map(x => x.render());
+			const container = new VNode('div', {
+				className: 'container'
+			}, relatives);
+			absolute.push(container);
+			return absolute;
+		} else {
+			return this.renderableNodes(this.nodes, this.rect).map(x => x.render());
+		}
+	}
+
+	render() {
+		return new VNode(this.tagName, this.attributes(), this.renderNodes());
 	}
 
 	getStyle() {
@@ -595,24 +632,6 @@ export default class SNode {
 			}
 		}
 		this.classes.push(sharedStyle.className);
-	}
-
-	renderNodes() {
-		if (this.containerRect) {
-			const absolute = this.renderableNodes(this.absolutes, this.rect).map(x => x.render());
-			const relatives = this.renderableNodes(this.relatives, this.containerRect).map(x => x.render());
-			const container = new VNode('div', {
-				className: 'container'
-			}, relatives);
-			absolute.push(container);
-			return absolute;
-		} else {
-			return this.renderableNodes(this.nodes, this.rect).map(x => x.render());
-		}
-	}
-
-	render() {
-		return new VNode(this.tagName, this.attributes(), this.renderNodes());
 	}
 
 	attributes() {
