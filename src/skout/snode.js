@@ -236,12 +236,6 @@ export default class SNode {
 		}
 	}
 
-	_setContainer() {
-		const container = new SContainer(this.nodes, this.rect);
-		this.container = container;
-		this.nodes.forEach(n => n.setContainer());
-	}
-
 	setContainer() {
 		const nodes = this.nodes;
 		const relatives = nodes.filter(x => x.relative);
@@ -305,26 +299,14 @@ export default class SNode {
 			});
 			// this.classes.push('v');
 		} else {
-			nodes.sort((a, b) => (a.rect.top * 10000 + a.rect.left) - (b.rect.top * 10000 + b.rect.left));
+			nodes.sort(SContainer.sortRowCol);
+			// nodes.sort((a, b) => (a.rect.top * 10000 + a.rect.left) - (b.rect.top * 10000 + b.rect.left));
 		}
 		this.nodes.forEach((a, i) => {
 			a.setMarginAndPaddings();
 		});
 		if (SOptions.log.layers) {
 			this.logLayers();
-		}
-	}
-
-	__renderNodes() {
-		if (this.container && this.container.rows.length) {
-			const container = new VNode('div', {
-				className: 'container'
-			}, this.container.render());
-			const absolute = this.renderableNodes(this.absolutes, this.rect).map(x => x.render());
-			absolute.push(container);
-			return absolute;
-		} else {
-			return this.renderableNodes(this.nodes, this.rect).map(x => x.render());
 		}
 	}
 
@@ -342,7 +324,31 @@ export default class SNode {
 		}
 	}
 
+	__setContainer() {
+		const nodes = this.nodes;
+		const rect = this.rect;
+		const innerRect = SRect.fromNodes(nodes);
+		const layout = SOptions.layout;
+		if (nodes.length && rect.width < layout.totalWidth) {
+			const container = new SContainer(nodes, rect);
+			this.container = container;
+			// this.nodes.forEach(n => n.setContainer());
+		}
+	}
+
+	__renderNodes() {
+		if (this.container && this.container.rows.length) {
+			// const absolute = this.renderableNodes(this.absolutes, this.rect).map(x => x.render());
+			// const absolute = this.nodes.filter(x => x.absolute).map(x => x.render());
+			// absolute.push(container);
+			return [this.container.render()];
+		} else {
+			return this.renderableNodes(this.nodes, this.rect).map(x => x.render());
+		}
+	}
+
 	render() {
+		// console.log(this.tagName);
 		return new VNode(this.tagName, this.attributes(), this.renderNodes());
 	}
 

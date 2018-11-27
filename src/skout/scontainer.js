@@ -8,6 +8,8 @@
  * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
  */
 
+import toHTML from 'vdom-to-html';
+import VNode from 'virtual-dom/vnode/vnode';
 import SGroup from './sgroup';
 import SRect from './srect';
 
@@ -15,12 +17,13 @@ export default class SContainer {
 
 	constructor(nodes, rect) {
 		nodes = SContainer.getNodes(nodes);
-		nodes = nodes.slice().sort(SContainer.sortRowCol);
-		// console.log(nodes.map(x => x.i).join(', '));
+		nodes = nodes.sort(SContainer.sortRowCol);
+		// console.log(nodes.map(x => x.zIndex).join(', '));
 		const rows = SContainer.getRows(nodes, rect);
 		// console.log('rows', rows.map(x => x.nodes.length).join(', '));
 		rows.forEach(r => {
 			r.cols = SContainer.getCols(r.nodes, r.rect);
+			// console.log(r.cols.map(c => c.nodes.length).join(', '));
 		});
 		// console.log('cols', rows.map(x => x.cols.length).join(', '));
 		this.nodes = nodes;
@@ -81,9 +84,9 @@ export default class SContainer {
 	}
 
 	static getNodes(nodes) {
+		nodes = nodes.slice();
 		if (nodes.length > 1) {
 			const absolutes = [];
-			nodes = nodes.slice();
 			nodes.forEach(a => {
 				nodes.forEach(b => {
 					if (a !== b && SRect.overlaps(a.rect, b.rect)) {
@@ -102,24 +105,26 @@ export default class SContainer {
 				});
 			});
 			nodes = nodes.filter(a => absolutes.indexOf(a) === -1);
-			return nodes;
-		} else {
-			return nodes.slice();
 		}
+		return nodes;
 	}
 
 	render() {
-		return this.rows.map(r => {
-			const cols = r.cols.map(c => {
-				const nodes = c.nodes.forEach(n => n.render());
+		const rendered = new VNode('div', {
+			className: 'container'
+		}, (this.rows.length === 1 && this.rows[0].cols.length === 1 ?
+			this.rows[0].cols[0].nodes.map(node => node.render()) :
+			this.rows.map(row => {
 				return new VNode('div', {
-					className: 'col'
-				}, nodes);
-			});
-			return new VNode('div', {
-				className: 'row'
-			}, cols);
-		});
+					className: 'row'
+				}, row.cols.map(col => {
+					return new VNode('div', {
+						className: 'col'
+					}, col.nodes.map(node => node.render()));
+				}));
+			})));
+		console.log(toHTML(rendered));
+		return rendered;
 	}
 
 }
