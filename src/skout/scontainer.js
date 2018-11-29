@@ -68,11 +68,13 @@ export default class SContainer {
 		nodes.forEach((b, i) => {
 			if (i === 0) {
 				col = SGroup.newWithNode(b);
+				col.classes = ['col'];
 				cols.push(col);
 			} else {
 				const a = nodes[i - 1];
 				if (b.rect.left >= a.rect.right) {
 					col = SGroup.newWithNode(b);
+					col.classes = ['col'];
 					cols.push(col);
 				} else {
 					col.nodes.push(b);
@@ -83,28 +85,34 @@ export default class SContainer {
 		return cols;
 	}
 
+	static reNode(a, b, childs) {
+		if (childs.indexOf(b) === -1) {
+			a.nodes.push(b);
+			childs.push(b);
+			b.rect.move(-a.rect.left, -a.rect.top);
+			b.absolute = true;
+			b.parentRect = a.rect;
+			b.parent = a;
+			b.parentSymbol = a.type === 'MSSymbolInstance' ? a : a.parentSymbol;
+		}
+	}
+
 	static getNodes(nodes) {
 		nodes = nodes.slice();
 		if (nodes.length > 1) {
-			const absolutes = [];
-			nodes.forEach(a => {
-				nodes.forEach(b => {
+			const childs = [];
+			nodes.filter(a => !a.absolute).forEach(a => {
+				nodes.filter(b => !b.absolute).forEach(b => {
 					if (a !== b && SRect.overlaps(a.rect, b.rect)) {
 						if (a.rect.width * a.rect.height > b.rect.width * b.rect.height) {
-							a.nodes.push(b);
-							absolutes.push(b);
-							b.rect.move(-a.rect.left, -a.rect.top);
-							b.absolute = true;
+							SContainer.reNode(a, b, childs);
 						} else {
-							b.nodes.push(a);
-							absolutes.push(a);
-							a.rect.move(-b.rect.left, -b.rect.top);
-							a.absolute = true;
+							SContainer.reNode(b, a, childs);
 						}
 					}
 				});
 			});
-			nodes = nodes.filter(a => absolutes.indexOf(a) === -1);
+			nodes = nodes.filter(a => childs.indexOf(a) === -1);
 		}
 		return nodes;
 	}

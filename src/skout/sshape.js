@@ -17,6 +17,8 @@ export default class SShape extends SNode {
 
 	constructor(node) {
 		super(node);
+		this.absolute = true;
+		this.relative = false;
 		// this.classes.push('sshape');
 	}
 

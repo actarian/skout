@@ -3,7 +3,7 @@
 skout! components
 -------------- */
 
-.content--hero>.hreo__title {
+.content--hero>.hero__title {
 	position: relative;
 	width: 100%;
 	z-index: 1;

@@ -132,8 +132,8 @@ export default class SNode {
 		this.pathNames = pathNames;
 		this.collectedNames = [];
 		if (this.containerRect) {
-			const absolute = this.renderableNodes(this.absolutes, this.rect);
-			absolute.forEach((a, i) => {
+			const absolutes = this.renderableNodes(this.absolutes, this.rect);
+			absolutes.forEach((a, i) => {
 				a.setPathNames(uniqueClassName, this.pathNames, this.collectedNames, this.type);
 			});
 			const relatives = this.renderableNodes(this.relatives, this.containerRect);
@@ -337,7 +337,7 @@ export default class SNode {
 		return new VNode(this.tagName, this.attributes(), this.renderNodes());
 	}
 
-	getStyle() {
+	getStyleMode1() {
 		const layout = SOptions.layout;
 		const rect = this.rect;
 		const parentRect = this.parentRect;
@@ -527,6 +527,16 @@ export default class SNode {
 		return style;
 	}
 
+	getStyle() {
+		if (SOptions.mode === 2) {
+			return this.getStyleMode2();
+
+		} else {
+			return this.getStyleMode1();
+
+		}
+	}
+
 	setStyle() {
 		this.style = this.getStyle();
 		const shape = this.nodes.find(x => x.isShapeForRect(this.rect));
@@ -568,6 +578,10 @@ export default class SNode {
 		}
 		*/
 		return this.tagName === 'placeholder' && this.parent.nodes.find(x => x.tagName === 'input') !== undefined;
+	}
+
+	isShape() {
+		return StyleShapes.indexOf(this.type) !== -1;
 	}
 
 	isShapeForRect(rect) {
@@ -662,13 +676,19 @@ export default class SNode {
 	// MODE 2
 
 	setNodes2() {
+		if (this.nodes.length === 0) {
+			return;
+		}
 		// parent then childs
 		const nodes = SContainer.getNodes(this.nodes);
 		this.nodes = nodes;
-		nodes.forEach(x => x.setNodes());
+		nodes.forEach(x => x.setNodes2());
 	}
 
 	setPosition2() {
+		if (this.nodes.length === 0) {
+			return;
+		}
 		/*
 		const absolutes = this.nodes.filter(x => {
 			x.absolute = false;
@@ -683,12 +703,22 @@ export default class SNode {
 		// let nodes = SContainer.getNodes(this.nodes.filter(x => !x.absolute));
 		// let nodes = SContainer.getNodes(this.nodes);
 		// childs then parents
+		const layout = SOptions.layout;
 		const nodes = this.nodes.sort(SContainer.sortRowCol);
 		nodes.forEach(a => a.setPosition2());
 		const renderableNodes = this.renderableNodes(nodes, this.rect);
 		const rows = SContainer.getRows(renderableNodes, this.rect);
 		rows.forEach(r => {
 			r.cols = SContainer.getCols(r.nodes, r.rect);
+			r.cols.forEach(c => {
+				const innerRect = SRect.fromNodes(c.nodes.filter(x => !x.absolute));
+				const col = layout.cols.reduce((x, col, i) => {
+					return (Math.abs(col - innerRect.width) <= 1 ? (i + 1) : x);
+				}, 0);
+				if (col > 0 && col < layout.numberOfColumns + 1) {
+					c.classes.push(`col-${col}`);
+				}
+			});
 			/*
 				r.cols.forEach(c => {
 				// console.log(this.name, c.nodes.map(n => n.name).join(', '));
@@ -701,42 +731,203 @@ export default class SNode {
 		});
 		this.rows = rows;
 		this.nodes = nodes;
-		const layout = SOptions.layout;
-		const innerRect = SRect.fromNodes(renderableNodes);
+		const innerRect = SRect.fromNodes(this.nodes.filter(x => !x.absolute));
 		const container = this.rect.width >= layout.totalWidth && innerRect.width < layout.totalWidth;
+		const grid = container; //  && (this.rows.length > 1 || (this.rows.find(r => r.cols.length > 1) !== undefined));
 		const vertical = !container && this.rows.length > 1;
 		const horizontal = !container && this.rows.find(r => r.cols.length > 1) !== undefined;
 		this.container = container;
+		this.grid = grid;
 		this.vertical = vertical;
 		this.horizontal = horizontal;
+		/*
+		if (this.name === 'section--hero') {
+			console.log(this.rect.width, innerRect.width, renderableNodes.map(x => x.name + ' ' + x.rect.width + ' ' + x.absolute).join(', '));
+		}
+		*/
 	}
 
-	setContainer2() {
+	setContainer2() {}
 
+	setMarginAndPaddings2() {}
+
+	setPathNames2(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
+		const fileName = this.fileName;
+		let pathNames = [],
+			nameCount = 0;
+		if (parentType == 'MSSymbolInstance') {
+			pathNames = [parentClassName];
+		} else if (Array.isArray(parentPathNames)) {
+			pathNames = parentPathNames.slice();
+		}
+		nameCount = parentCollectedNames[fileName] || 0;
+		nameCount++;
+		parentCollectedNames[fileName] = nameCount;
+		let uniqueClassName = fileName + (nameCount > 1 ? '-' + nameCount : '');
+		/*
+		const placeholderInput = this.getPlaceholderInput();
+		if (placeholderInput) {
+			const className = `${placeholderInput.uniqueClassName}::placeholder`;
+			pathNames.push(className);
+		} else {
+			pathNames.push(uniqueClassName);
+		}
+		console.log('uniqueClassName', uniqueClassName);
+		*/
+		pathNames.push(uniqueClassName);
+		this.parentType = parentType;
+		this.uniqueClassName = uniqueClassName;
+		this.classes.push(uniqueClassName);
+		this.pathNames = pathNames;
+		this.collectedNames = [];
+		if (this.grid) {
+			this.nodes.filter(x => x.absolute).forEach(a => {
+				a.setPathNames2(uniqueClassName, this.pathNames, this.collectedNames, this.type);
+			});
+			let containerPathNames = pathNames.slice();
+			containerPathNames.shift();
+			containerPathNames = containerPathNames.concat(['container', 'row', 'col']);
+			this.nodes.filter(x => !x.absolute).forEach(a => {
+				a.setPathNames2('col', containerPathNames);
+			});
+			// } else if (this.vertical && this.horizontal) {} else if (this.vertical) {} else if (this.horizontal) {} else {
+		} else if (this.container) {
+			this.nodes.filter(x => x.absolute).forEach(a => {
+				a.setPathNames2(uniqueClassName, this.pathNames, this.collectedNames, this.type);
+			});
+			let containerPathNames = pathNames.slice();
+			containerPathNames.shift();
+			containerPathNames = containerPathNames.concat(['container']);
+			this.nodes.filter(x => !x.absolute).forEach(a => {
+				a.setPathNames2('container', containerPathNames);
+			});
+			// } else if (this.vertical && this.horizontal) {} else if (this.vertical) {} else if (this.horizontal) {} else {
+		} else {
+			this.nodes.forEach((a, i) => {
+				a.setPathNames2(uniqueClassName, this.pathNames, this.collectedNames, this.type);
+			});
+		}
 	}
 
-	setMarginAndPaddings2() {
-
+	getStyleMode2() {
+		const layout = SOptions.layout;
+		const rect = this.rect;
+		const parentRect = this.parentRect;
+		const margin = this.margin;
+		const padding = this.padding;
+		let style = {};
+		if (SOptions.html.relative) {
+			style = {
+				position: this.absolute ? 'absolute' : 'relative',
+				width: '100%',
+				zIndex: this.zIndex,
+			};
+			if (this.absolute) {
+				style.top = toPx(rect.top);
+				style.left = toPx(rect.left);
+				style.height = toPxx(rect.height);
+				style.maxWidth = toPxx(rect.width);
+			} else if (this.parent.grid) {
+				style.minHeight = toPxx(rect.height);
+			} else if (this.parent.container) {
+				style.maxWidth = toPxx(rect.width);
+				if (this.type !== 'MSTextLayer') {
+					style.minHeight = toPxx(rect.height);
+				}
+			} else {
+				if (rect.width < parentRect.width) {
+					style.maxWidth = toPxx(rect.width);
+				}
+				if (this.type !== 'MSTextLayer') {
+					style.height = toPxx(rect.height);
+				}
+			}
+			if (this.horizontal) {
+				style.display = 'flex';
+				style.flexDirection = 'row';
+				style.justifyContent = 'space-between';
+				style.alignItems = 'center';
+			}
+			if (this.vertical) {
+				style.display = 'block';
+				style.flexDirection = 'column';
+			}
+			if (!this.parent.horizontal) {
+				style.marginTop = toPx(margin.top);
+				style.marginRight = toPx(margin.right);
+				style.marginBottom = toPx(margin.bottom);
+				style.marginLeft = toPx(margin.left);
+			}
+			if (this.nodes.length) {
+				if (padding.top < 120 || Math.abs(padding.bottom - padding.top) > 1) {
+					style.paddingTop = toPxx(padding.top);
+					style.paddingBottom = toPxx(padding.bottom);
+				} else {
+					style.alignItems = 'center';
+				}
+				if (padding.left < 120 || Math.abs(padding.right - padding.left) > 1) {
+					style.paddingLeft = toPxx(padding.left);
+					style.paddingRight = toPxx(padding.right);
+				} else {
+					style.justifyContent = 'center';
+				}
+			}
+			const placeholder = this.getInputPlaceholder();
+			if (placeholder) {
+				const innerRect = placeholder.rect;
+				style.paddingTop = toPxx(innerRect.top);
+				style.paddingRight = toPxx(rect.width - innerRect.right);
+				style.paddingBottom = toPxx(rect.height - innerRect.bottom);
+				style.paddingLeft = toPxx(innerRect.left);
+			}
+		} else if (SOptions.html.exact) {
+			style = {
+				position: 'absolute',
+				top: toPx(rect.top),
+				left: toPx(rect.left),
+				width: toPxx(rect.width),
+				height: toPxx(rect.height),
+				zIndex: this.zIndex,
+			};
+		} else {
+			style = {
+				position: 'absolute',
+				top: this.constraint.top ? toPx(rect.top) : (rect.top / parentRect.height * 100).toFixed(2) + '%',
+				left: this.constraint.left ? toPx(rect.left) : (rect.left / parentRect.width * 100).toFixed(2) + '%',
+				zIndex: this.zIndex,
+			};
+			if (this.constraint.right) {
+				style.right = toPx(parentRect.width - rect.right);
+			}
+			if (this.constraint.bottom) {
+				style.bottom = toPx(parentRect.height - rect.bottom);
+			}
+			if (this.constraint.left && this.constraint.right) {
+				style.width = 'auto';
+			} else {
+				style.width = this.constraint.width ? toPxx(rect.width) : (rect.width / parentRect.width * 100).toFixed(2) + '%';
+			}
+			if (this.constraint.top && this.constraint.bottom) {
+				style.width = 'auto';
+			} else {
+				style.height = this.constraint.height ? toPxx(rect.height) : (rect.height / parentRect.height * 100).toFixed(2) + '%';
+			}
+		}
+		if (this.sketchObject.rotation()) {
+			style.transform = `rotateZ(${this.sketchObject.rotation()}deg)`;
+		}
+		return style;
 	}
 
 	renderNodesMode2() {
 		if (this.rows) {
-			if (this.container) {
-				console.log('mode', 1, this.name);
-			} else if (this.vertical && this.horizontal) {
-				console.log('mode', 2, this.name);
-			} else if (this.vertical) {
-				console.log('mode', 3, this.name);
-			} else if (this.horizontal) {
-				console.log('mode', 4, this.name);
-			}
-			const renderedNodes = [];
+			let renderedNodes = [];
 			const rows = this.rows.map(row => {
 				return new VNode('div', {
 					className: 'row'
 				}, row.cols.map(col => {
 					return new VNode('div', {
-						className: 'col'
+						className: col.classes.join(' ')
 					}, col.nodes.map(node => {
 						const rendered = node.render();
 						renderedNodes.push(rendered);
@@ -744,16 +935,30 @@ export default class SNode {
 					}));
 				}));
 			});
+			if (this.grid) {
+				// console.log('mode', 1, this.name);
+				renderedNodes = [new VNode('div', {
+					className: 'container'
+				}, rows)];
+			} else if (this.container) {
+				// console.log('mode', 1, this.name);
+				renderedNodes = [new VNode('div', {
+					className: 'container'
+				}, renderedNodes)];
+			} else if (this.vertical && this.horizontal) {
+				// console.log('mode', 2, this.name);
+			} else if (this.vertical) {
+				// console.log('mode', 3, this.name);
+			} else if (this.horizontal) {
+				// console.log('mode', 4, this.name);
+			} else {}
+			const absolutes = this.nodes.filter(x => x.absolute).map(x => x.render());
+			return renderedNodes.concat(absolutes);
 			/*
 			const container = new VNode('div', {
 				className: 'container'
 			}, rows);
 			*/
-			/*
-			const absolutes = this.nodes.filter(x => x.absolute).map(x => x.render());
-			return renderedNodes.concat(absolutes);
-			*/
-			return renderedNodes;
 			// return [container].concat(absolutes);
 			/*
 			if (this.rect.width >= layout.totalWidth && innerRect.width < layout.totalWidth) {

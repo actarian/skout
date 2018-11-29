@@ -524,6 +524,17 @@ skout! ${s}
 			padding-right: ${(layout.gutterWidth / 2).toFixed(2)}px;
             padding-left: ${(layout.gutterWidth / 2).toFixed(2)}px;
 		}
+		.row {
+			width:100%;
+			display: flex;
+			flex-wrap: wrap;
+			margin-right: ${(layout.gutterWidth / -2).toFixed(2)}px;
+			margin-left: ${(layout.gutterWidth / -2).toFixed(2)}px;
+		}
+		.col {
+			width: auto;
+			flex: 1 1 auto;
+		}
 		${SStyle.getCols()}
 		`);
 		return grid;
