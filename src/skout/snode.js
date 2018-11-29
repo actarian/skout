@@ -191,6 +191,8 @@ export default class SNode {
 		this.constraint = constraint;
 	}
 
+	setNodes() {}
+
 	setPosition() {
 		const layout = SOptions.layout;
 		const nodes = this.nodes.slice();
@@ -226,14 +228,17 @@ export default class SNode {
 		const relatives = nodes.filter(x => x.relative);
 		if (relatives.length > 1) {
 			const horizontals = relatives.sort((a, b) => a.rect.left - b.rect.left);
-			const isHorizontal = horizontals.reduce((a, b) => (a && b && a.rect.right <= b.rect.left) ? b : null);
-			this.isHorizontal = isHorizontal;
+			const horizontal = horizontals.reduce((a, b) => (a && b && a.rect.right <= b.rect.left) ? b : null);
+			this.horizontal = horizontal;
 		}
 		if (nodes.length > 1) {
 			const verticals = nodes.sort((a, b) => a.rect.top - b.rect.top);
-			const isVertical = verticals.reduce((a, b) => (a && b && a.rect.bottom <= b.rect.top) ? b : null);
-			this.isVertical = isVertical;
+			const vertical = verticals.reduce((a, b) => (a && b && a.rect.bottom <= b.rect.top) ? b : null);
+			this.vertical = vertical;
 		}
+		this.nodes.forEach((a, i) => {
+			a.setPosition();
+		});
 	}
 
 	setContainer() {
@@ -268,6 +273,9 @@ export default class SNode {
 		}
 		this.relatives = relatives;
 		this.absolutes = absolutes;
+		this.nodes.forEach((a, i) => {
+			a.setContainer();
+		});
 	}
 
 	setMarginAndPaddings() {
@@ -282,7 +290,7 @@ export default class SNode {
 		padding.left = innerRect.left;
 		// nodes = this.nodes;
 		const renderableRect = this.containerRect || this.rect;
-		if (this.isHorizontal) {
+		if (this.horizontal) {
 			nodes.sort((a, b) => a.rect.left - b.rect.left).filter(x => x.isRenderable(renderableRect)).forEach((b, i) => {
 				if (i > 0) {
 					const a = nodes[i - 1];
@@ -290,7 +298,7 @@ export default class SNode {
 				}
 			});
 			// this.classes.push('h');
-		} else if (this.isVertical) {
+		} else if (this.vertical) {
 			nodes.sort((a, b) => a.rect.top - b.rect.top).filter(x => x.isRenderable(renderableRect)).forEach((b, i) => {
 				if (i > 0) {
 					const a = nodes[i - 1];
@@ -310,7 +318,7 @@ export default class SNode {
 		}
 	}
 
-	renderNodes() {
+	renderNodesMode1() {
 		if (this.containerRect) {
 			const absolute = this.renderableNodes(this.absolutes, this.rect).map(x => x.render());
 			const relatives = this.renderableNodes(this.relatives, this.containerRect).map(x => x.render());
@@ -319,29 +327,6 @@ export default class SNode {
 			}, relatives);
 			absolute.push(container);
 			return absolute;
-		} else {
-			return this.renderableNodes(this.nodes, this.rect).map(x => x.render());
-		}
-	}
-
-	__setContainer() {
-		const nodes = this.nodes;
-		const rect = this.rect;
-		const innerRect = SRect.fromNodes(nodes);
-		const layout = SOptions.layout;
-		if (nodes.length && rect.width < layout.totalWidth) {
-			const container = new SContainer(nodes, rect);
-			this.container = container;
-			// this.nodes.forEach(n => n.setContainer());
-		}
-	}
-
-	__renderNodes() {
-		if (this.container && this.container.rows.length) {
-			// const absolute = this.renderableNodes(this.absolutes, this.rect).map(x => x.render());
-			// const absolute = this.nodes.filter(x => x.absolute).map(x => x.render());
-			// absolute.push(container);
-			return [this.container.render()];
 		} else {
 			return this.renderableNodes(this.nodes, this.rect).map(x => x.render());
 		}
@@ -432,14 +417,14 @@ export default class SNode {
 				}
 			}
 
-			if (this.isHorizontal) {
+			if (this.horizontal) {
 				style.display = 'flex';
 				style.flexDirection = 'row';
 				style.justifyContent = 'space-between';
 				style.alignItems = 'center';
 			}
 
-			if (this.isVertical) {
+			if (this.vertical) {
 				style.display = 'block';
 				style.flexDirection = 'column';
 				/*
@@ -450,7 +435,7 @@ export default class SNode {
 				*/
 			}
 
-			if (!this.parent.isHorizontal) {
+			if (!this.parent.horizontal) {
 				style.marginTop = toPx(margin.top);
 				style.marginRight = toPx(margin.right);
 				style.marginBottom = toPx(margin.bottom);
@@ -672,6 +657,122 @@ export default class SNode {
 			console.log(this.uniqueClassName, '=>', a.uniqueClassName, ' '.repeat(50 - this.uniqueClassName.length - 4 - a.uniqueClassName.length), (a.absolute ? 'abs' : 'rel'), a.rect.width, 'x', a.rect.height);
 		});
 		console.log(' ', ' ');
+	}
+
+	// MODE 2
+
+	setNodes2() {
+		// parent then childs
+		const nodes = SContainer.getNodes(this.nodes);
+		this.nodes = nodes;
+		nodes.forEach(x => x.setNodes());
+	}
+
+	setPosition2() {
+		/*
+		const absolutes = this.nodes.filter(x => {
+			x.absolute = false;
+			return x.rect.width === this.rect.width && x.rect.height === this.rect.height;
+		});
+		if (this.nodes.length > absolutes.length) {
+			absolutes.forEach(x => x.absolute = true);
+		}
+		*/
+		// console.log('absolutes', absolutes.length);
+		// let nodes = this.nodes; // SContainer.getNodes(this.renderableNodes(this.nodes, this.rect));
+		// let nodes = SContainer.getNodes(this.nodes.filter(x => !x.absolute));
+		// let nodes = SContainer.getNodes(this.nodes);
+		// childs then parents
+		const nodes = this.nodes.sort(SContainer.sortRowCol);
+		nodes.forEach(a => a.setPosition2());
+		const renderableNodes = this.renderableNodes(nodes, this.rect);
+		const rows = SContainer.getRows(renderableNodes, this.rect);
+		rows.forEach(r => {
+			r.cols = SContainer.getCols(r.nodes, r.rect);
+			/*
+				r.cols.forEach(c => {
+				// console.log(this.name, c.nodes.map(n => n.name).join(', '));
+				c.nodes.forEach((a, i) => {
+					a.setPosition();
+				});
+			});
+			*/
+			// console.log(r.cols.map(c => c.nodes.length).join(', '));
+		});
+		this.rows = rows;
+		this.nodes = nodes;
+		const layout = SOptions.layout;
+		const innerRect = SRect.fromNodes(renderableNodes);
+		const container = this.rect.width >= layout.totalWidth && innerRect.width < layout.totalWidth;
+		const vertical = !container && this.rows.length > 1;
+		const horizontal = !container && this.rows.find(r => r.cols.length > 1) !== undefined;
+		this.container = container;
+		this.vertical = vertical;
+		this.horizontal = horizontal;
+	}
+
+	setContainer2() {
+
+	}
+
+	setMarginAndPaddings2() {
+
+	}
+
+	renderNodesMode2() {
+		if (this.rows) {
+			if (this.container) {
+				console.log('mode', 1, this.name);
+			} else if (this.vertical && this.horizontal) {
+				console.log('mode', 2, this.name);
+			} else if (this.vertical) {
+				console.log('mode', 3, this.name);
+			} else if (this.horizontal) {
+				console.log('mode', 4, this.name);
+			}
+			const renderedNodes = [];
+			const rows = this.rows.map(row => {
+				return new VNode('div', {
+					className: 'row'
+				}, row.cols.map(col => {
+					return new VNode('div', {
+						className: 'col'
+					}, col.nodes.map(node => {
+						const rendered = node.render();
+						renderedNodes.push(rendered);
+						return rendered;
+					}));
+				}));
+			});
+			/*
+			const container = new VNode('div', {
+				className: 'container'
+			}, rows);
+			*/
+			/*
+			const absolutes = this.nodes.filter(x => x.absolute).map(x => x.render());
+			return renderedNodes.concat(absolutes);
+			*/
+			return renderedNodes;
+			// return [container].concat(absolutes);
+			/*
+			if (this.rect.width >= layout.totalWidth && innerRect.width < layout.totalWidth) {
+
+			} else {
+				return this.renderableNodes(this.nodes, this.rect).map(x => x.render());
+			}
+			*/
+		} else {
+			return this.renderableNodes(this.nodes, this.rect).map(x => x.render());
+		}
+	}
+
+	renderNodes() {
+		if (SOptions.mode === 2) {
+			return this.renderNodesMode2();
+		} else {
+			return this.renderNodesMode1();
+		}
 	}
 
 }

@@ -27,6 +27,7 @@ export default function() {
 			save: false,
 			launch: false,
 			folder: folder,
+			mode: 1,
 		});
 		AppController.sharedInstance().pluginManager().reloadPlugins();
 	} else {

@@ -39,7 +39,8 @@ const defaultOptions = {
 	},
 	"log": {
 		"layers": false
-	}
+	},
+	"mode": 2,
 };
 
 export default class SOptions {

@@ -147,10 +147,6 @@ export default class SPage extends SNode {
 			    console.log(node.nodes.map(x => x.name).join(', '));
 			}
 			*/
-			if (SOptions.html.relative) {
-				node.setPosition();
-				node.setContainer();
-			}
 		} else {
 			node.nodes = [];
 			if (SOptions.html.relative) {
@@ -187,7 +183,17 @@ export default class SPage extends SNode {
 		page.parentRect = layout.rect;
 		page.originalRect = layout.rect;
 		if (SOptions.html.relative) {
-			page.setMarginAndPaddings();
+			if (SOptions.mode === 2) {
+				page.setNodes2();
+				page.setPosition2();
+				page.setContainer2();
+				page.setMarginAndPaddings2();
+			} else {
+				page.setNodes();
+				page.setPosition();
+				page.setContainer();
+				page.setMarginAndPaddings();
+			}
 		}
 		page.setPathNames();
 		page.setStyle();
