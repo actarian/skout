@@ -10,12 +10,12 @@
 
 import toHTML from 'vdom-to-html';
 import VNode from 'virtual-dom/vnode/vnode';
-import SNode from './snode';
+import SLayer from './slayer';
 import SOptions from './soptions';
 import SStyle from './sstyle';
 import SUtil from './sutil';
 
-export default class SSymbol extends SNode {
+export default class SSymbol extends SLayer {
 
 	/*
 	static getNames(text, id) {
@@ -112,7 +112,7 @@ window.customElements.define('${object.componentTagName}', ${object.componentCla
 
 	getStyle(...rest) {
 		this.classes.push('scomponent');
-		const style = SNode.prototype.getStyle.apply(this, rest);
+		const style = SLayer.prototype.getStyle.apply(this, rest);
 		return style;
 	}
 
@@ -150,7 +150,7 @@ window.customElements.define('${object.componentTagName}', ${object.componentCla
 			console.log(this.name, this.originalName, this.overrides);
 			*/
 		} else {
-			return SNode.prototype.render.call(this);
+			return SLayer.prototype.render.call(this);
 		}
 	}
 

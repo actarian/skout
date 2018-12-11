@@ -9,11 +9,11 @@
  */
 
 import VNode from 'virtual-dom/vnode/vnode';
-import SNode from './snode';
+import SLayer from './slayer';
 import SOptions from './soptions';
 import SUtil from './sutil';
 
-export default class SImage extends SNode {
+export default class SImage extends SLayer {
 
 	attributes() {
 		return {

@@ -8,26 +8,131 @@
  * found in the LICENSE file at https://github.com/actarian/skout/blob/master/LICENSE
  */
 
-import toHTML from 'vdom-to-html';
-import VNode from 'virtual-dom/vnode/vnode';
-import SGroup from './sgroup';
+import SCol from './scol';
+import SNode from './snode';
+import SOptions from './soptions';
 import SRect from './srect';
+import SRow from './srow';
+import SUtil, { toPx, toPxx } from './sutil';
 
-export default class SContainer {
+export default class SContainer extends SNode {
 
-	constructor(nodes, rect) {
-		nodes = SContainer.getNodes(nodes);
-		nodes = nodes.sort(SContainer.sortRowCol);
-		// console.log(nodes.map(x => x.zIndex).join(', '));
-		const rows = SContainer.getRows(nodes, rect);
-		// console.log('rows', rows.map(x => x.nodes.length).join(', '));
-		rows.forEach(r => {
-			r.cols = SContainer.getCols(r.nodes, r.rect);
-			// console.log(r.cols.map(c => c.nodes.length).join(', '));
+	constructor(node) {
+		super();
+		const type = 'SContainer';
+		const name = 'container';
+		this.type = type;
+		this.name = name;
+		this.fileName = name;
+		this.className = name;
+		this.tagName = SUtil.getTagName(name);
+		this.groups = [];
+		this.rect = node.rect;
+		this.originalRect = node.rect;
+		this.parentRect = node.rect;
+		this.originalParentRect = node.originalRect;
+		this.childOfSymbol = node.childOfSymbol;
+		this.collectedStyles = node.collectedStyles;
+		this.zIndex = 0;
+		this.styleText = '';
+		this.margin = new SRect();
+		this.padding = new SRect();
+		this.style = {};
+		this.collectedNames = {};
+		this.classes = [];
+		this.overrides = {};
+		this.absolute = false;
+		this.relative = true;
+		Object.defineProperty(this, 'parent', {
+			value: node.parent,
+			writable: true
 		});
-		// console.log('cols', rows.map(x => x.cols.length).join(', '));
-		this.nodes = nodes;
-		this.rows = rows;
+		Object.defineProperty(this, 'parentSymbol', {
+			value: node.parent.type === 'MSSymbolInstance' ? node.parent : node.parent.parentSymbol,
+			writable: true
+		});
+	}
+
+	static parseNodes(node) {
+		const layout = SOptions.layout;
+		const rect = node.rect;
+		let nodes = node.nodes;
+		const shapes = node.shapes;
+		const relatives = node.relatives;
+		const absolutes = node.absolutes;
+		nodes.forEach(a => a.setPosition2());
+		relatives.forEach(x => x._rect = new SRect(x.rect));
+		const innerRect = SRect.fromNodes(relatives);
+		const isContainer = rect.width >= layout.totalWidth && innerRect.width < layout.totalWidth;
+		const rows = SRow.getRows(relatives, rect);
+		rows.forEach(row => {
+			row.cols = SCol.getCols(row.nodes, row.rect);
+			row.cols.forEach(col => {
+				col.col = 0;
+				col.colWidth = 0;
+				if (isContainer) {
+					const innerRect = SRect.fromNodes(col.nodes);
+					/*
+					const colName = layout.cols.reduce((x, width, i) => {
+						return (Math.abs(width - innerRect.width) <= 1 ? (i + 1) : x);
+					}, 0);
+					*/
+					const colName = layout.reverseCols.reduce((x, width, i) => {
+						return innerRect.width < width ? (layout.reverseCols.length - 1 - i) : x;
+					}, layout.numberOfColumns);
+					if (colName > 0 && colName < layout.numberOfColumns + 1) {
+						col.col = colName;
+						col.colWidth = layout.cols[colName - 1];
+					}
+				}
+			});
+		});
+		const numCols = rows.reduce((p, row) => p + row.cols.length, 0);
+		const colSizes = rows.reduce((p, row) => p.concat(row.cols.map(col => col.col)), []);
+		const colTotal = colSizes.reduce((p, num) => p + num, 0);
+		const isGrid = isContainer && colTotal < layout.numberOfColumns; //  && (this.rows.length > 1 || (this.rows.find(r => r.cols.length > 1) !== undefined));
+		const isVertical = !isContainer && rows.length > 1;
+		const isHorizontal = !isContainer && rows.find(row => row.cols.length > 1) !== undefined;
+		if (isGrid) {
+			const container = new SContainer(node);
+			container.zIndex = relatives.reduce((p, x) => Math.min(p, x.zIndex), Number.POSITIVE_INFINITY);
+			rows.forEach(row => {
+				row.setParent(container);
+				const cols = row.cols;
+				cols.forEach(col => {
+					col.setParent(row);
+					col.relatives = col.nodes;
+				});
+				row.relatives = cols;
+				row.nodes = cols;
+			});
+			container.nodes = rows;
+			container.relatives = rows;
+			node.relatives = [container];
+			nodes = [].concat(shapes, absolutes, [container]).sort((a, b) => a.zIndex - b.zIndex);
+		} else {
+			relatives.forEach(x => {
+				x.rect = new SRect(x._rect);
+				x.parent = node.parent;
+			});
+		}
+		const parsed = {
+			parentName: node.parent.name,
+			isContainer,
+			isGrid,
+			isVertical,
+			isHorizontal,
+			numRows: rows.length,
+			numCols: numCols,
+			colSizes: colSizes,
+			colTotal: colTotal,
+			// nodes: [].concat(shapes, node.relatives, node.absolutes),
+			nodes: nodes,
+			shapes: shapes,
+			relatives: node.relatives,
+			absolutes: node.absolutes,
+		};
+		return parsed;
 	}
 
 	static sortRowCol(a, b) {
@@ -39,50 +144,6 @@ export default class SContainer {
 		} else {
 			return dx;
 		}
-	}
-
-	static getRows(nodes, rect) {
-		const rows = [];
-		let row;
-		nodes.filter(n => !n.absolute).forEach((b, i) => {
-			if (i === 0) {
-				row = SGroup.newWithNode(b);
-				rows.push(row);
-			} else {
-				const a = nodes[i - 1];
-				if (b.rect.top >= a.rect.bottom) {
-					row = SGroup.newWithNode(b);
-					rows.push(row);
-				} else {
-					row.nodes.push(b);
-				}
-			}
-		});
-		rows.forEach(r => r.setRowRect(rect));
-		return rows;
-	}
-
-	static getCols(nodes, rect) {
-		const cols = [];
-		let col;
-		nodes.forEach((b, i) => {
-			if (i === 0) {
-				col = SGroup.newWithNode(b);
-				col.classes = ['col'];
-				cols.push(col);
-			} else {
-				const a = nodes[i - 1];
-				if (b.rect.left >= a.rect.right) {
-					col = SGroup.newWithNode(b);
-					col.classes = ['col'];
-					cols.push(col);
-				} else {
-					col.nodes.push(b);
-				}
-			}
-		});
-		cols.forEach(c => c.setColRect(rect));
-		return cols;
 	}
 
 	static reNode(a, b, childs) {
@@ -117,22 +178,27 @@ export default class SContainer {
 		return nodes;
 	}
 
-	render() {
-		const rendered = new VNode('div', {
-			className: 'container'
-		}, (this.rows.length === 1 && this.rows[0].cols.length === 1 ?
-			this.rows[0].cols[0].nodes.map(node => node.render()) :
-			this.rows.map(row => {
-				return new VNode('div', {
-					className: 'row'
-				}, row.cols.map(col => {
-					return new VNode('div', {
-						className: 'col'
-					}, col.nodes.map(node => node.render()));
-				}));
-			})));
-		console.log(toHTML(rendered));
-		return rendered;
+	getStyle() {
+		const margin = this.margin;
+		const padding = this.padding;
+		let style = {};
+		if (Math.abs(padding.bottom - padding.top) > 1) {
+			if (padding.top) {
+				style.paddingTop = toPxx(padding.top);
+			}
+			if (padding.bottom) {
+				style.paddingBottom = toPxx(padding.bottom);
+			}
+		} else {
+			style.alignItems = 'center';
+		}
+		if (margin.top) {
+			style.marginTop = toPx(margin.top);
+		}
+		if (margin.top) {
+			style.marginBottom = toPx(margin.bottom);
+		}
+		return style;
 	}
 
 }

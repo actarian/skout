@@ -11,55 +11,13 @@
 import sketch from 'sketch';
 import svg from 'virtual-dom/virtual-hyperscript/svg';
 import VNode from 'virtual-dom/vnode/vnode';
-import SNode from './snode';
+import SLayer from './slayer';
 import SOptions from './soptions';
 
 const SVG_MARKER = /[MmLlSsQqLlHhVvCcSsQqTtAaZz]/g;
 const SVG_DIGIT = /-?[0-9]*\.?\d+/g;
 
-export default class SSvg extends SNode {
-
-	render() {
-		if (this.parentType === 'MSSymbolInstance' ||
-			this.type === 'MSLayerGroup' ||
-			this.type === 'MSShapeGroup') {
-			SSvg.collectedSvgs.push({
-				name: this.fileName,
-				sketchObject: this.sketchObject,
-				rect: this.rect,
-			});
-			/*
-			const attributes = {
-				className: this.className
-			};
-			const style = {
-				position: 'absolute',
-				top: this.rect.top + 'px',
-				left: this.rect.left + 'px',
-				width: '100%',
-				height: '100%',
-			};
-			if (SOptions.inline) {
-				attributes.style = style;
-			} else {
-				this.collectStyle(style);
-			}
-			*/
-			const attributes = this.attributes();
-			attributes.width = `100%`;
-			attributes.viewBox = `0 0 ${this.rect.width} ${this.rect.height}`;
-			if (SOptions.svg.sprite) {
-				return svg('svg', attributes,
-					svg('use', {
-						'xmlns:xlink': 'http://www.w3.org/1999/xlink',
-						'xlink:href': `#${this.fileName}`
-					}));
-			} else {
-				attributes.src = SSvg.filePath(this.fileName);
-				return new VNode('img', attributes, []);
-			}
-		}
-	}
+export default class SSvg extends SLayer {
 
 	static filePath(name) {
 		return `${SOptions.svg.folder}/${name}.svg`;
@@ -332,6 +290,48 @@ export default class SSvg extends SNode {
 		const bounds = SSvg.commandsToBounds(commands);
 		// console.log('pathRebound', bounds);
 		return path;
+	}
+
+	render() {
+		if (this.parentType === 'MSSymbolInstance' ||
+			this.type === 'MSLayerGroup' ||
+			this.type === 'MSShapeGroup') {
+			SSvg.collectedSvgs.push({
+				name: this.fileName,
+				sketchObject: this.sketchObject,
+				rect: this.rect,
+			});
+			/*
+			const attributes = {
+				className: this.className
+			};
+			const style = {
+				position: 'absolute',
+				top: this.rect.top + 'px',
+				left: this.rect.left + 'px',
+				width: '100%',
+				height: '100%',
+			};
+			if (SOptions.inline) {
+				attributes.style = style;
+			} else {
+				this.collectStyle(style);
+			}
+			*/
+			const attributes = this.attributes();
+			attributes.width = `100%`;
+			attributes.viewBox = `0 0 ${this.rect.width} ${this.rect.height}`;
+			if (SOptions.svg.sprite) {
+				return svg('svg', attributes,
+					svg('use', {
+						'xmlns:xlink': 'http://www.w3.org/1999/xlink',
+						'xlink:href': `#${this.fileName}`
+					}));
+			} else {
+				attributes.src = SSvg.filePath(this.fileName);
+				return new VNode('img', attributes, []);
+			}
+		}
 	}
 
 	/*

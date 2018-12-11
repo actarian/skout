@@ -13,8 +13,8 @@ import toHTML from 'vdom-to-html';
 import VNode from 'virtual-dom/vnode/vnode';
 import VText from 'virtual-dom/vnode/vtext';
 import SImage from './simage';
+import SLayer from './slayer';
 import SLayout from './slayout';
-import SNode from './snode';
 import SOptions from './soptions';
 import SRect from './srect';
 import SShape from './sshape';
@@ -24,7 +24,7 @@ import SSymbol from './ssymbol';
 import SText from './stext';
 import SUtil from './sutil';
 
-export default class SPage extends SNode {
+export default class SPage extends SLayer {
 
 	static getNode(object, parent, parentData, childOfSymbol) {
 		parentData = parentData || {};
@@ -101,7 +101,7 @@ export default class SPage extends SNode {
 					node = new SSvg(node);
 					layers = [];
 				} else {
-					node = new SNode(node);
+					node = new SLayer(node);
 				}
 				break;
 			case 'MSShapeGroup':
@@ -127,7 +127,7 @@ export default class SPage extends SNode {
 				node = new SImage(node);
 				break;
 			default:
-				node = new SNode(node);
+				node = new SLayer(node);
 		}
 		node.setConstraint();
 		if (layers) {
@@ -205,7 +205,7 @@ export default class SPage extends SNode {
 	}
 
 	render() {
-		const node = SNode.prototype.render.call(this);
+		const node = SLayer.prototype.render.call(this);
 		// const nodes = this.renderNodes();
 		const css = SStyle.getCss();
 		SPage.css = css;
@@ -280,7 +280,7 @@ export default class SPage extends SNode {
 	}
 
 	save(folder) {
-		SNode.folder = folder;
+		SLayer.folder = folder;
 		let html = this.getHtml();
 		if (SOptions.css.export) {
 			const cssFolder = `${folder}/${SOptions.css.folder}`;

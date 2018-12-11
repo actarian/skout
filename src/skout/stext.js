@@ -10,11 +10,11 @@
 
 import VNode from 'virtual-dom/vnode/vnode';
 import VText from 'virtual-dom/vnode/vtext';
-import SNode from './snode';
+import SLayer from './slayer';
 import SOptions from './soptions';
 import SStyle from './sstyle';
 
-export default class SText extends SNode {
+export default class SText extends SLayer {
 
 	constructor(node) {
 		super(node);
@@ -28,7 +28,7 @@ export default class SText extends SNode {
 
 	getStyle(...rest) {
 		this.classes.push('stext');
-		const style = SNode.prototype.getStyle.apply(this, rest);
+		const style = SLayer.prototype.getStyle.apply(this, rest);
 		const alignItems = (typeof this.sketchObject.verticalAlignment == 'function') ? ['flex-start', 'center', 'flex-end'][this.sketchObject.verticalAlignment()] : 'flex-start';
 		style.alignItems = alignItems;
 		const sharedStyle = SStyle.getSharedStyle(this.object);

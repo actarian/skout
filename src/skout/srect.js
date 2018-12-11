@@ -74,28 +74,40 @@ export default class SRect {
 		}
 	}
 
+	static getBounds(rects) {
+		if (rects.length) {
+			const bounds = rects.reduce((bounds, a) => {
+				return {
+					left: Math.min(a.left, bounds.left),
+					top: Math.min(a.top, bounds.top),
+					right: Math.max(a.right, bounds.right),
+					bottom: Math.max(a.bottom, bounds.bottom),
+				};
+			}, {
+				left: Number.POSITIVE_INFINITY,
+				top: Number.POSITIVE_INFINITY,
+				right: Number.NEGATIVE_INFINITY,
+				bottom: Number.NEGATIVE_INFINITY
+			});
+			return bounds;
+		} else {
+			return new SRect();
+		}
+	}
+
 	static fromRects(rects) {
-		const rect = {
-			top: Number.POSITIVE_INFINITY,
-			left: Number.POSITIVE_INFINITY,
-			bottom: Number.NEGATIVE_INFINITY,
-			right: Number.NEGATIVE_INFINITY,
-			width: 0,
-			height: 0
-		};
-		rects.forEach((x, i) => {
-			rect.top = Math.min(rect.top, x.top);
-			rect.left = Math.min(rect.left, x.left);
-			rect.bottom = Math.max(rect.bottom, x.bottom);
-			rect.right = Math.max(rect.right, x.right);
-		});
+		const rect = SRect.getBounds(rects);
 		rect.width = rect.right - rect.left;
 		rect.height = rect.bottom - rect.top;
 		return new SRect(rect);
 	}
 
 	static fromNodes(nodes) {
-		return SRect.fromRects(nodes.filter(x => x.relative).map(x => x.rect));
+		return SRect.fromRects(nodes.filter(x => x.relative).map(x => {
+			const rect = x.rect;
+			// console.log(x.name, rect);
+			return rect;
+		}));
 	}
 
 	static differs(a, b) {

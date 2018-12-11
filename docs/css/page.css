@@ -7,37 +7,31 @@ skout! page
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	max-width: 1440px;
-	min-height: 1440px;
-	margin-top: 0;
-	margin-right: 0;
-	margin-bottom: 0;
-	margin-left: 0;
-	padding-top: 0;
+	height: 1440px;
+	display: block;
+	flex-direction: column;
 	padding-bottom: 2px;
-	padding-left: 0;
-	padding-right: 0;
 }
 
 .homepage>.section--hero {
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	max-width: 1440px;
-	min-height: 608px;
-	margin-top: 0;
-	margin-right: 0;
-	margin-bottom: 0;
-	margin-left: 0;
-	align-items: center;
-	padding-left: 0;
-	padding-right: 0;
+	height: 608px;
 	background: url('../img/background.jpg') no-repeat center;
 	background-size: cover;
 	border-radius: 0;
 }
 
-.homepage>.header {
+.section--hero>.container {
+	align-items: center;
+}
+
+.section--hero>.container>.row {
+	justify-content: center;
+}
+
+.section--hero>.header {
 	position: absolute;
 	width: 100%;
 	z-index: 3;
@@ -45,10 +39,6 @@ skout! page
 	left: 0;
 	height: 110px;
 	max-width: 1440px;
-	margin-top: 0;
-	margin-right: 0;
-	margin-bottom: 0;
-	margin-left: 0;
 	padding-top: 33px;
 	padding-bottom: 14px;
 	padding-left: 79px;
@@ -59,34 +49,29 @@ skout! page
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 1440px;
-	min-height: 110px;
-	margin-top: 0;
-	margin-right: 0;
-	margin-bottom: 0;
-	margin-left: 0;
-	padding-top: 29px;
-	padding-bottom: 31px;
-	padding-left: 0;
-	padding-right: 0;
+	height: 110px;
 	background: var(--color-4);
 	background-size: cover;
 	border-radius: 0;
+}
+
+.section--whatsapp>.container {
+	align-items: center;
+}
+
+.section--whatsapp>.container>.row {
+	justify-content: center;
 }
 
 .homepage>.section--signin {
 	position: relative;
 	width: 100%;
 	z-index: 2;
-	max-width: 1440px;
-	min-height: 720px;
-	margin-top: 0;
-	margin-right: 0;
-	margin-bottom: 0;
-	margin-left: 0;
+	height: 720px;
+	border-radius: 0;
+}
+
+.section--signin>.container {
 	padding-top: 98px;
 	padding-bottom: 274px;
-	padding-left: 0;
-	padding-right: 0;
-	border-radius: 0;
 }

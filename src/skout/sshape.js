@@ -9,11 +9,11 @@
  */
 
 import VNode from 'virtual-dom/vnode/vnode';
-import SNode from './snode';
+import SLayer from './slayer';
 import SOptions from './soptions';
 import SStyle from './sstyle';
 
-export default class SShape extends SNode {
+export default class SShape extends SLayer {
 
 	constructor(node) {
 		super(node);
@@ -85,8 +85,8 @@ export default class SShape extends SNode {
 	        const gradient = SStyle.serializeStyle(this.styleText)['background-image']; // fill.gradient();
 	        if (image) {
 	            backgroundCss = `url('../${SOptions.image.folder}/${this.className}.png') no-repeat center`;
-	            if (SNode.folder) {
-	                SImage.saveToJpg(image, SNode.folder, `${SOptions.image.folder}/`, `${this.className}.png`);
+	            if (SLayer.folder) {
+	                SImage.saveToJpg(image, SLayer.folder, `${SOptions.image.folder}/`, `${this.className}.png`);
 	            } else {
 	                // backgroundCss = `url('${SImage.getImage(image)}') no-repeat center`;
 	            }
