@@ -27,10 +27,6 @@ skout! page
 	align-items: center;
 }
 
-.section--hero>.container>.row {
-	justify-content: center;
-}
-
 .section--hero>.header {
 	position: absolute;
 	width: 100%;
@@ -57,10 +53,6 @@ skout! page
 
 .section--whatsapp>.container {
 	align-items: center;
-}
-
-.section--whatsapp>.container>.row {
-	justify-content: center;
 }
 
 .homepage>.section--signin {

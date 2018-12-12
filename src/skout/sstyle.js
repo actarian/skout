@@ -526,6 +526,7 @@ skout! ${s}
 		}
 		.row {
 			width:100%;
+			flex: 1 0 100%;
 			display: flex;
 			flex-wrap: wrap;
 			margin-right: ${(layout.gutterWidth / -2).toFixed(2)}px;

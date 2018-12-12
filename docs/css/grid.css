@@ -16,6 +16,7 @@ skout! grid
 
 .row {
 	width: 100%;
+	flex: 1 0 100%;
 	display: flex;
 	flex-wrap: wrap;
 	margin-right: -10.00px;

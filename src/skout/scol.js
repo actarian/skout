@@ -72,7 +72,10 @@ export default class SCol extends SNode {
 		this.padding = new SRect();
 		this.style = {};
 		this.collectedNames = {};
-		this.classes = [`col-${this.col}`];
+		this.classes = [`col-${this.size}`];
+		if (this.offset) {
+			this.classes.push(`offset-${this.offset}`);
+		}
 		this.overrides = {};
 		this.absolute = false;
 		this.relative = true;

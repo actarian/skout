@@ -96,9 +96,11 @@ export default class SRow extends SNode {
 		if (padding.bottom) {
 			style.paddingBottom = toPxx(padding.bottom);
 		}
+		/*
 		if (Math.abs(padding.right - padding.left) <= 1) {
 			style.justifyContent = 'center';
 		}
+		*/
 		if (margin.top) {
 			style.marginTop = toPx(margin.top);
 		}

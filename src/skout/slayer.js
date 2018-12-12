@@ -106,54 +106,6 @@ export default class SLayer {
 		return constraint;
 	}
 
-	setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
-		const fileName = this.fileName;
-		let pathNames = [],
-			nameCount = 0;
-		if (parentType == 'MSSymbolInstance') {
-			pathNames = [parentClassName];
-		} else if (Array.isArray(parentPathNames)) {
-			pathNames = parentPathNames.slice();
-		}
-		nameCount = parentCollectedNames[fileName] || 0;
-		nameCount++;
-		parentCollectedNames[fileName] = nameCount;
-		let uniqueClassName = fileName + (nameCount > 1 ? '-' + nameCount : '');
-		/*
-		const placeholderInput = this.getPlaceholderInput();
-		if (placeholderInput) {
-			const className = `${placeholderInput.uniqueClassName}::placeholder`;
-			pathNames.push(className);
-		} else {
-			pathNames.push(uniqueClassName);
-		}
-		console.log('uniqueClassName', uniqueClassName);
-		*/
-		pathNames.push(uniqueClassName);
-		this.parentType = parentType;
-		this.uniqueClassName = uniqueClassName;
-		this.classes.push(uniqueClassName);
-		this.pathNames = pathNames;
-		this.collectedNames = [];
-		if (this.containerRect) {
-			const absolutes = this.renderableNodes(this.absolutes, this.rect);
-			absolutes.forEach((a, i) => {
-				a.setPathNames(uniqueClassName, this.pathNames, this.collectedNames, this.type);
-			});
-			const relatives = this.renderableNodes(this.relatives, this.containerRect);
-			const containerPathNames = pathNames.slice();
-			containerPathNames.shift();
-			containerPathNames.push('container');
-			relatives.forEach((a, i) => {
-				a.setPathNames('container', containerPathNames);
-			});
-		} else {
-			this.nodes.forEach((a, i) => {
-				a.setPathNames(uniqueClassName, this.pathNames, this.collectedNames, this.type);
-			});
-		}
-	}
-
 	setConstraint() {
 		const constraint = SLayer.getConstraint(this.object);
 		const parent = this.parent;
@@ -193,347 +145,6 @@ export default class SLayer {
 			}
 		}
 		this.constraint = constraint;
-	}
-
-	setNodes() {}
-
-	setPosition() {
-		const layout = SOptions.layout;
-		const nodes = this.nodes.slice();
-		nodes.forEach((a, i) => {
-			a.hasSibilings = nodes.length > 1;
-			if (a.hasSibilings) {
-				nodes.filter(b => b !== a).forEach(b => {
-					a.hasOverlaps = a.hasOverlaps || SRect.overlaps(a.rect, b.rect);
-					a.hasSmallOverlaps = a.hasSmallOverlaps || (SRect.overlaps(a.rect, b.rect) && a.rect.width >= layout.totalWidth && b.rect.width < layout.totalWidth);
-					a.hasLargeOverlaps = a.hasLargeOverlaps || (SRect.overlaps(a.rect, b.rect) && a.rect.width < layout.totalWidth && b.rect.width >= layout.totalWidth);
-				});
-			}
-		});
-		const overlaps = nodes.filter(a => a.hasOverlaps);
-		if (overlaps.length) {
-			const largest = overlaps.reduce((a, b) => a.rect.width >= b.rect.width && a.rect.height > b.rect.height ? a : b);
-			largest.isLargest = true;
-		}
-		nodes.forEach((a, i) => {
-			if (a.hasSmallOverlaps) {
-				a.absolute = true;
-			} else if (a.hasLargeOverlaps) {
-				a.absolute = false;
-			} else {
-				if (a.rect.width >= layout.totalWidth) {
-					a.absolute = (a.hasOverlaps && !a.isLargest) ? true : false;
-				} else {
-					a.absolute = (a.hasOverlaps && a.isLargest) ? true : false;
-				}
-			}
-			a.relative = !a.absolute;
-		});
-		const relatives = nodes.filter(x => x.relative);
-		if (relatives.length > 1) {
-			const horizontals = relatives.sort((a, b) => a.rect.left - b.rect.left);
-			const isHorizontal = horizontals.reduce((a, b) => (a && b && a.rect.right <= b.rect.left) ? b : null);
-			this.isHorizontal = isHorizontal;
-		}
-		if (nodes.length > 1) {
-			const verticals = nodes.sort((a, b) => a.rect.top - b.rect.top);
-			const isVertical = verticals.reduce((a, b) => (a && b && a.rect.bottom <= b.rect.top) ? b : null);
-			this.isVertical = isVertical;
-		}
-		this.nodes.forEach((a, i) => {
-			a.setPosition();
-		});
-	}
-
-	setContainer() {
-		const nodes = this.nodes;
-		const relatives = nodes.filter(x => x.relative);
-		const absolutes = nodes.filter(x => x.absolute);
-		const rect = this.rect;
-		const innerRect = SRect.fromNodes(relatives);
-		const layout = SOptions.layout;
-		this.innerRect = innerRect;
-		if (this.type !== 'MSArtboardGroup' &&
-			nodes.length && rect.width > layout.totalWidth && innerRect.width < layout.totalWidth) {
-			const containerRect = new SRect({
-				top: innerRect.top,
-				left: (rect.width - layout.totalWidth) / 2,
-				width: layout.totalWidth,
-				height: innerRect.height,
-			});
-			relatives.forEach(x => {
-				x.rect.move(-containerRect.left, -containerRect.top);
-				x.parentRect = containerRect;
-			});
-			const containerInnerRect = SRect.fromNodes(relatives);
-			this.containerRect = containerRect;
-			this.containerInnerRect = containerInnerRect;
-			this.innerRect = new SRect({
-				left: 0,
-				top: innerRect.top,
-				width: rect.width,
-				height: innerRect.height,
-			});
-		}
-		this.relatives = relatives;
-		this.absolutes = absolutes;
-		this.nodes.forEach((a, i) => {
-			a.setContainer();
-		});
-	}
-
-	setMarginAndPaddings() {
-		const rect = this.rect;
-		let innerRect = this.innerRect;
-		const padding = this.padding;
-		const nodes = this.containerRect ? this.relatives : this.nodes;
-		this.isLargest = this.isLargest || false;
-		padding.top = innerRect.top;
-		padding.right = rect.width - innerRect.right;
-		padding.bottom = rect.height - innerRect.bottom;
-		padding.left = innerRect.left;
-		// nodes = this.nodes;
-		const renderableRect = this.containerRect || this.rect;
-		if (this.isHorizontal) {
-			nodes.sort((a, b) => a.rect.left - b.rect.left).filter(x => x.isRenderable(renderableRect)).forEach((b, i) => {
-				if (i > 0) {
-					const a = nodes[i - 1];
-					a.margin.right = b.rect.left - a.rect.right;
-				}
-			});
-			// this.classes.push('h');
-		} else if (this.isVertical) {
-			nodes.sort((a, b) => a.rect.top - b.rect.top).filter(x => x.isRenderable(renderableRect)).forEach((b, i) => {
-				if (i > 0) {
-					const a = nodes[i - 1];
-					a.margin.bottom = b.rect.top - a.rect.bottom;
-				}
-			});
-			// this.classes.push('v');
-		} else {
-			nodes.sort(SContainer.sortRowCol);
-			// nodes.sort((a, b) => (a.rect.top * 10000 + a.rect.left) - (b.rect.top * 10000 + b.rect.left));
-		}
-		this.nodes.forEach((a, i) => {
-			a.setMarginAndPaddings();
-		});
-		if (SOptions.log.layers) {
-			this.logLayers();
-		}
-	}
-
-	renderNodesMode1() {
-		if (this.containerRect) {
-			const absolute = this.renderableNodes(this.absolutes, this.rect).map(x => x.render());
-			const relatives = this.renderableNodes(this.relatives, this.containerRect).map(x => x.render());
-			const container = new VNode('div', {
-				className: 'container'
-			}, relatives);
-			absolute.push(container);
-			return absolute;
-		} else {
-			return this.renderableNodes(this.nodes, this.rect).map(x => x.render());
-		}
-	}
-
-	getStyleMode1() {
-		const layout = SOptions.layout;
-		const rect = this.rect;
-		const parentRect = this.parentRect;
-		const margin = this.margin;
-		const padding = this.padding;
-		/*
-		const classes = this.classes;
-		this.layout.position = 'relative';
-		if (this.hasSibilings && this.hasOverlaps && this.isLargest) {
-		    this.layout.position = 'absolute';
-		}
-		*/
-		/*
-		this.layout.display = 'block';
-		this.layout.position = this.hasOverlaps && this.isLargest ? 'absolute' : 'relative';
-		*/
-		// this.layout.position = 'absolute';
-		/*
-		if (this.isLargest || !this.hasSibilings || !this.hasOverlaps) {
-		    this.layout.position = 'relative';
-		} else {
-		    this.layout.position = 'absolute';
-		}
-		*/
-		/*
-		if (this.layout.position === 'relative') {
-		    console.log(this.uniqueClassName, this.layout.position, 'isLargest', this.isLargest);
-		}
-		*/
-		let style = {};
-		if (SOptions.html.relative) {
-			// relative positioning
-			style = {
-				// display: 'block',
-				position: this.absolute ? 'absolute' : 'relative',
-				// minWidth: this.rect.width + 'px',
-				width: '100%',
-				// width: this.constraint.width ? rect.width + 'px' : (rect.width / parentRect.width * 100) + '%',
-				// height: this.constraint.height ? rect.height + 'px' : (rect.height / parentRect.height * 100) + '%',
-				zIndex: this.zIndex,
-				// background: 'rgba(0,0,0,0.05)'
-			};
-			/*
-			if (rect.width === layout.maxWidth || rect.width === layout.totalWidth || rect.width === parentRect.width) {
-				style.width = '100%';
-				style.maxWidth = rect.width + 'px';
-			} else {
-				style.width = rect.width + 'px';
-			}
-			*/
-
-			if (this.absolute) {
-				style.top = toPx(rect.top);
-				style.left = toPx(rect.left);
-				style.height = toPxx(rect.height);
-				style.maxWidth = toPxx(rect.width);
-
-			} else if (parentRect && parentRect.width >= layout.totalWidth) {
-				const col = layout.cols.reduce((x, col, i) => {
-					return (Math.abs(col - rect.width) <= 1 ? (i + 1) : x);
-				}, 0);
-				if (col > 0 && col < layout.numberOfColumns + 1) {
-					this.classes.push(`col-${col}`);
-					style.minHeight = toPxx(rect.height);
-				} else {
-					style.maxWidth = toPxx(rect.width);
-					if (this.type !== 'MSTextLayer') {
-						style.minHeight = toPxx(rect.height);
-					}
-				}
-			} else {
-				if (rect.width < parentRect.width) {
-					style.maxWidth = toPxx(rect.width);
-				}
-				if (this.type !== 'MSTextLayer') {
-					style.height = toPxx(rect.height);
-				}
-			}
-
-			if (this.isHorizontal) {
-				style.display = 'flex';
-				style.flexDirection = 'row';
-				style.justifyContent = 'space-between';
-				style.alignItems = 'center';
-			}
-
-			if (this.isVertical) {
-				style.display = 'block';
-				style.flexDirection = 'column';
-				/*
-				// !!!
-				style.display = 'flex';
-				style.justifyContent = 'flex-start';
-				style.alignItems = 'flex-start';
-				*/
-			}
-
-			if (!this.parent.isHorizontal) {
-				style.marginTop = toPx(margin.top);
-				style.marginRight = toPx(margin.right);
-				style.marginBottom = toPx(margin.bottom);
-				style.marginLeft = toPx(margin.left);
-			}
-
-			if (this.nodes.length) {
-				if (padding.top < 120 || Math.abs(padding.bottom - padding.top) > 1) {
-					style.paddingTop = toPxx(padding.top);
-					style.paddingBottom = toPxx(padding.bottom);
-				} else {
-					style.alignItems = 'center';
-				}
-				if (padding.left < 120 || Math.abs(padding.right - padding.left) > 1) {
-					style.paddingLeft = toPxx(padding.left);
-					style.paddingRight = toPxx(padding.right);
-				} else {
-					style.justifyContent = 'center';
-				}
-				// style.padding = `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
-			}
-
-			const placeholder = this.getInputPlaceholder();
-			if (placeholder) {
-				const innerRect = placeholder.rect;
-				style.paddingTop = toPxx(innerRect.top);
-				style.paddingRight = toPxx(rect.width - innerRect.right);
-				style.paddingBottom = toPxx(rect.height - innerRect.bottom);
-				style.paddingLeft = toPxx(innerRect.left);
-			}
-
-		} else if (SOptions.html.exact) {
-			style = {
-				position: 'absolute',
-				top: toPx(rect.top),
-				left: toPx(rect.left),
-				width: toPxx(rect.width),
-				height: toPxx(rect.height),
-				zIndex: this.zIndex,
-			};
-			// style.width = (rect.width / parentRect.width * 100) + '%';
-			/*
-			if (this.constraint.right) {
-			    style.right = (parentRect.width - rect.right) + 'px';
-			} else {
-			    style.width = rect.width + 'px';
-			}
-			*/
-		} else {
-			// absolute positioning
-			style = {
-				position: 'absolute',
-				top: this.constraint.top ? toPx(rect.top) : (rect.top / parentRect.height * 100).toFixed(2) + '%',
-				left: this.constraint.left ? toPx(rect.left) : (rect.left / parentRect.width * 100).toFixed(2) + '%',
-				zIndex: this.zIndex,
-			};
-			if (this.constraint.right) {
-				style.right = toPx(parentRect.width - rect.right);
-			}
-			if (this.constraint.bottom) {
-				style.bottom = toPx(parentRect.height - rect.bottom);
-			}
-			/*
-			if (!this.constraint.left && !this.constraint.right) {
-			    style.left = '50%';
-			    style.marginLeft = this.constraint.width ? (rect.width * -0.5) + 'px' : (rect.width / parentRect.width * -50) + '%';
-			}
-			*/
-			if (this.constraint.left && this.constraint.right) {
-				style.width = 'auto';
-			} else {
-				style.width = this.constraint.width ? toPxx(rect.width) : (rect.width / parentRect.width * 100).toFixed(2) + '%';
-			}
-			/*
-			if (!this.constraint.top && !this.constraint.bottom) {
-			    style.top = '50%';
-			    style.marginTop = this.constraint.height ? (rect.height * -0.5) + 'px' : (rect.height / parentRect.height * -50) + '%';
-			}
-			*/
-			if (this.constraint.top && this.constraint.bottom) {
-				style.width = 'auto';
-			} else {
-				style.height = this.constraint.height ? toPxx(rect.height) : (rect.height / parentRect.height * 100).toFixed(2) + '%';
-			}
-		}
-		if (this.sketchObject.rotation()) {
-			style.transform = `rotateZ(${this.sketchObject.rotation()}deg)`;
-		}
-		return style;
-	}
-
-	getStyle() {
-		if (SOptions.mode === 2) {
-			return this.getStyleMode2();
-
-		} else {
-			return this.getStyleMode1();
-
-		}
 	}
 
 	setStyle() {
@@ -674,7 +285,7 @@ export default class SLayer {
 
 	// MODE 2
 
-	setNodes2() {
+	setNodes() {
 		if (this.nodes.length === 0) {
 			return;
 		}
@@ -703,10 +314,10 @@ export default class SLayer {
 		this.absolutes = o.absolutes;
 		this.relatives = o.relatives;
 		this.nodes = nodes;
-		nodes.forEach(x => x.setNodes2());
+		nodes.forEach(x => x.setNodes());
 	}
 
-	setPosition2() {
+	setPosition() {
 		if (this.nodes.length === 0) {
 			return;
 		}
@@ -728,9 +339,7 @@ export default class SLayer {
 		*/
 	}
 
-	setContainer2() {}
-
-	setMarginAndPaddings2() {
+	setMarginAndPaddings() {
 		let innerRect = SRect.fromNodes(this.relatives);
 		const rect = this.rect;
 		const padding = this.padding;
@@ -754,11 +363,11 @@ export default class SLayer {
 			});
 		}
 		this.nodes.forEach((a, i) => {
-			a.setMarginAndPaddings2();
+			a.setMarginAndPaddings();
 		});
 	}
 
-	setPathNames2(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
+	setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
 		const fileName = this.fileName;
 		let pathNames = [],
 			nameCount = 0;
@@ -788,11 +397,11 @@ export default class SLayer {
 		this.pathNames = pathNames;
 		this.collectedNames = [];
 		this.nodes.forEach((a, i) => {
-			a.setPathNames2(uniqueClassName, this.pathNames, this.collectedNames, this.type);
+			a.setPathNames(uniqueClassName, this.pathNames, this.collectedNames, this.type);
 		});
 	}
 
-	getStyleMode2() {
+	getStyle() {
 		const rect = this.rect;
 		const parentRect = this.parentRect;
 		const margin = this.margin;
@@ -917,16 +526,8 @@ export default class SLayer {
 		return style;
 	}
 
-	renderNodesMode2() {
-		return this.nodes.filter(x => this.shapes.indexOf(x) === -1).map(x => x.render());
-	}
-
 	renderNodes() {
-		if (SOptions.mode === 2) {
-			return this.renderNodesMode2();
-		} else {
-			return this.renderNodesMode1();
-		}
+		return this.nodes.filter(x => this.shapes.indexOf(x) === -1).map(x => x.render());
 	}
 
 	render() {

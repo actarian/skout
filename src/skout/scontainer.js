@@ -55,40 +55,57 @@ export default class SContainer extends SNode {
 
 	static parseNodes(node) {
 		const layout = SOptions.layout;
-		const rect = node.rect;
-		let nodes = node.nodes;
 		const shapes = node.shapes;
 		const relatives = node.relatives;
 		const absolutes = node.absolutes;
-		nodes.forEach(a => a.setPosition2());
+		let nodes = node.nodes;
+		nodes.forEach(a => a.setPosition());
 		relatives.forEach(x => x._rect = new SRect(x.rect));
+		let rect = node.rect;
 		const innerRect = SRect.fromNodes(relatives);
 		const isContainer = rect.width >= layout.totalWidth && innerRect.width < layout.totalWidth;
+		if (isContainer) {
+			const containerWidth = layout.totalWidth + layout.gutterWidth;
+			rect = new SRect(rect);
+			rect.left = (rect.width - containerWidth) / 2;
+			rect.width = containerWidth;
+			rect.right = rect.left + rect.width;
+			relatives.forEach(x => x.rect.move(-rect.left, 0));
+		}
 		const rows = SRow.getRows(relatives, rect);
 		rows.forEach(row => {
 			row.cols = SCol.getCols(row.nodes, row.rect);
+			let colOffset = 0;
 			row.cols.forEach(col => {
-				col.col = 0;
-				col.colWidth = 0;
+				col.size = 0;
 				if (isContainer) {
-					const innerRect = SRect.fromNodes(col.nodes);
+					const module = (layout.columnWidth + layout.gutterWidth);
+					const offset = Math.floor(col.rect.left / module);
+					const size = Math.ceil(col.rect.width / module);
+					const width = Math.floor(size * module);
+					colOffset = Math.max(offset, colOffset) - colOffset;
+					if (size > 0 && size < layout.numberOfColumns + 1) {
+						col.size = size;
+						col.offset = colOffset;
+						col.width = width;
+					}
+					colOffset += size;
 					/*
-					const colName = layout.cols.reduce((x, width, i) => {
-						return (Math.abs(width - innerRect.width) <= 1 ? (i + 1) : x);
-					}, 0);
-					*/
+					const innerRect = SRect.fromNodes(col.nodes);
 					const colName = layout.reverseCols.reduce((x, width, i) => {
 						return innerRect.width < width ? (layout.reverseCols.length - 1 - i) : x;
 					}, layout.numberOfColumns);
 					if (colName > 0 && colName < layout.numberOfColumns + 1) {
-						col.col = colName;
-						col.colWidth = layout.cols[colName - 1];
+						col.size = colName;
+						col.width = layout.cols[colName - 1];
+						colOffset += colName;
 					}
+					*/
 				}
 			});
 		});
 		const numCols = rows.reduce((p, row) => p + row.cols.length, 0);
-		const colSizes = rows.reduce((p, row) => p.concat(row.cols.map(col => col.col)), []);
+		const colSizes = rows.reduce((p, row) => p.concat(row.cols.map(col => col.size)), []);
 		const colTotal = colSizes.reduce((p, num) => p + num, 0);
 		const isGrid = isContainer && colTotal < layout.numberOfColumns; //  && (this.rows.length > 1 || (this.rows.find(r => r.cols.length > 1) !== undefined));
 		const isVertical = !isContainer && rows.length > 1;

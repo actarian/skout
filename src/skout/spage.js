@@ -183,23 +183,11 @@ export default class SPage extends SLayer {
 		page.parentRect = layout.rect;
 		page.originalRect = layout.rect;
 		if (SOptions.html.relative) {
-			if (SOptions.mode === 2) {
-				page.setNodes2();
-				page.setPosition2();
-				page.setContainer2();
-				page.setMarginAndPaddings2();
-			} else {
-				page.setNodes();
-				page.setPosition();
-				page.setContainer();
-				page.setMarginAndPaddings();
-			}
+			page.setNodes();
+			page.setPosition();
+			page.setMarginAndPaddings();
 		}
-		if (SOptions.mode === 2) {
-			page.setPathNames2();
-		} else {
-			page.setPathNames();
-		}
+		page.setPathNames();
 		page.setStyle();
 		return page;
 	}

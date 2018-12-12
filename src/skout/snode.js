@@ -234,9 +234,7 @@ export default class SNode {
 		return new VNode(this.tagName, this.attributes(), this.renderNodes());
 	}
 
-	setContainer2() {}
-
-	setMarginAndPaddings2() {
+	setMarginAndPaddings() {
 		let innerRect = SRect.fromNodes(this.relatives);
 		const rect = this.rect;
 		const padding = this.padding;
@@ -260,11 +258,11 @@ export default class SNode {
 			});
 		}
 		this.nodes.forEach(x => {
-			x.setMarginAndPaddings2();
+			x.setMarginAndPaddings();
 		});
 	}
 
-	setPathNames2(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
+	setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
 		const fileName = this.fileName;
 		let pathNames = [],
 			nameCount = 0;
@@ -294,11 +292,11 @@ export default class SNode {
 		this.pathNames = pathNames;
 		this.collectedNames = [];
 		this.nodes.forEach((a, i) => {
-			a.setPathNames2(uniqueClassName, this.pathNames, this.collectedNames, this.type);
+			a.setPathNames(uniqueClassName, this.pathNames, this.collectedNames, this.type);
 		});
 	}
 
-	renderNodesMode2() {
+	renderNodes() {
 		return this.nodes.filter(x => this.shapes.indexOf(x) === -1).map(x => x.render());
 	}
 
