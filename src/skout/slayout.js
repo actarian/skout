@@ -29,14 +29,9 @@ export default class SLayout {
 
 	constructor(layout) {
 		Object.assign(this, SLayoutDefault);
-		this.merge(layout);
-	}
-
-	merge(layout) {
 		if (layout) {
 			Object.assign(this, layout);
 		}
-		return this;
 	}
 
 	static fromRect(rect) {

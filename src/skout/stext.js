@@ -26,6 +26,24 @@ export default class SText extends SLayer {
 		}
 	}
 
+	collectSharedStyle(sharedStyle) {
+		if (SOptions.component.export) {
+			this.collectedStyles.push(sharedStyle);
+		} else {
+			const collected = SStyle.collectedTextStyles.find(x => x.className == sharedStyle.className);
+			if (!collected) {
+				SStyle.collectedTextStyles.push(sharedStyle);
+			}
+		}
+		this.classes.push(sharedStyle.className);
+	}
+
+	getInput() {
+		if (this.tagName === 'placeholder' || this.tagName === 'value') {
+			return this.parent.nodes.find(x => x.tagName === 'input');
+		}
+	}
+
 	getStyle(...rest) {
 		this.classes.push('stext');
 		const style = SLayer.prototype.getStyle.apply(this, rest);
@@ -57,6 +75,10 @@ export default class SText extends SLayer {
 		return style;
 	}
 
+	/****************
+	RENDER
+	*****************/
+
 	attributes() {
 		const attributes = {
 			className: this.classes.join(' '),
@@ -65,6 +87,15 @@ export default class SText extends SLayer {
 			attributes.style = this.style;
 		}
 		return attributes;
+	}
+
+	isInputPlaceholder() {
+		/*
+		if (this.tagName == 'placeholder') {
+			console.log(this.parent.name, this.parent.nodes.map(x => x.tagName));
+		}
+		*/
+		return this.tagName === 'placeholder' && this.parent.nodes.find(x => x.tagName === 'input') !== undefined;
 	}
 
 	render() {

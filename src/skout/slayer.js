@@ -91,6 +91,16 @@ export default class SLayer {
 		this.overrides = {};
 	}
 
+	/*
+	isShape() {
+		return StyleShapes.indexOf(this.type) !== -1;
+	}
+	*/
+
+	/****************
+	CONSTRAINT
+	*****************/
+
 	static getConstraint(object) {
 		// const resizesContent = (typeof object.sketchObject.resizesContent == 'function') ? object.sketchObject.resizesContent() : 0;
 		const resizingConstraint = (typeof object.sketchObject.resizingConstraint == 'function') ? object.sketchObject.resizingConstraint() : 0;
@@ -147,143 +157,9 @@ export default class SLayer {
 		this.constraint = constraint;
 	}
 
-	setStyle() {
-		this.style = this.getStyle();
-		const shape = this.nodes.find(x => x.isShapeForRect(this.rect));
-		/*
-		if (this.name == 'search-bar') {
-		    console.log(this.nodes.map(x => x.name).join(', '));
-		}
-		*/
-		if (shape) {
-			// console.log('shape', shape.type, shape.parent.name);
-			const shapeStyle = SStyle.parseStyle(shape); // shape.getShapeStyle();
-			Object.assign(this.style, shapeStyle);
-		}
-		this.nodes.forEach(x => x.setStyle());
-	}
-
-	getInputPlaceholder() {
-		if (this.tagName === 'input') {
-			return this.parent.nodes.find(x => x.tagName === 'placeholder');
-		}
-	}
-
-	getPlaceholderInput() {
-		if (this.tagName === 'placeholder') {
-			return this.parent.nodes.find(x => x.tagName === 'input');
-		}
-	}
-
-	getInput() {
-		if (this.tagName === 'placeholder' || this.tagName === 'value') {
-			return this.parent.nodes.find(x => x.tagName === 'input');
-		}
-	}
-
-	isInputPlaceholder() {
-		/*
-		if (this.tagName == 'placeholder') {
-			console.log(this.parent.name, this.parent.nodes.map(x => x.tagName));
-		}
-		*/
-		return this.tagName === 'placeholder' && this.parent.nodes.find(x => x.tagName === 'input') !== undefined;
-	}
-
-	isShape() {
-		return StyleShapes.indexOf(this.type) !== -1;
-	}
-
-	isShapeForRect(rect) {
-		return this.tagName !== 'input' && this.zIndex === 0 && StyleShapes.indexOf(this.type) !== -1 && SRect.equals(rect, this.rect);
-	}
-
-	renderableNodes(nodes, rect) {
-		return nodes.filter(x => x.isRenderable(rect));
-	}
-
-	isRenderable(rect) {
-		return !this.isShapeForRect(rect); // !(this.isShapeForRect(rect) || this.isInputPlaceholder());
-	}
-
-	merge(object) {
-		if (object) {
-			Object.assign(this, object);
-		}
-		return this;
-	}
-
-	collectStyle(style) {
-		let selector = SOptions.component.export ?
-			this.pathNames.map((x, i) => {
-				return i === 0 ? (this.childOfSymbol ? ':host' : '.' + x) : x;
-			}).join(' > .') :
-			'.' + this.pathNames.join(' > .');
-		// console.log('selector', selector);
-		const styleObj = {
-			className: this.uniqueClassName,
-			selector: selector,
-			style: style,
-		};
-		if (this.type == 'MSSymbolInstance') {
-			this.parent.collectedStyles.push(styleObj);
-		} else {
-			this.collectedStyles.push(styleObj);
-		}
-		if (this.childOfSymbol) {
-			SStyle.collectedComponentStyles.push(styleObj);
-		} else {
-			SStyle.collectedStyles.push(styleObj);
-		}
-	}
-
-	collectSharedStyle(sharedStyle) {
-		if (SOptions.component.export) {
-			this.collectedStyles.push(sharedStyle);
-		} else {
-			const collected = SStyle.collectedTextStyles.find(x => x.className == sharedStyle.className);
-			if (!collected) {
-				SStyle.collectedTextStyles.push(sharedStyle);
-			}
-		}
-		this.classes.push(sharedStyle.className);
-	}
-
-	attributes() {
-		const attributes = {
-			className: this.classes.join(' '),
-		};
-		switch (this.tagName) {
-			case 'button':
-				attributes.type = 'button';
-				break;
-			case 'input':
-				attributes.type = 'text';
-				const placeholder = this.getInputPlaceholder();
-				if (placeholder) {
-					attributes.placeholder = placeholder.innerText;
-					// attributes.value = placeholder.innerText;
-				}
-				break;
-		}
-		const style = this.style;
-		if (SOptions.inline) {
-			attributes.style = style;
-		} else {
-			this.collectStyle(style);
-		}
-		return attributes;
-	}
-
-	logLayers() {
-		console.log(this.uniqueClassName, ' '.repeat(50 - this.uniqueClassName.length), (this.absolute ? 'abs' : 'rel'), this.rect.width, 'x', this.rect.height);
-		this.nodes.forEach((a, i) => {
-			console.log(this.uniqueClassName, '=>', a.uniqueClassName, ' '.repeat(50 - this.uniqueClassName.length - 4 - a.uniqueClassName.length), (a.absolute ? 'abs' : 'rel'), a.rect.width, 'x', a.rect.height);
-		});
-		console.log(' ', ' ');
-	}
-
-	// MODE 2
+	/****************
+	NODES
+	*****************/
 
 	setNodes() {
 		if (this.nodes.length === 0) {
@@ -339,6 +215,12 @@ export default class SLayer {
 		*/
 	}
 
+	/* ^ ^ ^ */
+
+	/****************
+	MARGIN PADDING
+	*****************/
+
 	setMarginAndPaddings() {
 		let innerRect = SRect.fromNodes(this.relatives);
 		const rect = this.rect;
@@ -366,6 +248,18 @@ export default class SLayer {
 			a.setMarginAndPaddings();
 		});
 	}
+
+	/****************
+	PATHNAMES
+	*****************/
+
+	/*
+	getPlaceholderInput() {
+		if (this.tagName === 'placeholder') {
+			return this.parent.nodes.find(x => x.tagName === 'input');
+		}
+	}
+	*/
 
 	setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
 		const fileName = this.fileName;
@@ -400,6 +294,10 @@ export default class SLayer {
 			a.setPathNames(uniqueClassName, this.pathNames, this.collectedNames, this.type);
 		});
 	}
+
+	/****************
+	STYLE
+	*****************/
 
 	getStyle() {
 		const rect = this.rect;
@@ -524,6 +422,79 @@ export default class SLayer {
 			style.transform = `rotateZ(${this.sketchObject.rotation()}deg)`;
 		}
 		return style;
+	}
+
+	isShapeForRect(rect) {
+		return this.tagName !== 'input' && this.zIndex === 0 && StyleShapes.indexOf(this.type) !== -1 && SRect.equals(rect, this.rect);
+	}
+
+	setStyle() {
+		this.style = this.getStyle();
+		const shape = this.nodes.find(x => x.isShapeForRect(this.rect));
+		if (shape) {
+			const shapeStyle = SStyle.parseStyle(shape);
+			Object.assign(this.style, shapeStyle);
+		}
+		this.nodes.forEach(x => x.setStyle());
+	}
+
+	/****************
+	RENDER
+	*****************/
+
+	getInputPlaceholder() {
+		if (this.tagName === 'input') {
+			return this.parent.nodes.find(x => x.tagName === 'placeholder');
+		}
+	}
+
+	collectStyle(style) {
+		let selector = SOptions.component.export ?
+			this.pathNames.map((x, i) => {
+				return i === 0 ? (this.childOfSymbol ? ':host' : '.' + x) : x;
+			}).join(' > .') :
+			'.' + this.pathNames.join(' > .');
+		const styleObj = {
+			className: this.uniqueClassName,
+			selector: selector,
+			style: style,
+		};
+		if (this.type == 'MSSymbolInstance') {
+			this.parent.collectedStyles.push(styleObj);
+		} else {
+			this.collectedStyles.push(styleObj);
+		}
+		if (this.childOfSymbol) {
+			SStyle.collectedComponentStyles.push(styleObj);
+		} else {
+			SStyle.collectedStyles.push(styleObj);
+		}
+	}
+
+	attributes() {
+		const attributes = {
+			className: this.classes.join(' '),
+		};
+		switch (this.tagName) {
+			case 'button':
+				attributes.type = 'button';
+				break;
+			case 'input':
+				attributes.type = 'text';
+				const placeholder = this.getInputPlaceholder();
+				if (placeholder) {
+					attributes.placeholder = placeholder.innerText;
+					// attributes.value = placeholder.innerText;
+				}
+				break;
+		}
+		const style = this.style;
+		if (SOptions.inline) {
+			attributes.style = style;
+		} else {
+			this.collectStyle(style);
+		}
+		return attributes;
 	}
 
 	renderNodes() {

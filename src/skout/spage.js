@@ -26,6 +26,10 @@ import SUtil from './sutil';
 
 export default class SPage extends SLayer {
 
+	/****************
+	NODES
+	*****************/
+
 	static getNode(object, parent, parentData, childOfSymbol) {
 		parentData = parentData || {};
 		const name = object.name;
@@ -74,12 +78,9 @@ export default class SPage extends SLayer {
 				node.symbolId = symbolId;
 				node.originalSymbolId = originalSymbolId;
 				layers = symbol.layers || [];
-				// object.layers = layers;
-				//
 				node = new SSymbol(node);
 				node.collectedStyles = [];
 				childOfSymbol = true;
-				//
 				originalRect = SRect.fromObject(symbol);
 				node.originalRect = originalRect;
 				parentData = {};
@@ -135,18 +136,13 @@ export default class SPage extends SLayer {
 				!x.hidden
 			));
 			layers = layers.map((layer, i) => {
-				const snode = SPage.getNode(layer, node, parentData, childOfSymbol);
-				snode.zIndex = i;
-				snode.parentRect = node.rect;
-				snode.originalParentRect = originalRect;
-				return snode;
+				layer = SPage.getNode(layer, node, parentData, childOfSymbol);
+				layer.zIndex = i;
+				layer.parentRect = node.rect;
+				layer.originalParentRect = originalRect;
+				return layer;
 			});
 			node.nodes = layers;
-			/*
-			if (node.name == 'home-hero') {
-			    console.log(node.nodes.map(x => x.name).join(', '));
-			}
-			*/
 		} else {
 			node.nodes = [];
 			if (SOptions.html.relative) {
@@ -191,6 +187,10 @@ export default class SPage extends SLayer {
 		page.setStyle();
 		return page;
 	}
+
+	/****************
+	RENDER
+	*****************/
 
 	render() {
 		const node = SLayer.prototype.render.call(this);

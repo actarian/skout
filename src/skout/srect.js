@@ -123,13 +123,6 @@ export default class SRect {
 		return !(b.left + c > a.right || b.right < a.left + c || b.top + c > a.bottom || b.bottom < a.top + c);
 	}
 
-	merge(object) {
-		if (object) {
-			Object.assign(this, object);
-		}
-		return this;
-	}
-
 	move(left, top) {
 		this.left += left;
 		this.top += top;

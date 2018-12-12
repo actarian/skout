@@ -14,15 +14,10 @@ import { SUtil, toPxx } from './sutil';
 
 export default class SStyle {
 
-	constructor(object) {
-		this.merge(object);
-	}
-
-	merge(object) {
-		if (object) {
-			Object.assign(this, object);
+	constructor(style) {
+		if (style) {
+			Object.assign(this, style);
 		}
-		return this;
 	}
 
 	static getSharedStyle(object) {

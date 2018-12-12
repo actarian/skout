@@ -25,39 +25,95 @@ export default class SNode {
 		this.shapes = [];
 	}
 
-	getInputPlaceholder() {
-		if (this.tagName === 'input') {
-			return this.parent.nodes.find(x => x.tagName === 'placeholder');
-		}
+	static log(node) {
+		console.log(node.uniqueClassName, ' '.repeat(50 - node.uniqueClassName.length), (node.absolute ? 'abs' : 'rel'), node.rect.width, 'x', node.rect.height);
+		node.nodes.forEach((a, i) => {
+			console.log(node.uniqueClassName, '=>', a.uniqueClassName, ' '.repeat(50 - node.uniqueClassName.length - 4 - a.uniqueClassName.length), (a.absolute ? 'abs' : 'rel'), a.rect.width, 'x', a.rect.height);
+		});
+		console.log(' ', ' ');
 	}
 
-	isShapeForRect(rect) {
-		return this.tagName !== 'input' && this.zIndex === 0 && StyleShapes.indexOf(this.type) !== -1 && SRect.equals(rect, this.rect);
+	/****************
+	MARGIN PADDING
+	*****************/
+
+	setMarginAndPaddings() {
+		let innerRect = SRect.fromNodes(this.relatives);
+		const rect = this.rect;
+		const padding = this.padding;
+		padding.top = innerRect.top;
+		padding.right = rect.width - innerRect.right;
+		padding.bottom = rect.height - innerRect.bottom;
+		padding.left = innerRect.left;
+		if (this.isHorizontal) {
+			this.relatives.forEach((b, i) => {
+				if (i > 0) {
+					const a = this.relatives[i - 1];
+					a.margin.right = b.rect.left - a.rect.right;
+				}
+			});
+		} else if (this.isVertical) {
+			this.relatives.forEach((b, i) => {
+				if (i > 0) {
+					const a = this.relatives[i - 1];
+					a.margin.bottom = b.rect.top - a.rect.bottom;
+				}
+			});
+		}
+		this.nodes.forEach(x => {
+			x.setMarginAndPaddings();
+		});
 	}
 
-	collectStyle(style) {
-		let selector = SOptions.component.export ?
-			this.pathNames.map((x, i) => {
-				return i === 0 ? (this.childOfSymbol ? ':host' : '.' + x) : x;
-			}).join(' > .') :
-			'.' + this.pathNames.join(' > .');
-		// console.log('selector', selector);
-		const styleObj = {
-			className: this.uniqueClassName,
-			selector: selector,
-			style: style,
-		};
-		if (this.type == 'MSSymbolInstance') {
-			this.parent.collectedStyles.push(styleObj);
-		} else {
-			this.collectedStyles.push(styleObj);
-		}
-		if (this.childOfSymbol) {
-			SStyle.collectedComponentStyles.push(styleObj);
-		} else {
-			SStyle.collectedStyles.push(styleObj);
+	/****************
+	PATHNAMES
+	*****************/
+
+	/*
+	getPlaceholderInput() {
+		if (this.tagName === 'placeholder') {
+			return this.parent.nodes.find(x => x.tagName === 'input');
 		}
 	}
+	*/
+
+	setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
+		const fileName = this.fileName;
+		let pathNames = [],
+			nameCount = 0;
+		if (parentType == 'MSSymbolInstance') {
+			pathNames = [parentClassName];
+		} else if (Array.isArray(parentPathNames)) {
+			pathNames = parentPathNames.slice();
+		}
+		nameCount = parentCollectedNames[fileName] || 0;
+		nameCount++;
+		parentCollectedNames[fileName] = nameCount;
+		let uniqueClassName = fileName + (nameCount > 1 ? '-' + nameCount : '');
+		/*
+		const placeholderInput = this.getPlaceholderInput();
+		if (placeholderInput) {
+			const className = `${placeholderInput.uniqueClassName}::placeholder`;
+			pathNames.push(className);
+		} else {
+			pathNames.push(uniqueClassName);
+		}
+		console.log('uniqueClassName', uniqueClassName);
+		*/
+		pathNames.push(uniqueClassName);
+		this.parentType = parentType;
+		this.uniqueClassName = uniqueClassName;
+		this.classes.push(uniqueClassName);
+		this.pathNames = pathNames;
+		this.collectedNames = [];
+		this.nodes.forEach((a, i) => {
+			a.setPathNames(uniqueClassName, this.pathNames, this.collectedNames, this.type);
+		});
+	}
+
+	/****************
+	STYLE
+	*****************/
 
 	getStyle() {
 		const rect = this.rect;
@@ -184,20 +240,51 @@ export default class SNode {
 		return style;
 	}
 
+	isShapeForRect(rect) {
+		return this.tagName !== 'input' && this.zIndex === 0 && StyleShapes.indexOf(this.type) !== -1 && SRect.equals(rect, this.rect);
+	}
+
 	setStyle() {
 		this.style = this.getStyle();
 		const shape = this.nodes.find(x => x.isShapeForRect(this.rect));
-		/*
-		if (this.name == 'search-bar') {
-		    console.log(this.nodes.map(x => x.name).join(', '));
-		}
-		*/
 		if (shape) {
-			// console.log('shape', shape.type, shape.parent.name);
-			const shapeStyle = SStyle.parseStyle(shape); // shape.getShapeStyle();
+			const shapeStyle = SStyle.parseStyle(shape);
 			Object.assign(this.style, shapeStyle);
 		}
 		this.nodes.forEach(x => x.setStyle());
+	}
+
+	/****************
+	RENDER
+	*****************/
+
+	getInputPlaceholder() {
+		if (this.tagName === 'input') {
+			return this.parent.nodes.find(x => x.tagName === 'placeholder');
+		}
+	}
+
+	collectStyle(style) {
+		let selector = SOptions.component.export ?
+			this.pathNames.map((x, i) => {
+				return i === 0 ? (this.childOfSymbol ? ':host' : '.' + x) : x;
+			}).join(' > .') :
+			'.' + this.pathNames.join(' > .');
+		const styleObj = {
+			className: this.uniqueClassName,
+			selector: selector,
+			style: style,
+		};
+		if (this.type == 'MSSymbolInstance') {
+			this.parent.collectedStyles.push(styleObj);
+		} else {
+			this.collectedStyles.push(styleObj);
+		}
+		if (this.childOfSymbol) {
+			SStyle.collectedComponentStyles.push(styleObj);
+		} else {
+			SStyle.collectedStyles.push(styleObj);
+		}
 	}
 
 	attributes() {
@@ -232,72 +319,6 @@ export default class SNode {
 
 	render() {
 		return new VNode(this.tagName, this.attributes(), this.renderNodes());
-	}
-
-	setMarginAndPaddings() {
-		let innerRect = SRect.fromNodes(this.relatives);
-		const rect = this.rect;
-		const padding = this.padding;
-		padding.top = innerRect.top;
-		padding.right = rect.width - innerRect.right;
-		padding.bottom = rect.height - innerRect.bottom;
-		padding.left = innerRect.left;
-		if (this.isHorizontal) {
-			this.relatives.forEach((b, i) => {
-				if (i > 0) {
-					const a = this.relatives[i - 1];
-					a.margin.right = b.rect.left - a.rect.right;
-				}
-			});
-		} else if (this.isVertical) {
-			this.relatives.forEach((b, i) => {
-				if (i > 0) {
-					const a = this.relatives[i - 1];
-					a.margin.bottom = b.rect.top - a.rect.bottom;
-				}
-			});
-		}
-		this.nodes.forEach(x => {
-			x.setMarginAndPaddings();
-		});
-	}
-
-	setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
-		const fileName = this.fileName;
-		let pathNames = [],
-			nameCount = 0;
-		if (parentType == 'MSSymbolInstance') {
-			pathNames = [parentClassName];
-		} else if (Array.isArray(parentPathNames)) {
-			pathNames = parentPathNames.slice();
-		}
-		nameCount = parentCollectedNames[fileName] || 0;
-		nameCount++;
-		parentCollectedNames[fileName] = nameCount;
-		let uniqueClassName = fileName + (nameCount > 1 ? '-' + nameCount : '');
-		/*
-		const placeholderInput = this.getPlaceholderInput();
-		if (placeholderInput) {
-			const className = `${placeholderInput.uniqueClassName}::placeholder`;
-			pathNames.push(className);
-		} else {
-			pathNames.push(uniqueClassName);
-		}
-		console.log('uniqueClassName', uniqueClassName);
-		*/
-		pathNames.push(uniqueClassName);
-		this.parentType = parentType;
-		this.uniqueClassName = uniqueClassName;
-		this.classes.push(uniqueClassName);
-		this.pathNames = pathNames;
-		this.collectedNames = [];
-		this.nodes.forEach((a, i) => {
-			a.setPathNames(uniqueClassName, this.pathNames, this.collectedNames, this.type);
-		});
-	}
-
-	renderNodes() {
-		return this.nodes.filter(x => this.shapes.indexOf(x) === -1).map(x => x.render());
 	}
 
 }
