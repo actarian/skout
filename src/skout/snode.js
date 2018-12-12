@@ -60,9 +60,7 @@ export default class SNode {
 				}
 			});
 		}
-		this.nodes.forEach(x => {
-			x.setMarginAndPaddings();
-		});
+		this.nodes.forEach(a => a.setMarginAndPaddings());
 	}
 
 	/****************
