@@ -7,7 +7,7 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	margin-bottom: 20px;
+	margin-bottom: 28px;
 	text-shadow: 0px 2px 4px var(--color-1);
 	align-items: flex-start;
 }
@@ -32,15 +32,6 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	max-width: 118px;
-	align-items: flex-start;
-}
-
-.header>.group>.nav--primary>.nav__item-2 {
-	position: relative;
-	width: 100%;
-	z-index: 1;
-	max-width: 31px;
 	align-items: flex-start;
 }
 
@@ -92,10 +83,10 @@ skout! components
 	align-items: flex-start;
 }
 
-.section--signin>.container>.row>.col>.exact-h {
+.section--features>.container>.row>.col>.exact-h {
 	position: relative;
 	width: 100%;
-	z-index: 1;
+	z-index: 6;
 	min-height: 180px;
 	align-items: flex-start;
 	color: var(--color-6);
@@ -107,10 +98,10 @@ skout! components
 	text-transform: uppercase;
 }
 
-.section--signin>.container>.row>.col>.select-between-a-res {
+.section--features>.container>.row>.col>.select-between-a-res {
 	position: relative;
 	width: 100%;
-	z-index: 2;
+	z-index: 7;
 	min-height: 180px;
 	align-items: flex-start;
 	color: var(--color-4);
@@ -121,76 +112,98 @@ skout! components
 	line-height: 2;
 }
 
-.form__head>.head__sup {
+.data__row>.data__label {
+	position: relative;
+	width: 100%;
+	z-index: 2;
+	max-width: 472px;
+	align-items: flex-start;
+}
+
+.data__row>.data__value {
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 412px;
-	align-items: center;
+	max-width: 490px;
+	align-items: flex-start;
 }
 
-.form__head>.head__title {
+.data__row>.data__label {
 	position: relative;
 	width: 100%;
-	z-index: 0;
-	max-width: 412px;
-	align-items: center;
+	z-index: 2;
+	max-width: 472px;
+	align-items: flex-start;
 }
 
-.form__control>.group>.control__label {
+.data__row>.data__value {
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 265px;
+	max-width: 490px;
 	align-items: flex-start;
 }
 
-.form__control>.group>.control__required {
+.data__row>.data__label {
 	position: relative;
 	width: 100%;
-	z-index: 0;
-	max-width: 87px;
+	z-index: 2;
+	max-width: 472px;
 	align-items: flex-start;
 }
 
-.control--text>.input__placeholder {
-	position: relative;
-	width: 100%;
-	z-index: 1;
-	max-width: 384px;
-	align-items: flex-start;
-}
-
-.form__control-2>.group>.control__label {
+.data__row>.data__value {
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 265px;
+	max-width: 490px;
 	align-items: flex-start;
 }
 
-.form__control-2>.group>.control__required {
+.data__row>.data__label {
 	position: relative;
 	width: 100%;
-	z-index: 0;
-	max-width: 87px;
+	z-index: 2;
+	max-width: 472px;
 	align-items: flex-start;
 }
 
-.control--text>.input__placeholder {
-	position: relative;
-	width: 100%;
-	z-index: 1;
-	max-width: 384px;
-	align-items: flex-start;
-}
-
-.btn--lg>.btn__label {
+.data__row>.data__value {
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 115px;
+	max-width: 490px;
 	align-items: flex-start;
+}
+
+.data__row>.data__label {
+	position: relative;
+	width: 100%;
+	z-index: 2;
+	max-width: 472px;
+	align-items: flex-start;
+}
+
+.data__row>.data__value {
+	position: relative;
+	width: 100%;
+	z-index: 1;
+	max-width: 490px;
+	align-items: flex-start;
+}
+
+.section--credits>.container>.row>.col>.share-help-spread-th {
+	position: relative;
+	width: 100%;
+	z-index: 1;
+	min-height: 200px;
+	align-items: flex-start;
+	color: var(--color-4);
+	font-size: 16px;
+	font-family: var(--font-1);
+	letter-spacing: 0;
+	text-align: center;
+	line-height: 1.25;
 }
 
 .section--hero>.overlay {
@@ -213,8 +226,6 @@ skout! components
 	min-height: 180px;
 	display: block;
 	flex-direction: column;
-	padding-top: 4px;
-	padding-bottom: 4px;
 }
 
 .content--hero>.control--search {
@@ -323,12 +334,8 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	max-width: 188px;
-	height: 18px;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
+	max-width: 222px;
+	height: 26px;
 }
 
 .header>.group>.logo {
@@ -469,117 +476,163 @@ skout! components
 	height: 24px;
 }
 
-.section--signin>.container>.row>.col>.form--signin {
+.section--features>.container>.row>.col>.data__row {
 	position: relative;
 	width: 100%;
-	z-index: 3;
-	min-height: 348px;
-	display: block;
-	flex-direction: column;
-}
-
-.form--signin>.form__head {
-	position: relative;
-	width: 100%;
-	z-index: 3;
-	height: 57px;
-	display: block;
-	flex-direction: column;
-	margin-bottom: 22px;
-	padding-top: 2px;
-	padding-left: 0;
+	z-index: 1;
+	min-height: 50px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 16px;
+	padding-bottom: 18px;
 	padding-right: 0;
 }
 
-.form--signin>.form__control {
+.data__row>.rectangle {
+	position: absolute;
+	width: 100%;
+	z-index: 0;
+	top: 49px;
+	left: 0;
+	height: 1px;
+	background: var(--color-7);
+	background-size: cover;
+	border-radius: 0;
+	display: inline-block;
+}
+
+.section--features>.container>.row>.col>.data__row {
 	position: relative;
 	width: 100%;
 	z-index: 2;
-	height: 69px;
-	display: block;
-	flex-direction: column;
-	margin-bottom: 21px;
-	padding-top: 1px;
-}
-
-.form__control>.group {
-	position: relative;
-	width: 100%;
-	z-index: 1;
-	height: 11px;
+	min-height: 50px;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 7px;
-	padding-left: 1px;
-}
-
-.form__control>.control--text {
-	position: relative;
-	width: 100%;
-	z-index: 0;
-	height: 50px;
 	padding-top: 16px;
 	padding-bottom: 18px;
-	padding-left: 15px;
-	padding-right: 14px;
-	background: var(--color-4);
+	padding-right: 0;
+}
+
+.data__row>.rectangle {
+	position: absolute;
+	width: 100%;
+	z-index: 0;
+	top: 49px;
+	left: 0;
+	height: 1px;
+	background: var(--color-7);
 	background-size: cover;
-	border: 2px solid var(--color-6);
-	border-radius: 3px;
+	border-radius: 0;
+	display: inline-block;
 }
 
-.form--signin>.form__control-2 {
+.section--features>.container>.row>.col>.data__row {
 	position: relative;
 	width: 100%;
-	z-index: 1;
-	height: 69px;
-	display: block;
-	flex-direction: column;
-	margin-bottom: 60px;
-	padding-top: 1px;
-}
-
-.form__control-2>.group {
-	position: relative;
-	width: 100%;
-	z-index: 1;
-	height: 11px;
+	z-index: 3;
+	min-height: 50px;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 7px;
-	padding-left: 1px;
-}
-
-.form__control-2>.control--text {
-	position: relative;
-	width: 100%;
-	z-index: 0;
-	height: 50px;
 	padding-top: 16px;
 	padding-bottom: 18px;
-	padding-left: 15px;
-	padding-right: 14px;
-	background: var(--color-4);
-	background-size: cover;
-	border: 2px solid var(--color-6);
-	border-radius: 3px;
+	padding-right: 0;
 }
 
-.form--signin>.btn--lg {
-	position: relative;
+.data__row>.rectangle {
+	position: absolute;
 	width: 100%;
 	z-index: 0;
-	max-width: 150px;
-	height: 50px;
-	padding-top: 18px;
-	padding-bottom: 19px;
-	padding-left: 18px;
-	padding-right: 17px;
-	background: var(--color-6);
+	top: 49px;
+	left: 0;
+	height: 1px;
+	background: var(--color-7);
 	background-size: cover;
-	border-radius: 8px;
+	border-radius: 0;
+	display: inline-block;
+}
+
+.section--features>.container>.row>.col>.data__row {
+	position: relative;
+	width: 100%;
+	z-index: 4;
+	min-height: 50px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 16px;
+	padding-bottom: 18px;
+	padding-right: 0;
+}
+
+.data__row>.rectangle {
+	position: absolute;
+	width: 100%;
+	z-index: 0;
+	top: 49px;
+	left: 0;
+	height: 1px;
+	background: var(--color-7);
+	background-size: cover;
+	border-radius: 0;
+	display: inline-block;
+}
+
+.section--features>.container>.row>.col>.data__row {
+	position: relative;
+	width: 100%;
+	z-index: 5;
+	min-height: 50px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 16px;
+	padding-bottom: 18px;
+	padding-right: 0;
+}
+
+.data__row>.rectangle {
+	position: absolute;
+	width: 100%;
+	z-index: 0;
+	top: 49px;
+	left: 0;
+	height: 1px;
+	background: var(--color-7);
+	background-size: cover;
+	border-radius: 0;
+	display: inline-block;
+}
+
+.section--features>.rectangle-2 {
+	position: absolute;
+	width: 100%;
+	z-index: 8;
+	top: 719px;
+	left: 0;
+	height: 1px;
+	background: var(--color-8);
+	background-size: cover;
+	border-radius: 0;
+	display: inline-block;
+}
+
+.section--credits>.rectangle-2 {
+	position: absolute;
+	width: 100%;
+	z-index: 2;
+	top: 719px;
+	left: 0;
+	height: 1px;
+	background: var(--color-8);
+	background-size: cover;
+	border-radius: 0;
+	display: inline-block;
 }

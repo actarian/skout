@@ -40,48 +40,17 @@ skout! typography
 	line-height: 1;
 }
 
-.head__sup {
-	color: var(--color-6);
-	font-size: 18px;
-	font-family: var(--font-1);
-	letter-spacing: 0;
-	text-align: left;
-	line-height: 1;
-	text-transform: uppercase;
-}
-
-.head__title {
-	color: var(--color-6);
-	font-size: 36px;
-	font-family: var(--font-1);
-	letter-spacing: 0;
-	text-align: left;
-	line-height: 1;
-	text-transform: uppercase;
-}
-
-.control__label {
-	color: var(--color-7);
-	font-size: 13px;
-	font-family: var(--font-1);
-	letter-spacing: 0;
-	text-align: left;
-	line-height: 0.8461538461538461;
-	text-transform: uppercase;
-}
-
-.control__required {
-	color: var(--color-6);
-	font-size: 13px;
-	font-family: var(--font-1);
-	letter-spacing: 0;
-	text-align: right;
-	line-height: 0.7692307692307693;
-	text-transform: uppercase;
-}
-
-.input__placeholder {
+.data__label {
 	color: var(--color-5);
+	font-size: 16px;
+	font-family: var(--font-2);
+	letter-spacing: 0;
+	text-align: left;
+	line-height: 1;
+}
+
+.data__value {
+	color: var(--color-4);
 	font-size: 16px;
 	font-family: var(--font-2);
 	letter-spacing: 0;

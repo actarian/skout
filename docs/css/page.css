@@ -7,10 +7,10 @@ skout! page
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	height: 1440px;
+	height: 3000px;
 	display: block;
 	flex-direction: column;
-	padding-bottom: 2px;
+	padding-bottom: 842px;
 	background-color: #111111;
 }
 
@@ -32,7 +32,7 @@ skout! page
 .section--hero>.header {
 	position: absolute;
 	width: 100%;
-	z-index: 3;
+	z-index: 4;
 	top: 0;
 	left: 0;
 	height: 160px;
@@ -57,7 +57,7 @@ skout! page
 	align-items: center;
 }
 
-.homepage>.section--signin {
+.homepage>.section--features {
 	position: relative;
 	width: 100%;
 	z-index: 2;
@@ -65,7 +65,20 @@ skout! page
 	border-radius: 0;
 }
 
-.section--signin>.container {
+.section--features>.container {
 	padding-top: 80px;
-	padding-bottom: 44px;
+	padding-bottom: 104px;
+}
+
+.homepage>.section--credits {
+	position: relative;
+	width: 100%;
+	z-index: 3;
+	height: 720px;
+	border-radius: 0;
+}
+
+.section--credits>.container {
+	padding-top: 468px;
+	padding-bottom: 52px;
 }
