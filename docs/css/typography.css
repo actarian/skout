@@ -4,7 +4,7 @@ skout! typography
 -------------- */
 
 .hero__title {
-	color: var(--color-4);
+	color: var(--color-3);
 	font-size: 40px;
 	font-family: var(--font-1);
 	letter-spacing: 0;
@@ -12,9 +12,18 @@ skout! typography
 	line-height: 1;
 }
 
-.search__placeholder {
-	color: var(--color-5);
-	font-size: 19px;
+.command__label {
+	color: var(--color-3);
+	font-size: 22px;
+	font-family: var(--font-2);
+	letter-spacing: 0;
+	text-align: center;
+	line-height: 1.4545454545454546;
+}
+
+.nav--item {
+	color: var(--color-3);
+	font-size: 16px;
 	font-family: var(--font-2);
 	letter-spacing: 0;
 	text-align: left;
@@ -22,7 +31,7 @@ skout! typography
 }
 
 .btn__label {
-	color: var(--color-4);
+	color: var(--color-3);
 	font-size: 15px;
 	font-family: var(--font-2);
 	letter-spacing: 1px;
@@ -31,26 +40,27 @@ skout! typography
 	text-transform: uppercase;
 }
 
-.nav--item {
-	color: var(--color-4);
-	font-size: 16px;
-	font-family: var(--font-3);
+.section__title {
+	color: var(--color-3);
+	font-size: 40px;
+	font-family: var(--font-1);
 	letter-spacing: 0;
 	text-align: left;
 	line-height: 1;
 }
 
 .data__label {
-	color: var(--color-5);
+	color: var(--color-4);
 	font-size: 16px;
-	font-family: var(--font-2);
+	font-family: var(--font-1);
 	letter-spacing: 0;
 	text-align: left;
 	line-height: 1;
+	text-transform: uppercase;
 }
 
 .data__value {
-	color: var(--color-4);
+	color: var(--color-3);
 	font-size: 16px;
 	font-family: var(--font-2);
 	letter-spacing: 0;

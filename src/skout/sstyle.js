@@ -465,12 +465,14 @@ skout! ${s}
 		let grid = ``;
 		const layout = SOptions.layout;
 		if (layout.numberOfColumns > 1) {
+			/*
 			const row = `.row {
 				display: flex;
 				flex-wrap: wrap;
 				margin-right: ${(layout.gutterWidth / -2).toFixed(2)}px;
 				margin-left: ${(layout.gutterWidth / -2).toFixed(2)}px;
 			}`;
+			*/
 			const cols = new Array(layout.numberOfColumns).fill(0).map((x, i) => {
 				return `.col-${i + 1} {
 				position: relative;
@@ -500,8 +502,14 @@ skout! ${s}
 			const query = `@media (max-width: ${Math.floor(layout.totalWidth * 0.5)}px) {
 				${queryCols}
 				${queryOffsets}
+				* {
+					text-align: center !important;
+					display: block!important;
+					margin-left: auto!important;
+					margin-right: auto!important;
+				}
 			}`;
-			grid += row + cols + offsets + query;
+			grid += cols + offsets + query;
 		}
 		return grid;
 	}
@@ -514,8 +522,7 @@ skout! ${s}
 			justify-content: center;
 			flex-wrap: wrap;
 			width: 100%;
-			min-height: 100%;
-            max-width: ${layout.totalWidth + layout.gutterWidth}px;
+			max-width: ${layout.totalWidth + layout.gutterWidth}px;
             margin-right: auto;
             margin-left: auto;
 			padding-right: ${(layout.gutterWidth / 2).toFixed(2)}px;

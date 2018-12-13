@@ -103,12 +103,19 @@ export default class SText extends SLayer {
 	}
 
 	render() {
+		const lines = this.innerText.split('\n');
 		return new VNode('div', this.attributes(), this.isInputPlaceholder() ? [] : [
-            new VNode('div', null, this.innerText.split('\n').map(x => {
-				return new VNode('p', null, [
-					new VText(x)
-				]);
-			}))
+			new VNode('div', null,
+				lines.length > 1 ?
+				lines.map(x => {
+					return x === '' ?
+						new VNode('br') :
+						new VNode('p', null, [
+							new VText(x)
+						]);
+				}) :
+				lines.map(x => new VText(x))
+			)
         ]);
 	}
 

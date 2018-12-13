@@ -8,7 +8,6 @@ skout! grid
 	justify-content: center;
 	flex-wrap: wrap;
 	width: 100%;
-	min-height: 100%;
 	max-width: 1300px;
 	margin-right: auto;
 	margin-left: auto;
@@ -28,13 +27,6 @@ skout! grid
 .col {
 	width: auto;
 	flex: 1 1 auto;
-}
-
-.row {
-	display: flex;
-	flex-wrap: wrap;
-	margin-right: -10.00px;
-	margin-left: -10.00px;
 }
 
 .col-1 {
@@ -224,5 +216,12 @@ skout! grid
 	.offset-11,
 	.offset-12 {
 		margin-left: 0;
+	}
+
+	* {
+		text-align: center !important;
+		display: block !important;
+		margin-left: auto !important;
+		margin-right: auto !important;
 	}
 }

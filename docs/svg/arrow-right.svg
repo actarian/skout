@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="22px" viewBox="0 0 24 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+    <title>arrow-right</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M23.296875,10.2796875 L15.328125,2.34374996 C14.3671875,1.38281246 12.834375,1.38281246 11.90625,2.34374996 C10.9453125,3.30468746 10.9453125,4.83749997 11.90625,5.76562497 L15.7125,9.57187499 L2.43281246,9.57187499 C1.08749995,9.57656249 -5.00000006e-08,10.6640625 -5.00000006e-08,12.009375 C-5.00000006e-08,13.3546875 1.08749995,14.4421875 2.43281246,14.4421875 L15.7125,14.4421875 L11.90625,18.2484375 C10.9453125,19.209375 10.9453125,20.7421875 11.90625,21.6703125 C12.384375,22.1484375 12.99375,22.3734375 13.6359375,22.3734375 C14.2453125,22.3734375 14.8828125,22.1484375 15.365625,21.6703125 L23.296875,13.734375 C23.746875,13.284375 24.0000001,12.646875 24.0000001,12.0046875 C24.0000001,11.3671875 23.7421875,10.7578125 23.296875,10.2796875 Z" id="path-1"></path>
+    </defs>
+    <g id="Icons-White" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icons-/-white-/-arrow-right" transform="translate(0.000000, -1.000000)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <use id="arrow-right" fill="#FFFFFF" xlink:href="#path-1"></use>
+        </g>
+    </g>
+</svg>

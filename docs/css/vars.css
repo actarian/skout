@@ -5,15 +5,12 @@ skout! vars
 
 :root {
 	--color-1: rgb(0, 0, 0, 0.4);
-	--color-2: rgb(0, 0, 0, 0.5);
-	--color-3: rgb(0, 0, 0, 0.15);
-	--color-4: #ffffff;
-	--color-5: #686868;
-	--color-6: #0024ff;
-	--color-7: rgb(0, 36, 255, 0.3);
-	--color-8: rgb(0, 36, 255, 0.2);
+	--color-2: rgb(0, 0, 0, 0.15);
+	--color-3: #ffffff;
+	--color-4: #0024ff;
+	--color-5: rgb(0, 36, 255, 0.3);
+	--color-6: rgb(0, 36, 255, 0.2);
 	--font-1: 'BalooBhaina-Regular';
 	--font-2: 'OpenSans-Semibold';
-	--font-3: 'GothamHTF-Book';
-	--font-4: 'Yesteryear-Regular';
+	--font-3: 'Yesteryear-Regular';
 }

@@ -152,7 +152,7 @@ export default class SNode {
 					style.maxWidth = toPxx(rect.width);
 				}
 				if (this.type !== 'MSTextLayer') {
-					style.height = toPxx(rect.height);
+					style.minHeight = toPxx(rect.height);
 				}
 			}
 			if (this.isHorizontal) {
@@ -160,6 +160,7 @@ export default class SNode {
 				style.flexDirection = 'row';
 				style.justifyContent = 'space-between';
 				style.alignItems = 'center';
+				style.flexWrap = 'wrap';
 			}
 			if (this.isVertical) {
 				style.display = 'block';
@@ -180,6 +181,16 @@ export default class SNode {
 				}
 			}
 			if (this.nodes.length) {
+				if (padding.top) {
+					style.paddingTop = toPxx(padding.top);
+				}
+				if (padding.bottom) {
+					style.paddingBottom = toPxx(padding.bottom);
+				}
+				if (Math.abs(padding.bottom - padding.top) <= 1) {
+					style.alignItems = 'center';
+				}
+				/*
 				if (padding.top < 120 || Math.abs(padding.bottom - padding.top) > 1) {
 					if (padding.top) {
 						style.paddingTop = toPxx(padding.top);
@@ -190,6 +201,7 @@ export default class SNode {
 				} else {
 					style.alignItems = 'center';
 				}
+				*/
 				if (padding.left < 120 || Math.abs(padding.right - padding.left) > 1) {
 					if (padding.left) {
 						style.paddingLeft = toPxx(padding.left);
@@ -201,6 +213,7 @@ export default class SNode {
 					style.justifyContent = 'center';
 				}
 			}
+			/*
 			const placeholder = this.getInputPlaceholder();
 			if (placeholder) {
 				const innerRect = placeholder.rect;
@@ -209,6 +222,7 @@ export default class SNode {
 				style.paddingBottom = toPxx(rect.height - innerRect.bottom);
 				style.paddingLeft = toPxx(innerRect.left);
 			}
+			*/
 		} else if (SOptions.html.exact) {
 			style = {
 				position: 'absolute',

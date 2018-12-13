@@ -7,10 +7,10 @@ skout! page
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	height: 3000px;
+	min-height: 3000px;
 	display: block;
 	flex-direction: column;
-	padding-bottom: 842px;
+	padding-bottom: 692px;
 	background-color: #111111;
 }
 
@@ -18,7 +18,8 @@ skout! page
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	height: 608px;
+	min-height: 608px;
+	align-items: center;
 	background: url('../img/background.jpg') no-repeat center;
 	background-size: cover;
 	border-radius: 0;
@@ -39,6 +40,7 @@ skout! page
 	max-width: 1440px;
 	padding-top: 8px;
 	padding-bottom: 8px;
+	align-items: center;
 	padding-left: 79px;
 	padding-right: 81px;
 }
@@ -47,13 +49,16 @@ skout! page
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	height: 110px;
-	background: var(--color-6);
+	min-height: 160px;
+	align-items: center;
+	background: var(--color-5);
 	background-size: cover;
 	border-radius: 0;
 }
 
 .section--whatsapp>.container {
+	padding-top: 55px;
+	padding-bottom: 55px;
 	align-items: center;
 }
 
@@ -61,24 +66,26 @@ skout! page
 	position: relative;
 	width: 100%;
 	z-index: 2;
-	height: 720px;
+	min-height: 720px;
+	align-items: center;
 	border-radius: 0;
 }
 
 .section--features>.container {
-	padding-top: 80px;
-	padding-bottom: 104px;
+	padding-top: 100px;
+	padding-bottom: 204px;
 }
 
 .homepage>.section--credits {
 	position: relative;
 	width: 100%;
 	z-index: 3;
-	height: 720px;
+	min-height: 820px;
+	align-items: center;
 	border-radius: 0;
 }
 
 .section--credits>.container {
-	padding-top: 468px;
-	padding-bottom: 52px;
+	padding-top: 94px;
+	padding-bottom: 63px;
 }

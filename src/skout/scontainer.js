@@ -139,11 +139,21 @@ export default class SContainer extends SNode {
 			container.relatives = rows;
 			node.relatives = [container];
 			nodes = [].concat(shapes, absolutes, [container]).sort((a, b) => a.zIndex - b.zIndex);
+
 		} else {
 			relatives.forEach(x => {
 				x.rect = new SRect(x._rect);
 				x.parent = node.parent;
 			});
+			if (isContainer) {
+				const container = new SContainer(node);
+				container.zIndex = relatives.reduce((p, x) => Math.min(p, x.zIndex), Number.POSITIVE_INFINITY);
+				container.nodes = relatives;
+				container.relatives = relatives;
+				node.relatives = [container];
+				nodes = [].concat(shapes, absolutes, [container]).sort((a, b) => a.zIndex - b.zIndex);
+
+			}
 		}
 		const parsed = {
 			parentName: node.parent.name,
@@ -212,6 +222,16 @@ export default class SContainer extends SNode {
 		const margin = this.margin;
 		const padding = this.padding;
 		let style = {};
+		if (padding.top) {
+			style.paddingTop = toPxx(padding.top);
+		}
+		if (padding.bottom) {
+			style.paddingBottom = toPxx(padding.bottom);
+		}
+		if (Math.abs(padding.bottom - padding.top) <= 1) {
+			style.alignItems = 'center';
+		}
+		/*
 		if (Math.abs(padding.bottom - padding.top) > 1) {
 			if (padding.top) {
 				style.paddingTop = toPxx(padding.top);
@@ -222,6 +242,7 @@ export default class SContainer extends SNode {
 		} else {
 			style.alignItems = 'center';
 		}
+		*/
 		if (margin.top) {
 			style.marginTop = toPx(margin.top);
 		}
