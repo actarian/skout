@@ -41,6 +41,10 @@ export default class SRow extends SNode {
 		return rows;
 	}
 
+	getUniqueClassName(parentCollectedNames) {
+		return this.fileName;
+	}
+
 	setRect(parentRect) {
 		this.parentRect = parentRect;
 		this.rect.left = 0;

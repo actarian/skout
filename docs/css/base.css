@@ -24,15 +24,21 @@ img {
 	height: auto;
 }
 
+p {
+	margin: 0;
+}
+
+/*
 .scomponent {
 	display: flex;
 }
+*/
 
 .stext {
 	display: inline-flex;
 }
 
-.stext>span {
+.stext>div {
 	width: 100%;
 }
 

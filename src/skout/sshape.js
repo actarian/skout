@@ -22,6 +22,10 @@ export default class SShape extends SLayer {
 		// this.classes.push('sshape');
 	}
 
+	/****************
+	RENDER
+	*****************/
+
 	attributes() {
 		const style = Object.assign(this.style, SStyle.parseStyle(this)); // this.getShapeStyle();
 		style.position = 'absolute';

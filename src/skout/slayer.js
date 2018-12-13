@@ -12,6 +12,7 @@ import SContainer from './scontainer';
 import SNode from './snode';
 import SOptions from './soptions';
 import SRect from './srect';
+import SStyle from './sstyle';
 import { SUtil } from './sutil';
 
 const ResizingConstraint = Object.freeze({
@@ -43,7 +44,6 @@ export default class SLayer extends SNode {
 		this.type = node.type;
 		this.rect = node.rect;
 		this.originalRect = node.originalRect;
-		this.rotation = sketchObject.rotation();
 		this.childOfSymbol = node.childOfSymbol;
 		this.collectedStyles = node.collectedStyles;
 		this.id = object.id;
@@ -87,15 +87,30 @@ export default class SLayer extends SNode {
 		this.absolutes = [];
 		this.shapes = [];
 		this.overrides = {};
+		this.rotation = sketchObject.rotation();
+		if (typeof sketchObject.hasBackgroundColor === 'function' && sketchObject.hasBackgroundColor()) {
+			this.backgroundColor = SStyle.cssColor(sketchObject.backgroundColor());
+		}
+		const objectStyle = sketchObject.style();
+		if (objectStyle.hasEnabledShadow()) {
+			const objectShadow = objectStyle.shadows().firstObject();
+			const shadowX = objectShadow.offsetX();
+			const shadowY = objectShadow.offsetY();
+			const shadowBlur = objectShadow.blurRadius();
+			const shadowSpread = objectShadow.spread();
+			const shadowColor = SStyle.cssColor(objectShadow.color());
+			const shadow = {
+				x: `${shadowX}px`,
+				y: `${shadowY}px`,
+				blur: `${shadowBlur}px`,
+				spread: `${shadowSpread}px`,
+				color: `${SStyle.getColor(shadowColor)}`,
+			};
+			this.shadow = shadow;
+			this.boxShadow = `${shadow.x} ${shadow.y} ${shadow.blur} ${shadow.spread} ${shadow.color}`;
+			this.textShadow = `${shadow.x} ${shadow.y} ${shadow.blur} ${shadow.color}`;
+		}
 	}
-
-	/*
-	const StyleShapes = ['MSRectangleShape', 'MSOvalShape'];
-
-	isShape() {
-		return StyleShapes.indexOf(this.type) !== -1;
-	}
-	*/
 
 	/****************
 	CONSTRAINT

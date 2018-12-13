@@ -71,6 +71,9 @@ export default class SContainer extends SNode {
 			rect.width = containerWidth;
 			rect.right = rect.left + rect.width;
 			relatives.forEach(x => x.rect.move(-rect.left, 0));
+			if (node.parent.name === 'section--signin') {
+				console.log(node.parent.name);
+			}
 		}
 		const rows = SRow.getRows(relatives, rect);
 		rows.forEach(row => {
@@ -107,7 +110,16 @@ export default class SContainer extends SNode {
 		const numCols = rows.reduce((p, row) => p + row.cols.length, 0);
 		const colSizes = rows.reduce((p, row) => p.concat(row.cols.map(col => col.size)), []);
 		const colTotal = colSizes.reduce((p, num) => p + num, 0);
-		const isGrid = isContainer && colTotal < layout.numberOfColumns; //  && (this.rows.length > 1 || (this.rows.find(r => r.cols.length > 1) !== undefined));
+		const isGrid = rows.reduce((p, row) => {
+			const totals = row.cols.reduce((p, col) => p + col.size + col.offset, 0);
+			if (node.parent.name === 'section--signin') {
+				console.log('totals', totals);
+			}
+			return p && (totals <= layout.numberOfColumns);
+		}, isContainer);
+		if (node.parent.name === 'section--signin') {
+			console.log('isGrid', isGrid, rows.length);
+		}
 		const isVertical = !isContainer && rows.length > 1;
 		const isHorizontal = !isContainer && rows.find(row => row.cols.length > 1) !== undefined;
 		if (isGrid) {
@@ -141,9 +153,6 @@ export default class SContainer extends SNode {
 			isHorizontal,
 			numRows: rows.length,
 			numCols: numCols,
-			colSizes: colSizes,
-			colTotal: colTotal,
-			// nodes: [].concat(shapes, node.relatives, node.absolutes),
 			nodes: nodes,
 			shapes: shapes,
 			relatives: node.relatives,
@@ -193,6 +202,10 @@ export default class SContainer extends SNode {
 			nodes = nodes.filter(a => childs.indexOf(a) === -1);
 		}
 		return nodes;
+	}
+
+	getUniqueClassName(parentCollectedNames) {
+		return this.fileName;
 	}
 
 	getStyle() {

@@ -6,7 +6,9 @@ skout! grid
 .container {
 	display: flex;
 	justify-content: center;
+	flex-wrap: wrap;
 	width: 100%;
+	min-height: 100%;
 	max-width: 1300px;
 	margin-right: auto;
 	margin-left: auto;

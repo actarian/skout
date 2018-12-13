@@ -192,6 +192,14 @@ export default class SPage extends SLayer {
 	RENDER
 	*****************/
 
+	getStyle() {
+		const style = SLayer.prototype.getStyle.call(this);
+		if (this.type === 'MSArtboardGroup') {
+
+		}
+		return style;
+	}
+
 	render() {
 		const node = SLayer.prototype.render.call(this);
 		// const nodes = this.renderNodes();
@@ -245,6 +253,19 @@ export default class SPage extends SLayer {
 				type: 'module',
 			}, [])));
 		}
+		/*
+		try {
+			fetch('https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyCVN8lXKd7uuVRYQWzHpH7Xh97laqkhCN0')
+				.then(response => response.json())
+				.then(value => {
+					const families = value.items.map(x => x.family);
+					console.log(families);
+				})
+				.catch(error => console.log(error));
+		} catch (e) {
+			console.log(e);
+		}
+		*/
 		return new VNode('html', null, [
             new VNode('head', null, headNodes),
             new VNode('body', null, [
@@ -252,7 +273,7 @@ export default class SPage extends SLayer {
                 // new VNode('div', this.attributes(), nodes),
                 new VText('##svg-sprite##')
             ])
-        ]);
+		]);
 	}
 
 	getHtml() {

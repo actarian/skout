@@ -26,6 +26,16 @@ export default class SText extends SLayer {
 		}
 	}
 
+	/****************
+	STYLE
+	*****************/
+
+	getInput() {
+		if (this.tagName === 'placeholder' || this.tagName === 'value') {
+			return this.parent.nodes.find(x => x.tagName === 'input');
+		}
+	}
+
 	collectSharedStyle(sharedStyle) {
 		if (SOptions.component.export) {
 			this.collectedStyles.push(sharedStyle);
@@ -36,12 +46,6 @@ export default class SText extends SLayer {
 			}
 		}
 		this.classes.push(sharedStyle.className);
-	}
-
-	getInput() {
-		if (this.tagName === 'placeholder' || this.tagName === 'value') {
-			return this.parent.nodes.find(x => x.tagName === 'input');
-		}
 	}
 
 	getStyle(...rest) {
@@ -100,9 +104,11 @@ export default class SText extends SLayer {
 
 	render() {
 		return new VNode('div', this.attributes(), this.isInputPlaceholder() ? [] : [
-            new VNode('span', null, [
-                new VText(this.innerText)
-            ])
+            new VNode('div', null, this.innerText.split('\n').map(x => {
+				return new VNode('p', null, [
+					new VText(x)
+				]);
+			}))
         ]);
 	}
 

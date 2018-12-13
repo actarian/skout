@@ -7,7 +7,8 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	margin-bottom: 25px;
+	margin-bottom: 20px;
+	text-shadow: 0px 2px 4px var(--color-1);
 	align-items: flex-start;
 }
 
@@ -27,7 +28,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.header>.group>.nva--item {
+.header>.group>.nav--primary>.nav__item {
 	position: relative;
 	width: 100%;
 	z-index: 0;
@@ -35,12 +36,28 @@ skout! components
 	align-items: flex-start;
 }
 
-.header>.group>.nva--item-2 {
+.header>.group>.nav--primary>.nav__item-2 {
 	position: relative;
 	width: 100%;
 	z-index: 1;
 	max-width: 31px;
 	align-items: flex-start;
+}
+
+.logo>.skout {
+	position: relative;
+	width: 100%;
+	z-index: 0;
+	max-width: 184px;
+	transform: rotateZ(-5deg);
+	text-shadow: 0px 8px 8px var(--color-3);
+	align-items: flex-start;
+	color: var(--color-4);
+	font-size: 80px;
+	font-family: var(--font-4);
+	letter-spacing: 0;
+	text-align: center;
+	line-height: 1;
 }
 
 .btn--md>.btn__label {
@@ -55,9 +72,9 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 1;
-	max-width: 425px;
+	max-width: 254px;
 	align-items: flex-start;
-	color: var(--color-1);
+	color: var(--color-4);
 	font-size: 17px;
 	font-family: var(--font-2);
 	letter-spacing: 0;
@@ -70,9 +87,38 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	max-width: 51px;
-	transform: rotateZ(-180deg);
+	max-width: 52px;
+	transform: rotateZ(180deg);
 	align-items: flex-start;
+}
+
+.section--signin>.container>.row>.col>.exact-h {
+	position: relative;
+	width: 100%;
+	z-index: 1;
+	min-height: 180px;
+	align-items: flex-start;
+	color: var(--color-6);
+	font-size: 15px;
+	font-family: var(--font-1);
+	letter-spacing: 0;
+	text-align: left;
+	line-height: 2.4;
+	text-transform: uppercase;
+}
+
+.section--signin>.container>.row>.col>.select-between-a-res {
+	position: relative;
+	width: 100%;
+	z-index: 2;
+	min-height: 180px;
+	align-items: flex-start;
+	color: var(--color-4);
+	font-size: 18px;
+	font-family: var(--font-1);
+	letter-spacing: 0;
+	text-align: left;
+	line-height: 2;
 }
 
 .form__head>.head__sup {
@@ -80,8 +126,7 @@ skout! components
 	width: 100%;
 	z-index: 1;
 	max-width: 412px;
-	margin-bottom: 3px;
-	align-items: flex-start;
+	align-items: center;
 }
 
 .form__head>.head__title {
@@ -89,7 +134,7 @@ skout! components
 	width: 100%;
 	z-index: 0;
 	max-width: 412px;
-	align-items: flex-start;
+	align-items: center;
 }
 
 .form__control>.group>.control__label {
@@ -155,7 +200,6 @@ skout! components
 	top: 0;
 	left: 0;
 	height: 332px;
-	max-width: 1440px;
 	background: linear-gradient(-180deg, #000000 0%, rgba(0, 0, 0, 0.00) 100%);
 	background-size: cover;
 	border-radius: 0;
@@ -166,9 +210,11 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 2;
-	min-height: 129px;
+	min-height: 180px;
 	display: block;
 	flex-direction: column;
+	padding-top: 4px;
+	padding-bottom: 4px;
 }
 
 .content--hero>.control--search {
@@ -184,7 +230,7 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 10px;
 	padding-right: 20px;
-	background: var(--color-1);
+	background: var(--color-4);
 	background-size: cover;
 	border-radius: 3px;
 }
@@ -256,9 +302,9 @@ skout! components
 	padding-bottom: 12px;
 	padding-left: 18px;
 	padding-right: 18px;
-	background: var(--color-3);
+	background: var(--color-6);
 	background-size: cover;
-	border-radius: 18px;
+	border-radius: 8px;
 }
 
 .header>.group {
@@ -266,40 +312,60 @@ skout! components
 	width: 100%;
 	z-index: 0;
 	max-width: 1280px;
-	height: 63px;
+	height: 144px;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
 }
 
-.header>.group>.icon-2 {
-	position: relative;
-	width: 100%;
-	z-index: 2;
-	max-width: 260px;
-	height: 63px;
-	padding-top: 0;
-}
-
-.icon-2>.group {
+.header>.group>.nav--primary {
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	height: 64px;
+	max-width: 188px;
+	height: 18px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
 }
 
-.header>.group>.btn--icon {
+.header>.group>.logo {
 	position: relative;
 	width: 100%;
-	z-index: 3;
+	z-index: 1;
+	max-width: 265px;
+	height: 144px;
+	padding-top: 33px;
+	padding-bottom: 31px;
+	padding-left: 41px;
+	padding-right: 40px;
+}
+
+.header>.group>.nav--secondary {
+	position: relative;
+	width: 100%;
+	z-index: 2;
+	max-width: 157px;
+	height: 36px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.header>.group>.nav--secondary>.btn--icon {
+	position: relative;
+	width: 100%;
+	z-index: 0;
 	max-width: 36px;
 	height: 36px;
 	padding-top: 6px;
 	padding-bottom: 6px;
 	padding-left: 6px;
 	padding-right: 6px;
-	background: var(--color-3);
+	background: var(--color-6);
 	background-size: cover;
 	border-radius: 50%;
 }
@@ -310,30 +376,31 @@ skout! components
 	z-index: 1;
 	max-width: 24px;
 	height: 24px;
-	padding-top: 3px;
-	padding-bottom: 3px;
+	padding-left: 2px;
+	padding-right: 1px;
 }
 
-.icon>.basket {
+.icon>.arrow-down {
 	position: relative;
 	width: 100%;
 	z-index: 0;
-	height: 18px;
+	max-width: 21px;
+	height: 24px;
 }
 
-.header>.group>.btn--md {
+.header>.group>.nav--secondary>.btn--md {
 	position: relative;
 	width: 100%;
-	z-index: 4;
+	z-index: 1;
 	max-width: 112px;
 	height: 36px;
 	padding-top: 11px;
 	padding-bottom: 12px;
 	padding-left: 18px;
 	padding-right: 18px;
-	background: var(--color-3);
+	background: var(--color-6);
 	background-size: cover;
-	border-radius: 18px;
+	border-radius: 8px;
 }
 
 .section--whatsapp>.container>.row>.col>.group {
@@ -345,6 +412,7 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	padding-left: 1px;
 }
 
 .section--whatsapp>.container>.row>.col>.group>.btn--icon-label {
@@ -357,9 +425,10 @@ skout! components
 	padding-bottom: 13px;
 	padding-left: 34px;
 	padding-right: 33px;
-	background: var(--color-3);
+	box-shadow: 0px 10px 20px 0px var(--color-2);
+	background: var(--color-6);
 	background-size: cover;
-	border-radius: 25px;
+	border-radius: 8px;
 }
 
 .btn--icon-label>.label-icon {
@@ -368,6 +437,7 @@ skout! components
 	z-index: 1;
 	max-width: 83px;
 	height: 24px;
+	padding-right: 0;
 }
 
 .label-icon>.group {
@@ -379,7 +449,8 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	transform: rotateZ(-180deg);
+	padding-left: 1px;
+	transform: rotateZ(180deg);
 }
 
 .label-icon>.group>.icon {
@@ -388,7 +459,7 @@ skout! components
 	z-index: 1;
 	max-width: 24px;
 	height: 24px;
-	transform: rotateZ(-180deg);
+	transform: rotateZ(180deg);
 }
 
 .icon>.whatsapp {
@@ -401,7 +472,7 @@ skout! components
 .section--signin>.container>.row>.col>.form--signin {
 	position: relative;
 	width: 100%;
-	z-index: 1;
+	z-index: 3;
 	min-height: 348px;
 	display: block;
 	flex-direction: column;
@@ -411,10 +482,12 @@ skout! components
 	position: relative;
 	width: 100%;
 	z-index: 3;
-	height: 45px;
+	height: 57px;
 	display: block;
 	flex-direction: column;
-	margin-bottom: 34px;
+	margin-bottom: 22px;
+	padding-top: 2px;
+	padding-left: 0;
 	padding-right: 0;
 }
 
@@ -426,6 +499,7 @@ skout! components
 	display: block;
 	flex-direction: column;
 	margin-bottom: 21px;
+	padding-top: 1px;
 }
 
 .form__control>.group {
@@ -437,7 +511,7 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 8px;
+	margin-bottom: 7px;
 	padding-left: 1px;
 }
 
@@ -450,9 +524,9 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 15px;
 	padding-right: 14px;
-	background: var(--color-1);
+	background: var(--color-4);
 	background-size: cover;
-	border: 2px solid var(--color-5);
+	border: 2px solid var(--color-6);
 	border-radius: 3px;
 }
 
@@ -464,6 +538,7 @@ skout! components
 	display: block;
 	flex-direction: column;
 	margin-bottom: 60px;
+	padding-top: 1px;
 }
 
 .form__control-2>.group {
@@ -475,7 +550,7 @@ skout! components
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 8px;
+	margin-bottom: 7px;
 	padding-left: 1px;
 }
 
@@ -488,9 +563,9 @@ skout! components
 	padding-bottom: 18px;
 	padding-left: 15px;
 	padding-right: 14px;
-	background: var(--color-1);
+	background: var(--color-4);
 	background-size: cover;
-	border: 2px solid var(--color-5);
+	border: 2px solid var(--color-6);
 	border-radius: 3px;
 }
 
@@ -500,11 +575,11 @@ skout! components
 	z-index: 0;
 	max-width: 150px;
 	height: 50px;
-	padding-top: 19px;
-	padding-bottom: 18px;
+	padding-top: 18px;
+	padding-bottom: 19px;
 	padding-left: 18px;
 	padding-right: 17px;
-	background: var(--color-3);
+	background: var(--color-6);
 	background-size: cover;
-	border-radius: 25px;
+	border-radius: 8px;
 }

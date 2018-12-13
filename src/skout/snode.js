@@ -75,19 +75,23 @@ export default class SNode {
 	}
 	*/
 
-	setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
+	getUniqueClassName(parentCollectedNames) {
 		const fileName = this.fileName;
-		let pathNames = [],
-			nameCount = 0;
+		let count = 0;
+		count = parentCollectedNames[fileName] || 0;
+		count++;
+		parentCollectedNames[fileName] = count;
+		return fileName + (count > 1 ? '-' + count : '');
+	}
+
+	setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
+		let pathNames = [];
 		if (parentType == 'MSSymbolInstance') {
 			pathNames = [parentClassName];
 		} else if (Array.isArray(parentPathNames)) {
 			pathNames = parentPathNames.slice();
 		}
-		nameCount = parentCollectedNames[fileName] || 0;
-		nameCount++;
-		parentCollectedNames[fileName] = nameCount;
-		let uniqueClassName = fileName + (nameCount > 1 ? '-' + nameCount : '');
+		const uniqueClassName = this.getUniqueClassName(parentCollectedNames);
 		/*
 		const placeholderInput = this.getPlaceholderInput();
 		if (placeholderInput) {
@@ -113,6 +117,10 @@ export default class SNode {
 	STYLE
 	*****************/
 
+	isShape() {
+		return StyleShapes.indexOf(this.type) !== -1;
+	}
+
 	getStyle() {
 		const rect = this.rect;
 		const parentRect = this.parentRect;
@@ -129,7 +137,9 @@ export default class SNode {
 				style.top = toPx(rect.top);
 				style.left = toPx(rect.left);
 				style.height = toPxx(rect.height);
-				style.maxWidth = toPxx(rect.width);
+				if (!this.isShape()) {
+					style.maxWidth = toPxx(rect.width);
+				}
 			} else if (this.parent.isGrid) {
 				style.minHeight = toPxx(rect.height);
 			} else if (this.parent.isContainer) {
@@ -232,8 +242,20 @@ export default class SNode {
 				style.height = this.constraint.height ? toPxx(rect.height) : (rect.height / parentRect.height * 100).toFixed(2) + '%';
 			}
 		}
-		if (this.sketchObject.rotation()) {
-			style.transform = `rotateZ(${this.sketchObject.rotation()}deg)`;
+		if (this.rotation) {
+			style.transform = `rotateZ(${-this.rotation}deg)`;
+		}
+		if (this.backgroundColor) {
+			style.backgroundColor = this.backgroundColor;
+		}
+		if (this.type === 'MSTextLayer') {
+			if (this.textShadow) {
+				style.textShadow = this.textShadow;
+			}
+		} else {
+			if (this.boxShadow) {
+				style.boxShadow = this.boxShadow;
+			}
 		}
 		return style;
 	}

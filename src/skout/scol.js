@@ -41,6 +41,10 @@ export default class SCol extends SNode {
 		return cols;
 	}
 
+	getUniqueClassName(parentCollectedNames) {
+		return this.fileName;
+	}
+
 	setRect(parentRect) {
 		this.parentRect = parentRect;
 		this.rect.top = 0;

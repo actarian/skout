@@ -11,6 +11,7 @@ skout! page
 	display: block;
 	flex-direction: column;
 	padding-bottom: 2px;
+	background-color: #111111;
 }
 
 .homepage>.section--hero {
@@ -24,7 +25,8 @@ skout! page
 }
 
 .section--hero>.container {
-	align-items: center;
+	padding-top: 270px;
+	padding-bottom: 158px;
 }
 
 .section--hero>.header {
@@ -33,10 +35,10 @@ skout! page
 	z-index: 3;
 	top: 0;
 	left: 0;
-	height: 110px;
+	height: 160px;
 	max-width: 1440px;
-	padding-top: 33px;
-	padding-bottom: 14px;
+	padding-top: 8px;
+	padding-bottom: 8px;
 	padding-left: 79px;
 	padding-right: 81px;
 }
@@ -46,7 +48,7 @@ skout! page
 	width: 100%;
 	z-index: 1;
 	height: 110px;
-	background: var(--color-4);
+	background: var(--color-6);
 	background-size: cover;
 	border-radius: 0;
 }
@@ -64,6 +66,6 @@ skout! page
 }
 
 .section--signin>.container {
-	padding-top: 98px;
-	padding-bottom: 274px;
+	padding-top: 80px;
+	padding-bottom: 44px;
 }

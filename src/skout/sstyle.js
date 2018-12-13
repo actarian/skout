@@ -511,8 +511,10 @@ skout! ${s}
 		const grid = SUtil.beautifyCss(`
         .container {
             display: flex;
-            justify-content: center;
-            width: 100%;
+			justify-content: center;
+			flex-wrap: wrap;
+			width: 100%;
+			min-height: 100%;
             max-width: ${layout.totalWidth + layout.gutterWidth}px;
             margin-right: auto;
             margin-left: auto;
