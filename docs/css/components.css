@@ -19,6 +19,54 @@ skout! components
 	align-items: center;
 }
 
+.command>.group>.select {
+	position: relative;
+	width: 100%;
+	z-index: 1;
+	max-width: 339px;
+	align-items: center;
+}
+
+.command>.group>.ctrl>.title {
+	position: relative;
+	width: 100%;
+	z-index: 1;
+	max-width: 86px;
+	align-items: center;
+}
+
+.command>.group>. {
+	position: relative;
+	width: 100%;
+	z-index: 3;
+	max-width: 13px;
+	align-items: flex-start;
+}
+
+.command>.group>.cmd>.title {
+	position: relative;
+	width: 100%;
+	z-index: 1;
+	max-width: 119px;
+	align-items: center;
+}
+
+.command>.group>.-2 {
+	position: relative;
+	width: 100%;
+	z-index: 5;
+	max-width: 13px;
+	align-items: flex-start;
+}
+
+.command>.group>.s>.title {
+	position: relative;
+	width: 100%;
+	z-index: 1;
+	max-width: 52px;
+	align-items: center;
+}
+
 .header>.group>.nav--primary>.nav__item {
 	position: relative;
 	width: 100%;
@@ -50,55 +98,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.section--whatsapp>.container>.select {
-	position: relative;
-	width: 100%;
-	z-index: 1;
-	max-width: 339px;
-	align-items: center;
-}
-
-.section--whatsapp>.container>.ctrl>.title {
-	position: relative;
-	width: 100%;
-	z-index: 1;
-	max-width: 86px;
-	align-items: center;
-}
-
-.section--whatsapp>.container>. {
-	position: relative;
-	width: 100%;
-	z-index: 3;
-	max-width: 13px;
-	align-items: flex-start;
-}
-
-.section--whatsapp>.container>.cmd>.title {
-	position: relative;
-	width: 100%;
-	z-index: 1;
-	max-width: 119px;
-	align-items: center;
-}
-
-.section--whatsapp>.container>.-2 {
-	position: relative;
-	width: 100%;
-	z-index: 5;
-	max-width: 13px;
-	align-items: flex-start;
-}
-
-.section--whatsapp>.container>.s>.title {
-	position: relative;
-	width: 100%;
-	z-index: 1;
-	max-width: 52px;
-	align-items: center;
-}
-
-.section--features>.container>.row>.col>.features {
+.section--features>.container>.row:nth-child(1)>.col>.features {
 	position: relative;
 	width: 100%;
 	z-index: 6;
@@ -187,7 +187,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.section--credits>.container>.row>.col>.share {
+.section--credits>.container>.row:nth-child(1)>.col>.share {
 	position: relative;
 	width: 100%;
 	z-index: 3;
@@ -196,7 +196,7 @@ skout! components
 	align-items: flex-start;
 }
 
-.section--credits>.container>.row>.col>.help-spread-the-love {
+.section--credits>.container>.row:nth-child(2)>.col>.help-spread-the-love {
 	position: relative;
 	width: 100%;
 	z-index: 2;
@@ -210,21 +210,100 @@ skout! components
 	z-index: 1;
 	top: 0;
 	left: 0;
-	height: 332px;
+	height: 481px;
 	background: linear-gradient(-180deg, #000000 0%, rgba(0, 0, 0, 0.00) 100%);
 	background-size: cover;
 	border-radius: 0;
 	display: inline-block;
 }
 
-.section--hero>.container>.row>.col>.content--hero {
+.section--hero>.container>.row:nth-child(1)>.col>.content--hero {
 	position: relative;
 	width: 100%;
 	z-index: 2;
 	min-height: 180px;
 	display: block;
 	flex-direction: column;
-	padding-bottom: 27px;
+	padding-top: 10px;
+	padding-bottom: 17px;
+}
+
+.section--hero>.container>.row:nth-child(2)>.col>.command {
+	position: relative;
+	width: 100%;
+	z-index: 3;
+	min-height: 160px;
+	align-items: center;
+}
+
+.command>.group {
+	position: relative;
+	width: 100%;
+	z-index: 0;
+	min-height: 160px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	padding-top: 55px;
+	padding-bottom: 55px;
+	padding-left: 51px;
+	padding-right: 48px;
+	background: var(--color-4);
+	background-size: cover;
+	border-radius: 20px;
+}
+
+.command>.group>.ctrl {
+	position: relative;
+	width: 100%;
+	z-index: 2;
+	max-width: 93px;
+	min-height: 50px;
+	padding-top: 3px;
+	padding-bottom: 4px;
+	align-items: center;
+	padding-left: 4px;
+	padding-right: 3px;
+	background: var(--color-5);
+	background-size: cover;
+	border: 3px solid var(--color-3);
+	border-radius: 8px;
+}
+
+.command>.group>.cmd {
+	position: relative;
+	width: 100%;
+	z-index: 4;
+	max-width: 125px;
+	min-height: 50px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	align-items: center;
+	padding-left: 3px;
+	padding-right: 3px;
+	background: var(--color-5);
+	background-size: cover;
+	border: 3px solid var(--color-3);
+	border-radius: 8px;
+}
+
+.command>.group>.s {
+	position: relative;
+	width: 100%;
+	z-index: 6;
+	max-width: 58px;
+	min-height: 50px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	align-items: center;
+	padding-left: 3px;
+	padding-right: 3px;
+	background: var(--color-5);
+	background-size: cover;
+	border: 3px solid var(--color-3);
+	border-radius: 8px;
 }
 
 .header>.group {
@@ -285,7 +364,7 @@ skout! components
 	align-items: center;
 	padding-left: 6px;
 	padding-right: 6px;
-	background: var(--color-4);
+	background: var(--color-5);
 	background-size: cover;
 	border-radius: 50%;
 }
@@ -320,63 +399,12 @@ skout! components
 	align-items: center;
 	padding-left: 18px;
 	padding-right: 18px;
-	background: var(--color-4);
+	background: var(--color-5);
 	background-size: cover;
 	border-radius: 8px;
 }
 
-.section--whatsapp>.container>.ctrl {
-	position: relative;
-	width: 100%;
-	z-index: 2;
-	max-width: 93px;
-	min-height: 50px;
-	padding-top: 3px;
-	padding-bottom: 4px;
-	align-items: center;
-	padding-left: 4px;
-	padding-right: 3px;
-	background: var(--color-4);
-	background-size: cover;
-	border: 3px solid var(--color-3);
-	border-radius: 8px;
-}
-
-.section--whatsapp>.container>.cmd {
-	position: relative;
-	width: 100%;
-	z-index: 4;
-	max-width: 125px;
-	min-height: 50px;
-	padding-top: 3px;
-	padding-bottom: 3px;
-	align-items: center;
-	padding-left: 3px;
-	padding-right: 3px;
-	background: var(--color-4);
-	background-size: cover;
-	border: 3px solid var(--color-3);
-	border-radius: 8px;
-}
-
-.section--whatsapp>.container>.s {
-	position: relative;
-	width: 100%;
-	z-index: 6;
-	max-width: 58px;
-	min-height: 50px;
-	padding-top: 3px;
-	padding-bottom: 3px;
-	align-items: center;
-	padding-left: 3px;
-	padding-right: 3px;
-	background: var(--color-4);
-	background-size: cover;
-	border: 3px solid var(--color-3);
-	border-radius: 8px;
-}
-
-.section--features>.container>.row>.col>.data__row {
+.section--features>.container>.row:nth-child(2)>.col>.data__row {
 	position: relative;
 	width: 100%;
 	z-index: 1;
@@ -398,13 +426,13 @@ skout! components
 	top: 49px;
 	left: 0;
 	height: 1px;
-	background: var(--color-5);
+	background: var(--color-4);
 	background-size: cover;
 	border-radius: 0;
 	display: inline-block;
 }
 
-.section--features>.container>.row>.col>.data__row {
+.section--features>.container>.row:nth-child(3)>.col>.data__row {
 	position: relative;
 	width: 100%;
 	z-index: 2;
@@ -426,13 +454,13 @@ skout! components
 	top: 49px;
 	left: 0;
 	height: 1px;
-	background: var(--color-5);
+	background: var(--color-4);
 	background-size: cover;
 	border-radius: 0;
 	display: inline-block;
 }
 
-.section--features>.container>.row>.col>.data__row {
+.section--features>.container>.row:nth-child(4)>.col>.data__row {
 	position: relative;
 	width: 100%;
 	z-index: 3;
@@ -454,13 +482,13 @@ skout! components
 	top: 49px;
 	left: 0;
 	height: 1px;
-	background: var(--color-5);
+	background: var(--color-4);
 	background-size: cover;
 	border-radius: 0;
 	display: inline-block;
 }
 
-.section--features>.container>.row>.col>.data__row {
+.section--features>.container>.row:nth-child(5)>.col>.data__row {
 	position: relative;
 	width: 100%;
 	z-index: 4;
@@ -482,13 +510,13 @@ skout! components
 	top: 49px;
 	left: 0;
 	height: 1px;
-	background: var(--color-5);
+	background: var(--color-4);
 	background-size: cover;
 	border-radius: 0;
 	display: inline-block;
 }
 
-.section--features>.container>.row>.col>.data__row {
+.section--features>.container>.row:nth-child(6)>.col>.data__row {
 	position: relative;
 	width: 100%;
 	z-index: 5;
@@ -510,7 +538,7 @@ skout! components
 	top: 49px;
 	left: 0;
 	height: 1px;
-	background: var(--color-5);
+	background: var(--color-4);
 	background-size: cover;
 	border-radius: 0;
 	display: inline-block;

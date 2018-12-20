@@ -43,6 +43,7 @@ export default class SContainer extends SNode {
 		this.overrides = {};
 		this.absolute = false;
 		this.relative = true;
+		this.isVertical = true;
 		Object.defineProperty(this, 'parent', {
 			value: node.parent,
 			writable: true
@@ -71,9 +72,6 @@ export default class SContainer extends SNode {
 			rect.width = containerWidth;
 			rect.right = rect.left + rect.width;
 			relatives.forEach(x => x.rect.move(-rect.left, 0));
-			if (node.parent.name === 'section--signin') {
-				console.log(node.parent.name);
-			}
 		}
 		const rows = SRow.getRows(relatives, rect);
 		rows.forEach(row => {
@@ -112,14 +110,8 @@ export default class SContainer extends SNode {
 		const colTotal = colSizes.reduce((p, num) => p + num, 0);
 		const isGrid = rows.reduce((p, row) => {
 			const totals = row.cols.reduce((p, col) => p + col.size + col.offset, 0);
-			if (node.parent.name === 'section--signin') {
-				console.log('totals', totals);
-			}
 			return p && (totals <= layout.numberOfColumns);
 		}, isContainer);
-		if (node.parent.name === 'section--signin') {
-			console.log('isGrid', isGrid, rows.length);
-		}
 		const isVertical = !isContainer && rows.length > 1;
 		const isHorizontal = !isContainer && rows.find(row => row.cols.length > 1) !== undefined;
 		if (isGrid) {
@@ -139,7 +131,6 @@ export default class SContainer extends SNode {
 			container.relatives = rows;
 			node.relatives = [container];
 			nodes = [].concat(shapes, absolutes, [container]).sort((a, b) => a.zIndex - b.zIndex);
-
 		} else {
 			relatives.forEach(x => {
 				x.rect = new SRect(x._rect);
@@ -152,7 +143,6 @@ export default class SContainer extends SNode {
 				container.relatives = relatives;
 				node.relatives = [container];
 				nodes = [].concat(shapes, absolutes, [container]).sort((a, b) => a.zIndex - b.zIndex);
-
 			}
 		}
 		const parsed = {
@@ -246,7 +236,7 @@ export default class SContainer extends SNode {
 		if (margin.top) {
 			style.marginTop = toPx(margin.top);
 		}
-		if (margin.top) {
+		if (margin.bottom) {
 			style.marginBottom = toPx(margin.bottom);
 		}
 		return style;

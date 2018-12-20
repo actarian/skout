@@ -84,6 +84,10 @@ export default class SNode {
 		return fileName + (count > 1 ? '-' + count : '');
 	}
 
+	getUniqueStyleName() {
+		return this.uniqueClassName;
+	}
+
 	setPathNames(parentClassName = '', parentPathNames = [], parentCollectedNames = {}, parentType = 'Root') {
 		let pathNames = [];
 		if (parentType == 'MSSymbolInstance') {
@@ -92,6 +96,7 @@ export default class SNode {
 			pathNames = parentPathNames.slice();
 		}
 		const uniqueClassName = this.getUniqueClassName(parentCollectedNames);
+		this.uniqueClassName = uniqueClassName;
 		/*
 		const placeholderInput = this.getPlaceholderInput();
 		if (placeholderInput) {
@@ -102,14 +107,14 @@ export default class SNode {
 		}
 		console.log('uniqueClassName', uniqueClassName);
 		*/
-		pathNames.push(uniqueClassName);
+		const uniqueStyleName = this.getUniqueStyleName();
+		pathNames.push(uniqueStyleName);
 		this.parentType = parentType;
-		this.uniqueClassName = uniqueClassName;
 		this.classes.push(uniqueClassName);
 		this.pathNames = pathNames;
 		this.collectedNames = [];
 		this.nodes.forEach((a, i) => {
-			a.setPathNames(uniqueClassName, this.pathNames, this.collectedNames, this.type);
+			a.setPathNames(uniqueStyleName, this.pathNames, this.collectedNames, this.type);
 		});
 	}
 
@@ -305,7 +310,7 @@ export default class SNode {
 			}).join(' > .') :
 			'.' + this.pathNames.join(' > .');
 		const styleObj = {
-			className: this.uniqueClassName,
+			className: this.getUniqueStyleName(),
 			selector: selector,
 			style: style,
 		};

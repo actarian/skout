@@ -112,7 +112,7 @@ export default class SCol extends SNode {
 		if (margin.top) {
 			style.marginTop = toPx(margin.top);
 		}
-		if (margin.top) {
+		if (margin.bottom) {
 			style.marginBottom = toPx(margin.bottom);
 		}
 		return style;

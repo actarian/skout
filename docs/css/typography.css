@@ -50,7 +50,7 @@ skout! typography
 }
 
 .data__label {
-	color: var(--color-4);
+	color: var(--color-5);
 	font-size: 16px;
 	font-family: var(--font-1);
 	letter-spacing: 0;

@@ -26,11 +26,13 @@ export default class SRow extends SNode {
 		nodes.forEach((b, i) => {
 			if (i === 0) {
 				row = new SRow(b);
+				row.i = rows.length;
 				rows.push(row);
 			} else {
 				const a = nodes[i - 1];
 				if (b.rect.top >= a.rect.bottom) {
 					row = new SRow(b);
+					row.i = rows.length;
 					rows.push(row);
 				} else {
 					row.nodes.push(b);
@@ -43,6 +45,10 @@ export default class SRow extends SNode {
 
 	getUniqueClassName(parentCollectedNames) {
 		return this.fileName;
+	}
+
+	getUniqueStyleName() {
+		return `${this.uniqueClassName}:nth-child(${this.i + 1})`;
 	}
 
 	setRect(parentRect) {
@@ -108,7 +114,7 @@ export default class SRow extends SNode {
 		if (margin.top) {
 			style.marginTop = toPx(margin.top);
 		}
-		if (margin.top) {
+		if (margin.bottom) {
 			style.marginBottom = toPx(margin.bottom);
 		}
 		return style;

@@ -609,10 +609,8 @@ skout! ${s}
 		const doc = context.document;
 		const styles = doc.documentData().layerTextStyles().objects();
 		// styles.forEach(x => console.log(x.name()));
-
 		let layers = NSArray.array();
 		let style, predicate;
-
 		const enumerator = styles.objectEnumerator();
 		while (style = enumerator.nextObject()) {
 			predicate = NSPredicate.predicateWithFormat('style.sharedObjectID == %@', style.objectID());
@@ -620,26 +618,21 @@ skout! ${s}
 		}
 		// console.log(artboard.sketchObject.children().length);
 		// console.log(layers.length);
-
 		/*
 		const styleName = 'H1';
 		const searchPredicate = NSPredicate.predicateWithFormat('name == %@', styleName);
 		const filteredStyles = styles.filteredArrayUsingPredicate(searchPredicate);
 		*/
-
 		/*
 		const filteredLayers = NSArray.array();
 		const loopStyles = filteredStyles.objectEnumerator(), style, predicate;
-
 		while (style = loopStyles.nextObject()) {
 		    predicate = NSPredicate.predicateWithFormat('style.sharedObjectID == %@', style.objectID())
 		    filteredLayers = filteredLayers.arrayByAddingObjectsFromArray(findLayersMatchingPredicate_inContainer_filterByType(context, predicate, container))
 		}
-
 		for (let i = 0; i < filteredLayers.length; i++) {
 		    filteredLayers[i].style = newStyle;
 		}
-
 		return filteredLayers;
 		*/
 	}
